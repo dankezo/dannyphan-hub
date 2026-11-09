@@ -92,6 +92,7 @@ header .hstat b{color:var(--acid);font-weight:400}
 @keyframes catWiggle{0%{transform:rotate(0)}25%{transform:rotate(-1.6deg) translateY(-3px)}55%{transform:rotate(1.2deg)}100%{transform:rotate(0)}}
 #rain{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;opacity:.38}
 #physGL{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+@media (min-width:901px){ .hero.gl3d .danny-wrap{visibility:hidden} }
 /* Portrait (mobile-native) layer stack - hidden on desktop */
 .key-p{display:none;width:100%;height:100%;object-fit:cover;object-position:50% 38%}
 .mpose,.mcpose{display:none;position:absolute;inset:0;opacity:0;transition:opacity 220ms ease;object-position:50% 38%}
@@ -1404,7 +1405,7 @@ function stackOf(sel){ return Array.prototype.slice.call(document.querySelectorA
 var poseEls = { type: stackOf('#poseType,[data-mpose="type"]'), think: stackOf('#poseThink,[data-mpose="think"]'), lean: stackOf('#poseLean,[data-mpose="lean"]') };
 var catEls = { sit: stackOf('#catSit,[data-mcpose="sit"]'), groom: stackOf('#catGroom,[data-mcpose="groom"]'), sleep: stackOf('#catSleep,[data-mcpose="sleep"]') };
 var dannyState = 'type', catState = 'sit', dannyBusy = false, lastAlt = 'lean';
-function setPose(name){ if (!poseEls[name]) return; dannyState = name; for (var k in poseEls) poseEls[k].forEach(function(el){ el.classList.toggle('on', k === name); }); heroEl2.classList.toggle('typing', name === 'type'); }
+function setPose(name){ if (!poseEls[name]) return; dannyState = name; for (var k in poseEls) poseEls[k].forEach(function(el){ el.classList.toggle('on', k === name); }); heroEl2.classList.toggle('typing', name === 'type'); window.__poseReq = name; if (window.__setPose3D) window.__setPose3D(name); }
 function setCatPose(name){ if (!catEls[name]) return; catState = name; for (var k in catEls) catEls[k].forEach(function(el){ el.classList.toggle('on', k === name); }); heroEl2.classList.toggle('cat-sleep', name === 'sleep'); }
 function directorTick(){
   if (motionOn && heroVisible && !document.hidden) {
@@ -1499,6 +1500,7 @@ if (AC && soundPref !== 'off') {
 window.addEventListener('resize', fxSize);
 })();
 </script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
 /* ---------- DECK PHYSICS: a real-time interactive 3D layer ----------
    Three.js scene over the painted deck: holographic shards with simple
@@ -1508,7 +1510,7 @@ window.addEventListener('resize', fxSize);
    drag a shard to throw it, click for a shockwave. If the CDN or WebGL
    is unavailable the painted scene simply carries on without it. */
 try {
-  const THREE = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js');
+  const THREE = await import('three');
   const hero = document.getElementById('hero'), art = document.getElementById('heroFrame'), cv = document.getElementById('physGL');
   const renderer = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
@@ -1536,14 +1538,16 @@ try {
     halfH = Math.tan(THREE.MathUtils.degToRad(20)) * 30;
     halfW = halfH * camera.aspect;
     lotus.position.set(halfW * (camera.aspect < 1 ? 0.33 : 0.29), halfH * 0.30, -3);
+    if (window.__placeDanny) window.__placeDanny();
   }
   fit();
 
   /* shards */
   const isMobile = matchMedia('(max-width: 900px)').matches;
+  if (isMobile) { lotus.visible = false; ring.visible = false; }
   const geos = [new THREE.IcosahedronGeometry(0.55, 0), new THREE.OctahedronGeometry(0.62), new THREE.TetrahedronGeometry(0.68), new THREE.TorusGeometry(0.5, 0.15, 8, 20), new THREE.BoxGeometry(0.72, 0.72, 0.72)];
   const bodies = [];
-  const NB = isMobile ? 14 : 24;
+  const NB = isMobile ? 6 : 10;
   for (let i = 0; i < NB; i++) {
     const g = geos[i % geos.length], col = [ACID, ACID, PAPER, CYAN][i % 4];
     const grp = new THREE.Group();
@@ -1564,11 +1568,56 @@ try {
   scene.add(new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: 0x8fd0ff, transparent: true, opacity: 0.22 })));
 
   /* rising motes */
-  const NM = 110, mPos = new Float32Array(NM * 3), mSeed = [];
+  const NM = 42, mPos = new Float32Array(NM * 3), mSeed = [];
   for (let i = 0; i < NM; i++) { mPos[i * 3] = (Math.random() * 2 - 1) * halfW; mPos[i * 3 + 1] = (Math.random() * 2 - 1) * halfH; mPos[i * 3 + 2] = -2 - Math.random() * 3; mSeed.push(Math.random() * 6.28); }
   const moteGeo = new THREE.BufferGeometry();
   moteGeo.setAttribute('position', new THREE.BufferAttribute(mPos, 3));
   scene.add(new THREE.Points(moteGeo, new THREE.PointsMaterial({ color: ACID, size: 0.13, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false })));
+
+  /* ---------- Danny himself: the real 3D operator ----------
+     Mixamo-rigged GLB in the same scene as the holograms. Desktop only;
+     mobile keeps its painted portrait band. If the GLB fails to load the
+     painted pose stack simply stays - nothing breaks. */
+  let danny = null, mixer = null, dActions = {}, dCur = null, parX = 0, parY = 0;
+  function playClip(name) {
+    const a = dActions[name];
+    if (!a || a === dCur) return;
+    a.enabled = true;
+    a.weight = 1;
+    a.reset();
+    if (name === 'LeanBack') { a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; }
+    else { a.setLoop(THREE.LoopRepeat, Infinity); }
+    a.fadeIn(0.35); a.play();
+    if (dCur) dCur.fadeOut(0.35);
+    dCur = a;
+  }
+  window.__setPose3D = function (name) {
+    playClip(name === 'think' ? 'Thinking' : name === 'lean' ? 'LeanBack' : 'Typing');
+  };
+  function placeDanny() {
+    if (!danny) return;
+    danny.scale.setScalar(halfH * 1.09);
+    danny.position.set(-0.66 * halfW + parX, -0.94 * halfH + parY, 0.5);
+    danny.rotation.y = 0.5;
+  }
+  window.__placeDanny = placeDanny;
+  if (!isMobile) {
+    scene.add(new THREE.HemisphereLight(0xdfeaff, 0x1a2016, 1.25));
+    const dKey = new THREE.DirectionalLight(0xfff2df, 1.5); dKey.position.set(6, 10, 12); scene.add(dKey);
+    const dRim = new THREE.DirectionalLight(0xa3e635, 0.8); dRim.position.set(-9, 4, -6); scene.add(dRim);
+    import('three/addons/loaders/GLTFLoader.js').then(({ GLTFLoader }) => {
+      new GLTFLoader().load('assets/danny-hero.glb', g => {
+        danny = g.scene;
+        danny.traverse(o => { if (o.isMesh && o.material && 'roughness' in o.material) { o.material.roughness = 0.92; o.material.metalness = 0.0; } });
+        scene.add(danny);
+        mixer = new THREE.AnimationMixer(danny);
+        g.animations.forEach(c => { const a = mixer.clipAction(c); a.stop(); a.weight = 0; a.enabled = false; dActions[c.name] = a; });
+        placeDanny();
+        playClip(window.__poseReq === 'think' ? 'Thinking' : window.__poseReq === 'lean' ? 'LeanBack' : 'Typing');
+        hero.classList.add('gl3d');
+      });
+    }).catch(() => {});
+  }
 
   /* pointer + physics */
   let px = 0, py = 0, pvx = 0, inside = false, grabbed = null, gdx = 0, gdy = 0, lastPX = null, lastPY = null;
@@ -1612,6 +1661,12 @@ try {
     const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
     if (!heroOn || document.hidden || window.__motionOn === false) return;
     if (!live) { live = true; window.__physLive = true; const rc = document.getElementById('rain'); if (rc) rc.style.display = 'none'; }
+    if (mixer) {
+      mixer.update(dt);
+      parX += ((inside ? px * 0.03 : 0) - parX) * Math.min(1, dt * 3);
+      parY += ((inside ? py * 0.015 : 0) - parY) * Math.min(1, dt * 3);
+      placeDanny();
+    }
     const damp = Math.exp(-1.7 * dt), floorY = -halfH + 1.0;
     for (const b of bodies) {
       b.vx += (b.hx - b.x) * 0.85 * dt + Math.sin(t * 0.7 + b.ph) * 0.10 * dt + pvx * 0.10 * dt;
