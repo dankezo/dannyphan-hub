@@ -94,6 +94,20 @@ header .hstat b{color:var(--acid);font-weight:400}
 #catHot{position:absolute;left:51%;top:69%;width:11%;height:25%;z-index:7;background:none;border:none;cursor:pointer;padding:0}
 .danny-layer{width:100%;height:100%;object-fit:cover;object-position:36% 46%;transition:filter 400ms;animation:breathe 9s ease-in-out infinite;transform-origin:26% 88%}
 @keyframes breathe{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.012) translateY(-4px)}}
+/* Pose stacks: the operator and the cat swap full poses (typing / thinking /
+   leaning back, sitting / grooming / sleeping) with a short crossfade. */
+.pose,.cpose{position:absolute;inset:0;opacity:0;transition:opacity 220ms ease}
+.pose.on,.cpose.on{opacity:1}
+.hero.typing .danny-layer{animation:typeBob .16s steps(2,end) infinite}
+@keyframes typeBob{0%{transform:translateY(0) rotate(0)}50%{transform:translateY(1.6px) rotate(.14deg)}100%{transform:translateY(.4px) rotate(-.08deg)}}
+.zzz{position:absolute;left:57%;top:55%;z-index:4;pointer-events:none;font-family:var(--mono);color:var(--acid);opacity:0;transition:opacity 600ms}
+.zzz i{position:absolute;font-style:normal;font-weight:700;text-shadow:0 0 12px rgba(163,230,53,.6);opacity:0}
+.zzz i:nth-child(1){font-size:13px}.zzz i:nth-child(2){font-size:18px}.zzz i:nth-child(3){font-size:25px}
+.hero.cat-sleep .zzz{opacity:1}
+.hero.cat-sleep .zzz i{animation:floatZ 2.6s ease-in infinite}
+.hero.cat-sleep .zzz i:nth-child(2){animation-delay:.85s}
+.hero.cat-sleep .zzz i:nth-child(3){animation-delay:1.7s}
+@keyframes floatZ{0%{transform:translate(0,0) rotate(-6deg);opacity:0}25%{opacity:.95}100%{transform:translate(26px,-64px) rotate(10deg);opacity:0}}
 .hero.react .danny-layer{animation:dannyNod 900ms var(--ease)}
 @keyframes dannyNod{0%{transform:rotate(0) translateY(0)}22%{transform:rotate(-1.3deg) translateY(7px) scale(1.006)}48%{transform:rotate(.7deg) translateY(-3px)}72%{transform:rotate(-.4deg) translateY(2px)}100%{transform:rotate(0) translateY(0)}}
 body.danny-hover .danny-layer{filter:brightness(1.08) saturate(1.07)}
@@ -171,19 +185,22 @@ h1.mega .acid{color:var(--acid);text-shadow:0 0 34px rgba(163,230,53,.35)}
 .scrollcue::after{content:"";width:1px;height:52px;background:linear-gradient(var(--acid),transparent);animation:cue 1.8s var(--ease) infinite}
 @keyframes cue{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 @media(max-width:900px){
-  .hero-art::after{background:linear-gradient(90deg,rgba(7,9,12,.82) 0%,rgba(7,9,12,.45) 55%,rgba(7,9,12,.05) 85%),linear-gradient(0deg,var(--bg) 4%,rgba(7,9,12,.74) 36%,rgba(7,9,12,0) 64%),linear-gradient(180deg,rgba(7,9,12,.55),rgba(7,9,12,0) 18%)}
-  .hero{min-height:124svh}
-  .hero-art img.key{object-position:31% 20%}
+  /* Mobile gets its own composition instead of a squeezed desktop frame:
+     the scene is a full-bleed band on top, the copy lives below it on solid
+     ground. Nobody is cropped into darkness, no text covers the operator. */
+  .hero{display:flex;flex-direction:column;min-height:0}
+  .hero-art{position:relative;inset:auto;width:100%;height:55svh;flex:none}
+  .hero-art::after{background:linear-gradient(0deg,var(--bg) 0%,rgba(7,9,12,0) 15%),linear-gradient(180deg,rgba(7,9,12,.5),rgba(7,9,12,0) 22%)}
+  .hero-art img.key,.danny-layer,.lotus-layer,.cat-layer{object-position:30% 42%}
   .hero .chip.c3{display:none}
   .scrollcue{display:none}
   .hero-grid{grid-template-columns:1fr}
-  .hero-copy{grid-column:auto}
-  .hero-inner{padding-top:33vh}
-  #dannyHot{left:0;bottom:auto;top:7%;width:64vw;height:32vh}
-  .danny-layer{object-position:31% 20%}
-  .lotus-layer,.cat-layer{object-position:31% 20%}
-  #catHot{left:38%;top:62%;width:17%;height:24%}
-  #dannySay{left:4%;top:auto;bottom:29%;width:min(258px,80vw)}
+  .hero-copy{grid-column:auto;text-shadow:none}
+  .hero-inner{padding-top:6px}
+  #dannyHot{left:0;bottom:auto;top:5svh;width:60vw;height:46svh}
+  #catHot{left:73%;top:31svh;width:27%;height:21svh}
+  #dannySay{left:4%;top:36svh;bottom:auto;width:min(252px,68vw)}
+  .zzz{left:80%;top:47%}
   #dannySay::after{left:26px;bottom:auto;top:-7px;transform:rotate(135deg)}
   .say-text{font-size:13.5px;min-height:46px}
   .hero-meta{flex-wrap:wrap}
@@ -408,10 +425,10 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
   <!-- HERO -->
   <section class="hero" id="hero">
     <div class="hero-art" id="heroFrame">
-      <img class="key" src="assets/hero-clean.jpg" alt="Danny Phan tại buồng chỉ huy nhìn xuống Neo-Hanoi, mèo đen ngồi cạnh bàn điều khiển" fetchpriority="high">
+      <img class="key" src="assets/hero-clean.jpg" alt="Danny Phan tại buồng chỉ huy nhìn xuống Neo-Hanoi, mèo đen ngồi cạnh bàn điều khiển" fetchpriority="high" onerror="this.onerror=null;this.src='assets/hero.jpg'">
       <div class="lotus-wrap" id="lotusWrap"><img class="lotus-layer" src="assets/lotus-cut.webp" alt="" aria-hidden="true"></div>
-      <div class="danny-wrap" id="dannyWrap"><img class="danny-layer" src="assets/danny-cut.webp" alt="" aria-hidden="true"></div>
-      <div class="cat-wrap" id="catWrap"><img class="cat-layer" src="assets/cat-cut.webp" alt="" aria-hidden="true"></div>
+      <div class="danny-wrap" id="dannyWrap"><img class="danny-layer pose on" id="poseType" src="assets/danny-cut.webp" alt="" aria-hidden="true"><img class="danny-layer pose" id="poseThink" src="assets/danny-think.webp" alt="" aria-hidden="true"><img class="danny-layer pose" id="poseLean" src="assets/danny-lean.webp" alt="" aria-hidden="true"></div>
+      <div class="cat-wrap" id="catWrap"><img class="cat-layer cpose on" id="catSit" src="assets/cat-cut.webp" alt="" aria-hidden="true"><img class="cat-layer cpose" id="catGroom" src="assets/cat-groom.webp" alt="" aria-hidden="true"><img class="cat-layer cpose" id="catSleep" src="assets/cat-sleep.webp" alt="" aria-hidden="true"><span class="zzz" aria-hidden="true"><i>Z</i><i>Z</i><i>Z</i></span></div>
       <div class="scan"><i></i></div>
     </div>
     <canvas id="gl" aria-hidden="true"></canvas>
@@ -957,7 +974,8 @@ function dannyReact(e){
   hero.classList.remove('react'); void hero.offsetWidth; hero.classList.add('react');
   setTimeout(function(){ hero.classList.remove('react'); }, 900);
   var dl = I18N[LANG].danny; typeSay(dl[(dannyClicks - 1) % dl.length]);
-  clearTimeout(sayTimer); sayTimer = setTimeout(function(){ dannySay.classList.remove('show'); }, 5200);
+  setPose('think'); dannyBusy = true;
+  clearTimeout(sayTimer); sayTimer = setTimeout(function(){ dannySay.classList.remove('show'); dannyBusy = false; setPose('type'); }, 5200);
   var c1 = $('.hero .chip.c1');
   if (c1) c1.innerHTML = 'DANNY - <b>ĐÃ BỊ CLICK x' + dannyClicks + '</b>';
   var catB = $('#catBtn');
@@ -1346,10 +1364,41 @@ if (rainCtx) { rainSize(); rainTick(); window.addEventListener('resize', rainSiz
 var catHot = $('#catHot');
 if (catHot) catHot.addEventListener('click', function(){
   var hero = $('#hero');
+  setCatPose('sit');
   hero.classList.remove('cat-wiggle'); void hero.offsetWidth; hero.classList.add('cat-wiggle');
   sfx('meow');
   setTimeout(openCat, 350);
 });
+
+/* ---------- the crew actually lives: pose directors ----------
+   Danny cycles typing (with a real keystroke bob) -> scratching his head ->
+   typing -> leaning back, hands behind head. Neo cycles sitting -> licking
+   her paw -> sitting -> curled up asleep with floating Z's. Directors only
+   run while the hero is on screen, motion is on and the tab is visible. */
+var heroEl2 = $('#hero');
+var poseEls = { type: $('#poseType'), think: $('#poseThink'), lean: $('#poseLean') };
+var catEls = { sit: $('#catSit'), groom: $('#catGroom'), sleep: $('#catSleep') };
+var dannyState = 'type', catState = 'sit', dannyBusy = false, lastAlt = 'lean';
+function setPose(name){ if (!poseEls[name]) return; dannyState = name; for (var k in poseEls) poseEls[k].classList.toggle('on', k === name); heroEl2.classList.toggle('typing', name === 'type'); }
+function setCatPose(name){ if (!catEls[name]) return; catState = name; for (var k in catEls) catEls[k].classList.toggle('on', k === name); heroEl2.classList.toggle('cat-sleep', name === 'sleep'); }
+function directorTick(){
+  if (motionOn && heroVisible && !document.hidden) {
+    if (!dannyBusy) {
+      if (dannyState === 'type') { lastAlt = (lastAlt === 'think') ? 'lean' : 'think'; setPose(lastAlt); }
+      else setPose('type');
+    }
+    if (catState === 'sit') setCatPose(Math.random() < .5 ? 'groom' : 'sleep');
+    else setCatPose('sit');
+  }
+  var hold = dannyState === 'type' ? 6200 + Math.random() * 2200 : (dannyState === 'think' ? 3400 : 4600);
+  if (catState === 'groom') hold = Math.min(hold, 4600);
+  if (catState === 'sleep') hold = Math.max(hold, 7000);
+  setTimeout(directorTick, hold);
+}
+setPose('type'); setCatPose('sit');
+setTimeout(directorTick, 5000);
+['assets/danny-think.webp','assets/danny-lean.webp','assets/cat-groom.webp','assets/cat-sleep.webp'].forEach(function(s){ var im = new Image(); im.src = s; });
+if (window.DECK) { window.DECK.act = function(name){ if (poseEls[name]) { setPose(name); return 'danny:' + name; } if (catEls[name]) { setCatPose(name); return 'cat:' + name; } return 'unknown'; }; window.DECK.pose = function(){ return dannyState + '/' + catState; }; }
 
 /* ---------- methods carousel: auto-scrolls, rests under your cursor ---------- */
 (function(){
