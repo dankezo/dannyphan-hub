@@ -1,104 +1,1341 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Danny Phan - Security, Automation, Web Tooling</title>
-<meta name="description" content="Danny Phan is a security operations and automation engineer in Hanoi, Vietnam. Builder of antiRea, an open-source library that meters dataset access per identity and flags coordinated bot abuse.">
-<link rel="canonical" href="https://dannyphan.me/">
-<meta name="theme-color" content="#101418">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="Danny Phan">
-<meta property="og:title" content="Danny Phan - Security, Automation, Web Tooling">
-<meta property="og:description" content="Security operations and automation engineer in Hanoi. Builder of antiRea, BaoAnSearch, Catopedia and the News Translator pipeline.">
-<meta property="og:url" content="https://dannyphan.me/">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Danny Phan">
-<meta name="twitter:description" content="Security operations and automation engineer in Hanoi, Vietnam.">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Danny Phan - Neo-Hanoi Command Deck</title>
+<meta name="description" content="Buồng chỉ huy cá nhân của Danny Phan tại Hà Nội: antiRea, bảo mật, tự động hóa, dữ liệu và web. Các module đang trực tuyến.">
+<link rel="icon" href="assets/cat.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/styles.css">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"Person","name":"Danny Phan","url":"https://dannyphan.me/","jobTitle":"Security Operations and Automation Engineer","address":{"@type":"PostalAddress","addressLocality":"Hanoi","addressCountry":"VN"},"sameAs":["https://github.com/dankezo","https://www.linkedin.com/in/dannyphan1909"]}
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090C; --ink:#101418; --ink2:#0C0F13; --paper:#F5F1E6; --acid:#A3E635;
+  --acid-dim:rgba(163,230,53,.55); --line:rgba(245,241,230,.14); --line2:rgba(245,241,230,.08);
+  --mut:rgba(245,241,230,.62); --ease:cubic-bezier(.22,1,.36,1);
+  --mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+html.no-motion{scroll-behavior:auto}
+body{background:var(--bg);color:var(--paper);font-family:'Be Vietnam Pro',system-ui,sans-serif;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+::selection{background:var(--acid);color:#0B0E11}
+a{color:inherit}
+img{display:block;max-width:100%}
+.mono{font-family:var(--mono);letter-spacing:.08em}
+
+/* ---------- grain + scanlines ---------- */
+.grain{position:fixed;inset:-40px;z-index:70;pointer-events:none;opacity:.05;background-repeat:repeat;animation:grain 900ms steps(4) infinite}
+@keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-14px,9px)}50%{transform:translate(11px,-13px)}75%{transform:translate(-7px,-6px)}100%{transform:translate(0,0)}}
+
+/* ---------- boot loader ---------- */
+#boot{position:fixed;inset:0;z-index:200;background:#05070A;display:flex;align-items:center;justify-content:center;clip-path:inset(0 0 0 0);transition:clip-path 700ms var(--ease)}
+#boot.done{clip-path:inset(0 0 100% 0)}
+#boot .box{width:min(520px,86vw)}
+#boot .blogo{font-weight:900;font-size:clamp(28px,6vw,44px);letter-spacing:-.01em;line-height:1}
+#boot .blogo em{font-style:normal;color:var(--acid)}
+#boot .blines{margin-top:18px;font-family:var(--mono);font-size:11px;line-height:1.9;color:var(--mut);min-height:96px;white-space:pre-line}
+#boot .bbar{margin-top:14px;height:3px;background:rgba(245,241,230,.12);position:relative;overflow:hidden}
+#boot .bbar i{position:absolute;inset:0;background:var(--acid);transform-origin:left;transform:scaleX(0)}
+#boot .bpct{margin-top:10px;font-family:var(--mono);font-size:11px;color:var(--acid);display:flex;justify-content:space-between}
+.no-js #boot{display:none}
+
+/* ---------- custom cursor ---------- */
+#cur,#curR{position:fixed;top:0;left:0;z-index:120;pointer-events:none;border-radius:50%;display:none}
+@media(pointer:fine){#cur,#curR{display:block}}
+#cur,#curR{opacity:0;transition:opacity 350ms}
+body.cur-on #cur,body.cur-on #curR{opacity:1}
+#cur{width:6px;height:6px;background:var(--acid);transform:translate(-50%,-50%)}
+#curR{width:34px;height:34px;border:1px solid var(--acid-dim);transform:translate(-50%,-50%);transition:width 250ms var(--ease),height 250ms var(--ease),background 250ms}
+#curR.big{width:64px;height:64px;background:rgba(163,230,53,.08)}
+#curR .clab{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:8px;letter-spacing:.14em;color:var(--acid);opacity:0;transition:opacity 200ms}
+#curR.big .clab{opacity:1}
+
+/* ---------- header ---------- */
+header{position:fixed;top:0;left:0;right:0;z-index:90;display:flex;align-items:center;justify-content:space-between;padding:16px clamp(16px,4vw,44px);mix-blend-mode:normal}
+header .brand{font-weight:900;font-size:17px;letter-spacing:.02em;text-decoration:none;display:flex;gap:10px;align-items:center}
+header .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--acid);box-shadow:0 0 12px var(--acid);animation:pulse 2.2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+header nav{display:flex;gap:26px}
+header nav a{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-decoration:none;color:var(--mut);transition:color 200ms}
+header nav a:hover{color:var(--acid)}
+header .hstat{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--mut)}
+header .hstat b{color:var(--acid);font-weight:400}
+#langBtn{cursor:pointer;background:none;border:1px solid var(--line);color:var(--paper);font-family:var(--mono);font-size:10px;letter-spacing:.14em;padding:8px 12px}
+#langBtn:hover{border-color:var(--acid);color:var(--acid)}
+@media(max-width:760px){header nav{display:none}header .hstat{display:none}header .brand .mono{display:none}}
+@media(max-width:640px){.chip.c2{display:none}#catTeaser{display:none}.kicker{font-size:10px;letter-spacing:.15em}.kicker::before{width:22px;flex:none}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;background:
+  radial-gradient(1100px 520px at 78% -10%,rgba(163,230,53,.13),transparent 60%),
+  radial-gradient(900px 600px at 8% 108%,rgba(38,64,110,.35),transparent 60%),var(--bg)}
+#gl{position:absolute;inset:0;width:100%;height:100%;opacity:.85}
+.sky{position:absolute;inset:-4% -4% auto -4%;height:66%;overflow:hidden;opacity:.5;
+  -webkit-mask-image:linear-gradient(#000 55%,transparent 98%);mask-image:linear-gradient(#000 55%,transparent 98%)}
+.sky img{width:100%;height:100%;object-fit:cover;object-position:14% 30%}
+#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
+#gl{z-index:2;mix-blend-mode:screen;opacity:.45}
+.hero-art{position:absolute;inset:0;z-index:1;overflow:hidden;will-change:transform}
+.hero-art img.key{width:100%;height:100%;object-fit:cover;object-position:36% 46%}
+/* Danny is a REAL separated layer (cut from the original art), animated on his own:
+   breathing idle, deeper parallax than the background, and a nod when clicked. */
+.danny-wrap{position:absolute;inset:0;z-index:2;pointer-events:none;will-change:transform}
+.danny-layer{width:100%;height:100%;object-fit:cover;object-position:36% 46%;transition:filter 400ms;animation:breathe 9s ease-in-out infinite;transform-origin:26% 88%}
+@keyframes breathe{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.012) translateY(-4px)}}
+.hero.react .danny-layer{animation:dannyNod 900ms var(--ease)}
+@keyframes dannyNod{0%{transform:rotate(0) translateY(0)}22%{transform:rotate(-1.3deg) translateY(7px) scale(1.006)}48%{transform:rotate(.7deg) translateY(-3px)}72%{transform:rotate(-.4deg) translateY(2px)}100%{transform:rotate(0) translateY(0)}}
+body.danny-hover .danny-layer{filter:brightness(1.08) saturate(1.07)}
+.hero-art::after{content:"";position:absolute;inset:0;background:
+  linear-gradient(90deg,rgba(7,9,12,.26) 0%,rgba(7,9,12,.05) 40%,rgba(7,9,12,.52) 63%,rgba(7,9,12,.88) 100%),
+  linear-gradient(0deg,var(--bg) 1%,rgba(7,9,12,0) 26%),
+  linear-gradient(180deg,rgba(7,9,12,.55),rgba(7,9,12,0) 18%)}
+/* Danny himself is interactive: hotspot, speech bubble, pulse rings */
+#dannyHot{position:absolute;z-index:6;left:2.5%;bottom:11%;width:min(31vw,450px);height:min(70vh,610px);background:transparent;border:none;cursor:pointer;padding:0}
+#dannyHot:focus-visible{outline:2px solid var(--acid);outline-offset:-2px}
+#dannyFx{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}
+.danny-ring{position:absolute;border:2px solid var(--acid);border-radius:50%;pointer-events:none;transform:translate(-50%,-50%);animation:ringX 950ms var(--ease) forwards}
+@keyframes ringX{from{width:36px;height:36px;opacity:.95}to{width:330px;height:330px;opacity:0}}
+#dannySay{position:absolute;z-index:7;left:46.5%;top:14.5%;width:min(312px,72vw);background:rgba(9,12,10,.92);border:1px solid rgba(163,230,53,.5);color:var(--paper);box-shadow:0 18px 44px rgba(0,0,0,.55);backdrop-filter:blur(6px);opacity:0;transform:translateY(10px) scale(.96);transform-origin:bottom left;transition:opacity 300ms var(--ease),transform 300ms var(--ease);pointer-events:none}
+#dannySay::before{content:"";position:absolute;top:-1px;left:-1px;width:14px;height:14px;border-top:2px solid var(--acid);border-left:2px solid var(--acid)}
+#dannySay::after{content:"";position:absolute;left:-7px;bottom:20px;width:12px;height:12px;background:rgba(9,12,10,.92);border-left:1px solid rgba(163,230,53,.5);border-bottom:1px solid rgba(163,230,53,.5);transform:rotate(45deg)}
+#dannySay.show{opacity:1;transform:none}
+.say-head{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:9px;letter-spacing:.18em;color:var(--acid);padding:10px 12px 0}
+.say-head .dot{width:7px;height:7px;border-radius:50%;background:var(--acid);box-shadow:0 0 9px var(--acid);animation:pulse 1.4s infinite;flex:none}
+.say-head .eq{margin-left:auto;display:flex;gap:2px;align-items:flex-end;height:10px}
+.say-head .eq i{width:3px;background:var(--acid);animation:eqB 680ms ease-in-out infinite}
+.say-head .eq i:nth-child(2){animation-delay:120ms}.say-head .eq i:nth-child(3){animation-delay:240ms}
+@keyframes eqB{0%,100%{height:3px}50%{height:10px}}
+.say-text{font-size:15px;font-weight:600;line-height:1.55;padding:7px 12px 13px;min-height:52px}
+.say-text .caret{display:inline-block;width:8px;height:15px;background:var(--acid);vertical-align:-2px;margin-left:3px;animation:blink 530ms steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+body.overdrive #gl{opacity:.8}
+body.overdrive .hero-art .scan i{animation-duration:1.5s}
+#catBtn.excited{animation:catWig 600ms var(--ease)}
+@keyframes catWig{0%,100%{transform:rotate(0)}25%{transform:rotate(-8deg) scale(1.07)}60%{transform:rotate(7deg) scale(1.07)}}
+.hero-art .scan{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:2}
+.hero-art .scan i{position:absolute;left:0;right:0;height:130px;top:-140px;background:linear-gradient(rgba(163,230,53,0),rgba(163,230,53,.13),rgba(163,230,53,0));animation:scan 5.5s var(--ease) infinite}
+.hero .chip{z-index:6}
+.hero .chip.c1{top:92px;left:clamp(16px,4vw,44px)}
+.hero .chip.c2{top:92px;right:clamp(16px,4vw,44px);left:auto}
+.hero .chip.c3{right:6%;bottom:32%;left:auto;top:auto}
+.hero-inner{position:relative;z-index:5;width:min(1440px,100%);margin:0 auto;padding:clamp(120px,17vh,180px) clamp(16px,4vw,44px) 0}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,600px);align-items:end}
+.hero-copy{grid-column:2;text-shadow:0 2px 22px rgba(7,9,12,.55)}
+.hudframe{position:relative;border:1px solid var(--line);background:rgba(12,15,19,.4)}
+.hudframe::before,.hudframe::after{content:"";position:absolute;width:22px;height:22px;border:2px solid var(--acid);z-index:3}
+.hudframe::before{top:-2px;left:-2px;border-right:none;border-bottom:none}
+.hudframe::after{bottom:-2px;right:-2px;border-left:none;border-top:none}
+.hudframe .scan{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:2}
+.hudframe .scan i{position:absolute;left:0;right:0;height:110px;top:-120px;background:linear-gradient(rgba(163,230,53,0),rgba(163,230,53,.14),rgba(163,230,53,0));animation:scan 5.5s var(--ease) infinite}
+@keyframes scan{0%,55%{top:-120px}85%,100%{top:110%}}
+.hudframe img.key{width:100%;height:100%;object-fit:cover;aspect-ratio:16/10.4}
+.chip{position:absolute;z-index:4;font-family:var(--mono);font-size:10px;letter-spacing:.12em;padding:7px 10px;background:rgba(7,9,12,.78);border:1px solid var(--line);backdrop-filter:blur(4px)}
+.chip b{color:var(--acid);font-weight:400}
+.chip.c1{top:14px;left:14px}.chip.c2{top:14px;right:14px}.chip.c3{bottom:14px;left:14px}
+.hero-copy{padding-bottom:8px}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--acid);display:flex;align-items:center;gap:12px}
+.kicker::before{content:"";width:34px;height:1px;background:var(--acid)}
+h1.mega{font-size:clamp(56px,8.6vw,132px);font-weight:900;line-height:.94;letter-spacing:-.015em;margin:16px 0 6px;text-transform:uppercase;transform:scale(1.055);transition:transform 1500ms var(--ease)}
+h1.mega.play{transform:scale(1)}
+h1.mega .ch{display:inline-block;transform:translateY(112%);clip-path:inset(0 0 0 0)}
+h1.mega .row{display:block;overflow:hidden;padding-bottom:.08em;margin-bottom:-.08em}
+h1.mega .acid{color:var(--acid);text-shadow:0 0 34px rgba(163,230,53,.35)}
+.glitching{animation:gl .38s steps(2) both}
+@keyframes gl{0%{transform:translate(3px,-2px) skewX(-6deg);opacity:.75}35%{transform:translate(-4px,1px)}70%{transform:translate(2px,2px) skewX(4deg)}100%{transform:none}}
+.hero-sub{font-size:clamp(15px,1.5vw,18px);line-height:1.65;color:var(--mut);max-width:46ch;margin-top:16px}
+.hero-sub b{color:var(--paper);font-weight:700}
+.cta-row{display:flex;gap:14px;margin-top:28px;flex-wrap:wrap}
+.btn{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-decoration:none;padding:15px 22px;border:1px solid var(--acid);color:#0B0E11;background:var(--acid);font-weight:700;transition:transform 250ms var(--ease),box-shadow 250ms;box-shadow:0 0 0 rgba(163,230,53,0)}
+.btn:hover{transform:translateY(-3px);box-shadow:0 12px 34px rgba(163,230,53,.28)}
+.btn.ghost{background:transparent;color:var(--paper);border-color:var(--line)}
+.btn.ghost:hover{border-color:var(--acid);color:var(--acid);box-shadow:none}
+.hero-meta{display:flex;gap:0;margin-top:clamp(28px,4vh,44px);border-top:1px solid var(--line2);position:relative;z-index:5}
+.hero-meta div{flex:1;padding:16px 18px 20px;border-right:1px solid var(--line2)}
+.hero-meta div:last-child{border-right:none}
+.hero-meta .n{font-size:clamp(22px,2.4vw,32px);font-weight:800}
+.hero-meta .n em{font-style:normal;color:var(--acid)}
+.hero-meta .l{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--mut);margin-top:5px}
+.scrollcue{position:absolute;right:clamp(16px,4vw,44px);bottom:110px;z-index:6;font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--mut);writing-mode:vertical-rl;display:flex;align-items:center;gap:10px}
+.scrollcue::after{content:"";width:1px;height:52px;background:linear-gradient(var(--acid),transparent);animation:cue 1.8s var(--ease) infinite}
+@keyframes cue{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+@media(max-width:900px){
+  .hero-art::after{background:linear-gradient(90deg,rgba(7,9,12,.82) 0%,rgba(7,9,12,.45) 55%,rgba(7,9,12,.05) 85%),linear-gradient(0deg,var(--bg) 4%,rgba(7,9,12,.74) 36%,rgba(7,9,12,0) 64%),linear-gradient(180deg,rgba(7,9,12,.55),rgba(7,9,12,0) 18%)}
+  .hero{min-height:124svh}
+  .hero-art img.key{object-position:31% 20%}
+  .hero .chip.c3{display:none}
+  .scrollcue{display:none}
+  .hero-grid{grid-template-columns:1fr}
+  .hero-copy{grid-column:auto}
+  .hero-inner{padding-top:33vh}
+  #dannyHot{left:0;bottom:auto;top:7%;width:64vw;height:32vh}
+  .danny-layer{object-position:31% 20%}
+  #dannySay{left:4%;top:auto;bottom:29%;width:min(258px,80vw)}
+  #dannySay::after{left:26px;bottom:auto;top:-7px;transform:rotate(135deg)}
+  .say-text{font-size:13.5px;min-height:46px}
+  .hero-meta{flex-wrap:wrap}
+  .hero-meta div{flex:1 1 42%;border-bottom:1px solid var(--line2)}
+}
+
+/* ---------- methods + field results ---------- */
+.meths{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.meths{grid-template-columns:1fr}}
+.meth{border:1px solid var(--line2);background:rgba(12,15,19,.55);padding:0 20px 20px;overflow:hidden}
+.mviz{height:118px;margin:0 -20px 16px;position:relative;overflow:hidden;background:radial-gradient(300px 130px at 50% 120%,rgba(163,230,53,.12),transparent 70%),#0A0D10;border-bottom:1px solid var(--line2)}
+.mviz .rings i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1px solid rgba(163,230,53,.35);border-radius:50%}
+.mviz .rings i:nth-child(1){width:36px;height:36px}.mviz .rings i:nth-child(2){width:72px;height:72px;opacity:.6}.mviz .rings i:nth-child(3){width:108px;height:108px;opacity:.35}
+.mviz .sweep{position:absolute;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;background:conic-gradient(from 0deg,rgba(163,230,53,.4),transparent 24%);border-radius:50%;animation:spin 5.5s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mviz .blip{position:absolute;left:63%;top:34%;width:7px;height:7px;border-radius:50%;background:var(--acid);box-shadow:0 0 12px var(--acid);animation:pulse 1.8s infinite}
+.mviz .chain{position:absolute;left:12%;right:12%;top:50%;height:2px;background:rgba(163,230,53,.25)}
+.mviz .chain i{position:absolute;top:50%;width:13px;height:13px;margin-top:-7px;border-radius:50%;border:2px solid var(--acid);background:#0A0D10;animation:pulse 2.2s infinite}
+.mviz .chain i:nth-child(1){left:0}.mviz .chain i:nth-child(2){left:33%;animation-delay:.4s}.mviz .chain i:nth-child(3){left:66%;animation-delay:.8s}.mviz .chain i:nth-child(4){left:calc(100% - 13px);animation-delay:1.2s;background:var(--acid)}
+.mviz .tg i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1px solid rgba(163,230,53,.55);border-radius:50%;animation:ringGrow 2.8s var(--ease) infinite}
+.mviz .tg i:nth-child(2){animation-delay:.9s}.mviz .tg i:nth-child(3){animation-delay:1.8s}
+@keyframes ringGrow{from{width:10px;height:10px;opacity:1}to{width:110px;height:110px;opacity:0}}
+.mviz .tg b{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px;border-radius:50%;background:var(--acid);box-shadow:0 0 12px var(--acid)}
+.meth .mname{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--acid)}
+.meth h3{font-size:21px;font-weight:800;margin:8px 0 8px}
+.meth p{color:var(--mut);line-height:1.65;font-size:14.5px}
+.board{margin-top:14px;border:1px solid var(--line2);background:rgba(12,15,19,.55)}
+.brow{display:grid;grid-template-columns:1.15fr 1.6fr 1fr .95fr;gap:14px;padding:14px 20px;border-top:1px solid var(--line2);font-size:14px;align-items:center}
+.brow.bhead{border-top:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--mut)}
+.brow .bst{color:var(--acid);font-size:13px}
+.bfoot{padding:12px 20px;border-top:1px solid var(--line2);font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--mut);line-height:1.8}
+@media(max-width:900px){.brow{grid-template-columns:1fr 1fr}.brow.bhead{display:none}}
+
+/* ---------- marquee ---------- */
+.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;background:var(--ink2);position:relative;z-index:6}
+.marquee .track{display:flex;width:max-content;animation:mq 26s linear infinite}
+.marquee:hover .track{animation-play-state:paused}
+.marquee span{font-weight:900;font-size:clamp(20px,3vw,34px);letter-spacing:.02em;padding:14px 0;white-space:nowrap;text-transform:uppercase}
+.marquee span i{font-style:normal;color:var(--acid);padding:0 18px}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+/* ---------- LIVE OPS dashboard ---------- */
+.ops{border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(163,230,53,.03),rgba(7,9,12,0) 40%),var(--ink2);position:relative;z-index:6}
+.ops-in{max-width:1440px;margin:0 auto;padding:26px clamp(16px,4vw,44px) 22px}
+.ops-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.ops-head .t{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--paper)}
+.ops-head .t b{color:var(--acid);font-weight:400}
+.ops-head .sim{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--mut);border:1px solid var(--line);padding:6px 9px}
+.ops-head .sim b{color:var(--acid);font-weight:400}
+.ops-grid{display:grid;grid-template-columns:1.25fr 1.35fr 1.25fr 1fr;gap:14px}
+@media(max-width:1080px){.ops-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.ops-grid{grid-template-columns:1fr}}
+.cell{border:1px solid var(--line2);background:rgba(7,9,12,.5);padding:16px 18px;min-height:118px}
+.cell .cl{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--mut);margin-bottom:10px}
+.cell .big{font-size:clamp(19px,1.7vw,24px);font-weight:800;line-height:1.2;display:flex;align-items:center;gap:10px}
+.cell .sub{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--mut);margin-top:8px;line-height:1.8}
+.cell .sub b{color:var(--paper);font-weight:400}
+.odot{width:11px;height:11px;border-radius:50%;background:var(--acid);box-shadow:0 0 14px var(--acid);animation:pulse 2s infinite;flex:none}
+.odot.off{background:#5b6672;box-shadow:none;animation:none}
+#ecgWrap{position:relative;height:56px;background:repeating-linear-gradient(0deg,rgba(245,241,230,.05) 0 1px,transparent 1px 14px),repeating-linear-gradient(90deg,rgba(245,241,230,.05) 0 1px,transparent 1px 14px)}
+#ecg{position:absolute;inset:0;width:100%;height:100%}
+.bpm{font-size:30px;font-weight:900;color:var(--acid)}
+#tokBars{display:flex;gap:4px;align-items:flex-end;height:34px;margin-top:10px}
+#tokBars i{flex:1;background:rgba(163,230,53,.28);min-height:3px}
+#tokBars i.now{background:var(--acid);animation:pulse 1.6s infinite}
+.crew{display:flex;flex-direction:column;gap:8px}
+.crew .row{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--mut)}
+.crew .row b{color:var(--paper);font-weight:400}
+.crew .d{width:7px;height:7px;border-radius:50%;background:var(--acid);box-shadow:0 0 8px var(--acid);flex:none}
+.crew .d.idle{background:#8a94a0;box-shadow:none}
+.crew .row .tag{margin-left:auto;color:var(--acid)}
+.crew .row .tag.idle{color:var(--mut)}
+
+.heat{margin-top:14px;border:1px solid var(--line2);background:rgba(7,9,12,.5);padding:14px 18px}
+.heat-head{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--mut)}
+.heat-head b{color:var(--acid);font-weight:400}
+.heat-grid{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,1fr);gap:3px;margin-top:12px}
+.heat-grid i{height:11px;background:rgba(163,230,53,.07)}
+.heat-grid i.l1{background:rgba(163,230,53,.28)}
+.heat-grid i.l2{background:rgba(163,230,53,.5)}
+.heat-grid i.l3{background:rgba(163,230,53,.78)}
+.heat-grid i.l4{background:var(--acid)}
+.heat-grid i.today{background:var(--acid);box-shadow:0 0 8px var(--acid);animation:pulse 1.6s infinite}
+
+/* ---------- sections ---------- */
+section.blk{position:relative;padding:clamp(70px,10vh,120px) clamp(16px,4vw,44px);max-width:1440px;margin:0 auto}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:clamp(30px,5vh,54px);flex-wrap:wrap}
+.sec-head h2{font-size:clamp(38px,5.4vw,74px);font-weight:900;line-height:.98;text-transform:uppercase;letter-spacing:-.01em;margin-top:14px}
+.sec-head h2 .acid{color:var(--acid)}
+.sec-head .idx{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--mut)}
+.sec-head .idx b{color:var(--acid);font-weight:400}
+.reveal{opacity:0;transform:translateY(30px) scale(.965);transition:opacity 900ms var(--ease),transform 900ms var(--ease)}
+.reveal.in{opacity:1;transform:none}
+
+/* modules */
+.mods{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:860px){.mods{grid-template-columns:1fr}}
+.mod{position:relative;border:1px solid var(--line);background:linear-gradient(160deg,rgba(245,241,230,.045),rgba(245,241,230,.012) 55%);padding:30px 30px 26px;overflow:hidden;transform-style:preserve-3d;will-change:transform;text-decoration:none;display:block}
+.mod::before{content:"";position:absolute;inset:0;background:radial-gradient(420px 240px at var(--mx,50%) var(--my,50%),rgba(163,230,53,.13),transparent 65%);opacity:0;transition:opacity 300ms;pointer-events:none}
+.mod:hover::before{opacity:1}
+.mod .shine{position:absolute;top:0;bottom:0;width:90px;left:-120px;background:linear-gradient(100deg,transparent,rgba(245,241,230,.13),transparent);transform:skewX(-18deg);transition:left 700ms var(--ease);pointer-events:none}
+.mod:hover .shine{left:115%}
+.mod .mid{font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:var(--acid);display:flex;justify-content:space-between}
+.mod .mid .st{color:var(--mut)}
+.mod h3{font-size:clamp(26px,3vw,38px);font-weight:900;margin:16px 0 10px;text-transform:uppercase}
+.mod p{color:var(--mut);line-height:1.65;font-size:15px;max-width:52ch}
+.mod .tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.mod .tags i{font-style:normal;font-family:var(--mono);font-size:10px;letter-spacing:.1em;border:1px solid var(--line);padding:6px 9px;color:var(--mut)}
+.mod .go{margin-top:22px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--paper)}
+.mod .go b{color:var(--acid);font-weight:400}
+.mod .bignum{position:absolute;right:14px;bottom:-16px;font-size:110px;font-weight:900;color:rgba(245,241,230,.05);line-height:1;pointer-events:none}
+
+/* panorama band */
+.band{position:relative;height:clamp(240px,42vh,420px);overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.band img{position:absolute;inset:-14% 0;width:100%;height:128%;object-fit:cover;object-position:center 62%}
+.band .cap{position:absolute;left:clamp(16px,4vw,44px);bottom:20px;z-index:2;font-family:var(--mono);font-size:10px;letter-spacing:.18em;background:rgba(7,9,12,.75);border:1px solid var(--line);padding:8px 11px}
+.band .cap b{color:var(--acid);font-weight:400}
+
+/* operator */
+.op{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(22px,4vw,56px);align-items:center}
+@media(max-width:860px){.op{grid-template-columns:1fr}}
+.op .frame{position:relative}
+.op .frame>img{width:100%;aspect-ratio:4/4.5;object-fit:cover;-webkit-mask-image:radial-gradient(118% 104% at 50% 42%,#000 58%,transparent 97%);mask-image:radial-gradient(118% 104% at 50% 42%,#000 58%,transparent 97%)}
+.op h2{font-size:clamp(34px,4.6vw,60px);font-weight:900;line-height:1.02;text-transform:uppercase}
+.op h2 .acid{color:var(--acid)}
+.op p{color:var(--mut);line-height:1.7;margin-top:18px;max-width:58ch;font-size:15.5px}
+.op p b{color:var(--paper)}
+.caps{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:26px}
+@media(max-width:520px){.caps{grid-template-columns:1fr}}
+.cap{border:1px solid var(--line2);padding:15px 16px;background:rgba(245,241,230,.02)}
+.cap .t{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--acid);margin-bottom:7px}
+.cap .d{font-size:13.5px;color:var(--mut);line-height:1.55}
+
+/* footer */
+footer{border-top:1px solid var(--line);padding:clamp(60px,9vh,100px) clamp(16px,4vw,44px) 34px;max-width:1440px;margin:0 auto;position:relative}
+footer .big{font-size:clamp(44px,7.4vw,104px);font-weight:900;line-height:.96;text-transform:uppercase}
+footer .big .acid{color:var(--acid)}
+.links{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:44px}
+@media(max-width:860px){.links{grid-template-columns:1fr 1fr}}
+.links a{border:1px solid var(--line);padding:18px;text-decoration:none;transition:border-color 250ms,transform 250ms var(--ease)}
+.links a:hover{border-color:var(--acid);transform:translateY(-3px)}
+.links .lt{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--mut)}
+.links .lv{font-size:16px;font-weight:700;margin-top:7px;word-break:break-all}
+.footrow{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:52px;padding-top:20px;border-top:1px solid var(--line2);font-family:var(--mono);font-size:10px;letter-spacing:.13em;color:var(--mut)}
+#motionBtn,#soundBtn{cursor:pointer;background:none;border:1px solid var(--line);color:var(--paper);font-family:var(--mono);font-size:10px;letter-spacing:.13em;padding:9px 13px}
+#motionBtn:hover,#soundBtn:hover{border-color:var(--acid);color:var(--acid)}
+#soundBtn.on{border-color:var(--acid);color:var(--acid)}
+
+/* ---------- cat widget ---------- */
+#catBtn{position:fixed;right:20px;bottom:20px;z-index:110;width:74px;height:74px;border-radius:50%;border:2px solid var(--acid);overflow:hidden;cursor:pointer;padding:0;background:#0d0f12;box-shadow:0 10px 34px rgba(0,0,0,.55),0 0 0 rgba(163,230,53,.0);transition:transform 300ms var(--ease),box-shadow 300ms;animation:catfloat 4.5s ease-in-out infinite}
+#catBtn:hover{transform:scale(1.07);box-shadow:0 14px 40px rgba(0,0,0,.6),0 0 26px rgba(163,230,53,.35)}
+#catBtn img{width:100%;height:100%;object-fit:cover}
+@keyframes catfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+#catTeaser{position:fixed;right:106px;bottom:44px;z-index:110;background:var(--paper);color:#101418;font-size:13px;font-weight:600;padding:10px 14px;max-width:230px;line-height:1.45;opacity:0;transform:translateX(8px);pointer-events:none;transition:opacity 400ms var(--ease),transform 400ms var(--ease)}
+#catTeaser.show{opacity:1;transform:none}
+#catTeaser::after{content:"";position:absolute;right:-7px;top:50%;border:7px solid transparent;border-left-color:var(--paper);border-right:none}
+#catPanel{position:fixed;right:20px;bottom:106px;z-index:111;width:min(372px,calc(100vw - 32px));height:min(520px,calc(100svh - 140px));background:#0B0E12;border:1px solid var(--line);display:flex;flex-direction:column;opacity:0;transform:translateY(16px) scale(.98);pointer-events:none;transition:opacity 350ms var(--ease),transform 350ms var(--ease);box-shadow:0 30px 80px rgba(0,0,0,.6)}
+#catPanel.open{opacity:1;transform:none;pointer-events:auto}
+#catPanel .chead{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line2)}
+#catPanel .chead img{width:42px;height:42px;border-radius:50%;object-fit:cover;border:1px solid var(--acid)}
+#catPanel .chead .nm{font-weight:800;font-size:15px}
+#catPanel .chead .st{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;color:var(--acid)}
+#catPanel .chead .cx{margin-left:auto;background:none;border:none;color:var(--mut);font-size:20px;cursor:pointer;line-height:1}
+#catMsgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin}
+.msg{max-width:86%;padding:10px 13px;font-size:13.5px;line-height:1.55;white-space:pre-line}
+.msg.neo{align-self:flex-start;background:rgba(245,241,230,.06);border:1px solid var(--line2);border-radius:2px 14px 14px 14px}
+.msg.me{align-self:flex-end;background:var(--acid);color:#0B0E11;font-weight:600;border-radius:14px 2px 14px 14px}
+.msg.typing{display:flex;gap:5px;align-items:center}
+.msg.typing i{width:6px;height:6px;border-radius:50%;background:var(--acid);animation:tp 1s infinite}
+.msg.typing i:nth-child(2){animation-delay:.15s}.msg.typing i:nth-child(3){animation-delay:.3s}
+@keyframes tp{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+#catChips{display:flex;gap:8px;padding:0 16px 10px;flex-wrap:wrap}
+#catChips button{cursor:pointer;background:rgba(163,230,53,.08);border:1px solid rgba(163,230,53,.35);color:var(--paper);font-size:11.5px;padding:7px 10px;border-radius:99px;font-family:inherit;transition:background 200ms}
+#catChips button:hover{background:rgba(163,230,53,.2)}
+#catForm{display:flex;border-top:1px solid var(--line2)}
+#catInput{flex:1;background:none;border:none;color:var(--paper);padding:14px 16px;font-size:13.5px;font-family:inherit;outline:none;min-width:0}
+#catForm button{background:var(--acid);border:none;color:#0B0E11;font-weight:800;padding:0 18px;cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:.1em}
+
+/* ---------- motion off / reduced ---------- */
+html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play-state:paused !important;transition-duration:.01ms !important}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
+  html{scroll-behavior:auto}
+  .reveal{opacity:1;transform:none}
+  h1.mega .ch{transform:none}
+}
+</style>
 </head>
 <body>
-<header class="topbar">
-  <a class="brand" href="/">DANNY&nbsp;PHAN</a>
-  <nav class="topnav">
-    <a href="#projects">Projects</a>
-    <a href="https://github.com/dankezo" rel="me">GitHub</a>
-    <a href="https://www.linkedin.com/in/dannyphan1909" rel="me">LinkedIn</a>
+
+<div class="grain" id="grainEl" aria-hidden="true"></div>
+
+<div id="boot" role="presentation">
+  <div class="box">
+    <div class="blogo">DANNY<em>PHAN</em><span style="color:var(--acid)">.</span></div>
+    <div class="blines" id="bootLines"></div>
+    <div class="bbar"><i id="bootBar"></i></div>
+    <div class="bpct"><span>NEO-HANOI COMMAND DECK</span><span id="bootPct">0%</span></div>
+  </div>
+</div>
+
+<div id="cur" aria-hidden="true"></div>
+<div id="curR" aria-hidden="true"><span class="clab" id="curLab">VIEW</span></div>
+
+<header>
+  <a class="brand" href="#top"><span class="dot"></span>DANNY PHAN <span class="mono" style="font-size:10px;color:var(--mut);letter-spacing:.16em">// DECK</span></a>
+  <nav>
+    <a href="#modules" data-cur="GO">MODULES</a>
+    <a href="#operator" data-cur="GO">OPERATOR</a>
+    <a href="#contact" data-cur="GO">CONTACT</a>
   </nav>
+  <div class="hstat" data-i18n="hstat">HANOI, VN - <b>SYSTEMS ONLINE</b></div>
+  <button id="langBtn" type="button" data-cur="LANG" aria-label="Switch language">EN</button>
 </header>
 
-<main>
-  <section class="hero">
-    <div class="hero-main">
-      <p class="kicker">HANOI, VIETNAM - SECURITY / AUTOMATION / WEB</p>
-      <h1>Danny Phan</h1>
-      <p class="lede">I work in security operations and build automation and web tooling on the side. My main open-source project is <a href="https://antirea.dannyphan.me">antiRea</a>, a server-side TypeScript library that meters dataset access per identity and flags coordinated bot abuse.</p>
+<main id="top">
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-art" id="heroFrame">
+      <img class="key" src="assets/hero.jpg" alt="Danny Phan tại buồng chỉ huy nhìn xuống Neo-Hanoi, mèo đen ngồi cạnh bàn điều khiển" fetchpriority="high">
+      <div class="danny-wrap" id="dannyWrap"><img class="danny-layer" src="assets/danny-cut.png" alt="" aria-hidden="true"></div>
+      <div class="scan"><i></i></div>
     </div>
-    <aside class="hero-facts">
-      <dl>
-        <div><dt>Day job</dt><dd>Security Operations</dd></div>
-        <div><dt>Focus</dt><dd>Anti-bot tooling, data automation</dd></div>
-        <div><dt>Stack</dt><dd>TypeScript, Python, Cloudflare, Turso</dd></div>
-        <div><dt>Elsewhere</dt><dd><a href="https://github.com/dankezo">github.com/dankezo</a></dd></div>
-      </dl>
-    </aside>
+    <canvas id="gl" aria-hidden="true"></canvas>
+    <canvas id="fx" aria-hidden="true"></canvas>
+    <div class="chip c1">CAM 01 - <b>DECK LIVE</b></div>
+    <div class="chip c2">LAT 21.0285 - LON 105.8542</div>
+    <div class="chip c3">CO-PILOT: <b>NEO THE CAT</b></div>
+    <button id="dannyHot" type="button" data-cur="TALK" aria-label="Tương tác với Danny, người điều hành deck"></button>
+    <div id="dannyFx" aria-hidden="true"></div>
+    <div id="dannySay" role="status"></div>
+    <div class="hero-inner">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <div class="kicker">UNBLOCK THE LIMIT // HANOI</div>
+          <h1 class="mega" id="megaTitle" aria-label="Danny Phan">
+            <span class="row" data-split>DANNY</span>
+            <span class="row acid" data-split>PHAN</span>
+          </h1>
+          <p class="hero-sub" data-i18n="heroSub">Kỹ sư bảo mật, đầu óc không chịu ngồi yên. Thấy hệ thống là muốn mở ra xem nó chạy thế nào, thấy giới hạn là muốn gỡ. Tự động hóa, dữ liệu, web, bảo mật, media - trong từ điển của tôi không có cụm <b>"không làm được"</b>.</p>
+          <div class="cta-row">
+            <a class="btn" href="#modules" data-cur="GO" data-i18n="ctaModules">XEM CÁC MODULE</a>
+            <a class="btn ghost" href="#" id="ctaCat" data-cur="CHAT" data-i18n="ctaCat">HỎI NEO - MÈO AI</a>
+          </div>
+        </div>
+      </div>
+      <div class="hero-meta">
+        <div><div class="n"><span data-count="812">0</span></div><div class="l">TEST CASES - ANTIREA SUITE</div></div>
+        <div><div class="n"><span data-count="8">0</span> <em data-i18n="wordKinds">loại</em></div><div class="l" data-i18n="meta2">SIGNAL KINDS ĐANG CHẠY</div></div>
+        <div><div class="n"><span data-count="150">0</span><em>/24h</em></div><div class="l" data-i18n="meta3">RECORD BUDGET MỖI DANH TÍNH</div></div>
+        <div><div class="n"><span data-count="4">0</span></div><div class="l" data-i18n="meta4">FLAGSHIP MODULES TRÊN DECK</div></div>
+      </div>
+    </div>
+    <div class="scrollcue" aria-hidden="true">SCROLL</div>
   </section>
 
-  <section class="projects" id="projects">
-    <div class="section-head">
-      <h2>Projects</h2>
-      <p class="section-note">Four things I built and still maintain.</p>
+  <!-- MARQUEE -->
+  <div class="marquee" aria-hidden="true">
+    <div class="track" id="mqTrack">
+      <span>Security <i>//</i> Automation <i>//</i> antiRea <i>//</i> Data <i>//</i> Web <i>//</i> Design <i>//</i> </span>
+      <span>Security <i>//</i> Automation <i>//</i> antiRea <i>//</i> Data <i>//</i> Web <i>//</i> Design <i>//</i> </span>
     </div>
+  </div>
 
-    <a class="row" href="https://antirea.dannyphan.me">
-      <span class="row-no">01</span>
-      <span class="row-body">
-        <span class="row-name">antiRea</span>
-        <span class="row-desc">Open-source library that meters dataset access per identity - record budgets, Web Bot Auth (RFC 9421), canary traps and cohort abuse detection for web apps and SaaS. Advisory only, zero dependencies.</span>
-      </span>
-      <span class="row-meta">v2.8.0 - MIT<br>antirea.dannyphan.me</span>
-    </a>
-
-    <div class="row row-static">
-      <span class="row-no">02</span>
-      <span class="row-body">
-        <span class="row-name">BaoAnSearch</span>
-        <span class="row-desc">Pharmaceutical product search and catalog tooling - thousands of products across dozens of manufacturers, normalized and searchable.</span>
-      </span>
-      <span class="row-meta">Internal tool<br>Data / Search</span>
+  <!-- LIVE OPS -->
+  <div class="ops" id="ops">
+    <div class="ops-in">
+      <div class="ops-head">
+        <div class="t">DECK OPS <b>//</b> LIVE FEED</div>
+        <div class="sim">DECK TIME - <b>HANOI GMT+7</b></div>
+      </div>
+      <div class="ops-grid">
+        <div class="cell">
+          <div class="cl">OPERATOR STATUS</div>
+          <div class="big"><span class="odot" id="opDot"></span><span id="opState">- - -</span></div>
+          <div class="sub">HANOI <b id="opClock">--:--:--</b> ICT<br><span id="opNext">- - -</span></div>
+        </div>
+        <div class="cell">
+          <div class="cl" data-i18n="opsBeat">HEARTBEAT - GIẢ LẬP NHỊP SINH HỌC</div>
+          <div id="ecgWrap"><canvas id="ecg" aria-hidden="true"></canvas></div>
+          <div class="sub"><span class="bpm" id="bpm">--</span> BPM - <span id="bpmState">- - -</span></div>
+        </div>
+        <div class="cell">
+          <div class="cl" data-i18n="opsTok">TOKEN BURN - HÔM NAY (AI CREW)</div>
+          <div class="big" style="font-size:clamp(24px,2.2vw,32px)"><span id="tokToday">0</span></div>
+          <div class="sub"><span data-i18n="tokRateL">TỐC ĐỘ</span> <b id="tokRate">- tok/phút</b> - <span data-i18n="tokPeakL">ĐỈNH HÔM NAY</span> <b id="tokPeak">-</b></div>
+          <div id="tokBars" aria-hidden="true"></div>
+        </div>
+        <div class="cell">
+          <div class="cl" data-i18n="opsCrew">AI CREW - GHẾ ĐANG TRỰC</div>
+          <div class="crew">
+            <div class="row"><span class="d"></span><b>REM</b> - LEAD BUILD<span class="tag" id="crewRem">ACTIVE</span></div>
+            <div class="row"><span class="d"></span><b>ARGON x4</b> - <span data-i18n="crewArgon">MEDIA / MODEL / RED TEAM</span><span class="tag" id="crewA1">QUEUED</span></div>
+            <div class="row"><span class="d"></span><b>SUPERAPI</b> - 10 ALIAS<span class="tag">ONLINE</span></div>
+            <div class="row"><span class="d"></span><b>NEO</b> - <span data-i18n="crewNeo">MÈO TRỰC DECK</span><span class="tag">PRR</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="heat">
+        <div class="heat-head"><span data-i18n="heatTitle">NHỊP SHIP HÀNG - 26 TUẦN GẦN NHẤT</span><span class="heat-stats"><b id="heatStreak">-</b> <span data-i18n="heatStreakL">TUẦN ĐANG CHÁY</span> · <b id="heatTotal">-</b> <span data-i18n="heatTotalL">NGÀY CÓ PUSH</span></span></div>
+        <div class="heat-grid" id="heatGrid" aria-hidden="true"></div>
+      </div>
     </div>
+  </div>
 
-    <a class="row" href="https://catopedia.space">
-      <span class="row-no">03</span>
-      <span class="row-body">
-        <span class="row-name">Catopedia</span>
-        <span class="row-desc">A free bilingual cat encyclopedia in Vietnamese and English, with breed guides and adoption listings.</span>
-      </span>
-      <span class="row-meta">Live<br>catopedia.space</span>
-    </a>
-
-    <div class="row row-static">
-      <span class="row-no">04</span>
-      <span class="row-body">
-        <span class="row-name">News Translator</span>
-        <span class="row-desc">End-to-end publishing pipeline - AI curates which stories are worth translating, translates them, and a Playwright bot posts each article. No manual copy-paste.</span>
-      </span>
-      <span class="row-meta">Pipeline<br>AI curation / Playwright</span>
+  <!-- MODULES -->
+  <section class="blk" id="modules">
+    <div class="sec-head reveal">
+      <div>
+        <div class="idx">SECTION <b>01</b> - LIVE SYSTEMS</div>
+        <h2>Modules<br><span class="acid">on deck</span></h2>
+      </div>
+      <div class="idx" style="max-width:300px;line-height:2" data-i18n="modsNote">BỐN HỆ THỐNG ĐANG CHẠY THẬT.<br>CÓ NGƯỜI DÙNG THẬT, SỐ LIỆU THẬT.<br>KHÔNG CÓ HÀNG TRƯNG BÀY.</div>
+    </div>
+    <div class="mods">
+      <a class="mod reveal" href="https://antirea.dannyphan.me" target="_blank" rel="noopener" data-cur="OPEN" data-tilt>
+        <div class="mid"><span>MOD-01 // SECURITY LIBRARY</span><span class="st">v2.8.0 - LIVE</span></div>
+        <h3>antiRea</h3>
+        <p data-i18n="mod1Desc">Thư viện TypeScript phía server chống cào dữ liệu: đo lượng theo từng danh tính, phát hiện bầy bot phối hợp, để lại bằng chứng điều tra được. Đã publish npm, JSR và MCP Registry - 812 test, 0 dependency, đang gác cổng cho cả deck này.</p>
+        <div class="tags"><i>TYPESCRIPT</i><i>ZERO-DEP</i><i>NPM + JSR</i><i>MCP</i></div>
+        <div class="go" data-i18n="goOpen">MỞ MODULE <b>-&gt;</b></div>
+        <div class="bignum">01</div><div class="shine"></div>
+      </a>
+      <a class="mod reveal" href="#contact" data-cur="ASK" data-tilt>
+        <div class="mid"><span>MOD-02 // SEARCH SYSTEM</span><span class="st">PRODUCTION</span></div>
+        <h3>BaoAnSearch</h3>
+        <p data-i18n="mod2Desc">Hệ tra cứu dữ liệu dược cho đội BaoAn Pharma: 9.237 dòng, 82 công ty, chuẩn hóa từ giấy và brochure thật thành dữ liệu tìm được trong vài giây theo công ty, sản phẩm, hoạt chất, hàm lượng.</p>
+        <div class="tags"><i>SEARCH</i><i>PHARMA DATA</i><i>TURSO</i></div>
+        <div class="go" data-i18n="goAsk">HỎI THÊM <b>-&gt;</b></div>
+        <div class="bignum">02</div><div class="shine"></div>
+      </a>
+      <a class="mod reveal" href="https://catopedia.space" target="_blank" rel="noopener" data-cur="OPEN" data-tilt>
+        <div class="mid"><span>MOD-03 // KNOWLEDGE WIKI</span><span class="st">LIVE</span></div>
+        <h3>Catopedia</h3>
+        <p data-i18n="mod3Desc">Wiki mèo song ngữ Việt - Anh: từ điển giống mèo, chăm sóc, nhận nuôi gần bạn. Next.js trên Cloudflare, toàn bộ hạ tầng chạy với chi phí bắt buộc 0 đồng - vẫn nhanh, vẫn miễn phí cho người đọc.</p>
+        <div class="tags"><i>NEXT.JS</i><i>SONG NGỮ VI/EN</i><i>CLOUDFLARE</i></div>
+        <div class="go" data-i18n="goOpen">MỞ MODULE <b>-&gt;</b></div>
+        <div class="bignum">03</div><div class="shine"></div>
+      </a>
+      <a class="mod reveal" href="#contact" data-cur="ASK" data-tilt>
+        <div class="mid"><span>MOD-04 // AI PIPELINE</span><span class="st">RUNNING</span></div>
+        <h3>News Translator</h3>
+        <p data-i18n="mod4Desc">Đường ống tin tự chạy: AI chọn bài đáng đọc, dịch, rồi Playwright tự đăng. Không biên tập viên, không người gác - một hệ thống xuất bản vận hành một mình từ đầu tới cuối.</p>
+        <div class="tags"><i>AI CURATION</i><i>PLAYWRIGHT</i><i>AUTO-PUBLISH</i></div>
+        <div class="go" data-i18n="goAsk">HỎI THÊM <b>-&gt;</b></div>
+        <div class="bignum">04</div><div class="shine"></div>
+      </a>
     </div>
   </section>
+
+
+  <!-- METHODS + FIELD RESULTS -->
+  <section class="blk" id="methods">
+    <div class="sec-head reveal">
+      <div>
+        <div class="idx">SECTION <b>02</b> - PROPRIETARY METHODS</div>
+        <h2 data-i18n="methTitle">Phương thức<br><span class="acid">tự cook</span></h2>
+      </div>
+      <div class="idx" style="max-width:300px;line-height:2" data-i18n="methNote">CHỈ NÓI SƠ BỘ.<br>QUY TRÌNH GIỮ KÍN.<br>KẾT QUẢ THÌ CÔNG KHAI.</div>
+    </div>
+    <div class="meths">
+      <div class="meth reveal">
+        <div class="mviz"><div class="rings"><i></i><i></i><i></i></div><div class="sweep"></div><div class="blip"></div></div>
+        <div class="mname">DEEP TRACE</div>
+        <h3 data-i18n="m1Name">Quét sâu theo dấu vết</h3>
+        <p data-i18n="m1Desc">Không quét bề mặt. Hệ thống nào cũng để lại dấu vết - version, cấu hình, thói quen vận hành. Tôi đi theo dấu vết đó, dựng lại bức tranh thật, rồi mới kết luận.</p>
+      </div>
+      <div class="meth reveal">
+        <div class="mviz"><div class="chain"><i></i><i></i><i></i><i></i></div></div>
+        <div class="mname">PROVE IT, END TO END</div>
+        <h3 data-i18n="m2Name">Chứng minh đầu - cuối</h3>
+        <p data-i18n="m2Desc">Không có chuyện "có vẻ là lỗ hổng". Một vấn đề chỉ được gọi tên khi đã khai thác được thật, từ đầu tới cuối, bằng chứng chụp thật. Còn lại, tất cả chỉ là gia cố.</p>
+      </div>
+      <div class="meth reveal">
+        <div class="mviz"><div class="tg"><i></i><i></i><i></i><b></b></div></div>
+        <div class="mname">ATTACKER'S EYE</div>
+        <h3 data-i18n="m3Name">Đọc bằng mắt kẻ tấn công</h3>
+        <p data-i18n="m3Desc">Nhìn một website như người muốn phá nó - rồi ra tay như người muốn cứu nó. Hai góc nhìn trong cùng một cái đầu. Đó là chỗ khác biệt.</p>
+      </div>
+    </div>
+    <div class="board reveal">
+      <div class="brow bhead"><span data-i18n="bSite">WEBSITE ĐÃ GIÚP</span><span data-i18n="bProb">VẤN ĐỀ</span><span data-i18n="bMeth">PHƯƠNG THỨC</span><span data-i18n="bStat">TRẠNG THÁI</span></div>
+      <div class="brow"><span data-i18n="r1Site">Khách sạn quốc tế - Hà Nội</span><span data-i18n="r1Prob">Chứng chỉ TLS hết hạn ngay mùa cao điểm</span><span>DEEP TRACE</span><span class="bst" data-i18n="r1Stat">Đã cảnh báo trước hạn</span></div>
+      <div class="brow"><span data-i18n="r2Site">Chuỗi nha khoa - TP.HCM</span><span data-i18n="r2Prob">CORS phản chiếu mọi origin, kèm credentials</span><span>PROVE IT, END TO END</span><span class="bst" data-i18n="r2Stat">Xác minh 2 vòng - báo riêng</span></div>
+      <div class="brow"><span data-i18n="r3Site">Website thương mại điện tử</span><span data-i18n="r3Prob">Vẫn bật TLS 1.0 / 1.1 lỗi thời</span><span>DEEP TRACE</span><span class="bst" data-i18n="r3Stat">Đã gửi khuyến nghị gia cố</span></div>
+      <div class="brow"><span data-i18n="r4Site">Khách sạn - Đà Nẵng</span><span data-i18n="r4Prob">Luồng đặt phòng cần rà soát bảo mật</span><span>ATTACKER'S EYE</span><span class="bst" data-i18n="r4Stat">Đã báo riêng, kèm bằng chứng</span></div>
+      <div class="bfoot" data-i18n="bFoot">Hiển thị 4 ca tiêu biểu. Tên khách hàng và hồ sơ đầy đủ giữ riêng - đó cũng là một phần của phương thức.</div>
+    </div>
+  </section>
+
+  <!-- PANORAMA BAND -->
+  <div class="band" aria-hidden="true">
+    <img id="bandImg" src="assets/panorama.jpg" alt="" loading="lazy">
+    <div class="cap">VIEWPORT - <b>NEO-HANOI, SECTOR WEST LAKE</b> - RENDER: LIVE</div>
+  </div>
+
+  <!-- OPERATOR -->
+  <section class="blk" id="operator">
+    <div class="sec-head reveal">
+      <div>
+        <div class="idx">SECTION <b>03</b> - THE OPERATOR</div>
+        <h2 data-i18n="opTitle">Người giữ<br><span class="acid">buồng lái</span></h2>
+      </div>
+    </div>
+    <div class="op">
+      <div class="frame reveal">
+        <img src="assets/operator.jpg" alt="Chân dung Danny Phan phong cách cartoon bán hiện thực, nền blueprint, mèo đen charm" loading="lazy">
+        <div class="chip c3">OPERATOR - <b>DANNY PHAN</b></div>
+      </div>
+      <div class="reveal">
+        <h2>Danny Phan <span class="acid">- Hanoi</span></h2>
+        <p data-i18n="opP1">Ban ngày tôi làm <b>bảo mật vận hành</b> trên hệ thống thật. Thời gian còn lại là để xây: thư viện chống cào dữ liệu, công cụ tra cứu dược, wiki song ngữ, pipeline tin tự động. Chuẩn không đổi: <b>làm kỹ, kiểm chứng bằng số, chưa ngon là chưa ship</b>.</p>
+        <p data-i18n="opP2">Deck này nhận việc một lần và bounty: tự động hóa, xử lý dữ liệu, web và bảo mật, media và thiết kế. Muốn biết tôi gỡ được tới đâu, cứ đưa bài toán. Hoặc hỏi Neo trước cũng được - nó trực deck 24/7.</p>
+        <div class="caps">
+          <div class="cap"><div class="t">01 // AUTOMATION</div><div class="d" data-i18n="cap1D">Python, API, crawler, tool và bot tự động hóa quy trình.</div></div>
+          <div class="cap"><div class="t">02 // DATA</div><div class="d" data-i18n="cap2D">Excel, SQL, PowerBI, làm sạch và phân tích dữ liệu lớn.</div></div>
+          <div class="cap"><div class="t">03 // WEB + SECURITY</div><div class="d" data-i18n="cap3D">Thiết kế web, IAM, Azure, Jenkins, audit bảo mật thực chiến.</div></div>
+          <div class="cap"><div class="t">04 // MEDIA + DESIGN</div><div class="d" data-i18n="cap4D">Edit video và ảnh, banner, logo, nhận diện thương hiệu, slide.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <footer id="contact">
+    <div class="idx mono" style="font-size:11px;letter-spacing:.2em;color:var(--mut)">SECTION <b style="color:var(--acid);font-weight:400">04</b> - OPEN CHANNEL</div>
+    <div class="big reveal" style="margin-top:30px" data-i18n="ctTitle">Mở kênh<br><span class="acid">liên lạc</span></div>
+    <div class="links reveal">
+      <a href="https://github.com/dankezo" target="_blank" rel="noopener" data-cur="OPEN"><div class="lt">GITHUB</div><div class="lv">github.com/dankezo</div></a>
+      <a href="https://www.linkedin.com/in/dannyphan1909" target="_blank" rel="noopener" data-cur="OPEN"><div class="lt">LINKEDIN</div><div class="lv">in/dannyphan1909</div></a>
+      <a href="https://www.facebook.com/phan.dung.587720/" target="_blank" rel="noopener" data-cur="OPEN"><div class="lt">FACEBOOK</div><div class="lv">Phan Dũng</div></a>
+      <a href="mailto:dannyphan190@gmail.com" data-cur="MAIL"><div class="lt">EMAIL</div><div class="lv">dannyphan190@gmail.com</div></a>
+    </div>
+    <div class="footrow">
+      <span>(C) 2026 DANNY PHAN - NEO-HANOI COMMAND DECK</span>
+      <span>HOSTED ON CLOUDFLARE PAGES - GUARDED BY <span style="color:var(--acid)">ANTIREA</span></span>
+      <span style="display:flex;gap:8px"><button id="soundBtn" type="button">SOUND: OFF</button><button id="motionBtn" type="button">MOTION: ON</button></span>
+    </div>
+  </footer>
 </main>
 
-<footer class="footer">
-  <p class="foot-left">&copy; <span id="year">2026</span> Danny Phan - Hanoi, Vietnam</p>
-  <p class="foot-right">Served by Cloudflare Pages - HTTPS enforced, no cookies, no trackers.</p>
-</footer>
-<script src="/app.js"></script>
+<!-- CAT -->
+<div id="catTeaser" role="presentation" data-i18n="catTeaser">Prr... tớ là Neo, mèo trực deck. Hỏi tớ về Danny và các module nhé!</div>
+<button id="catBtn" type="button" aria-label="Mở chat với Neo, mèo AI trợ lý"><img src="assets/cat.jpg" alt="Neo, mèo đen AI"></button>
+<div id="catPanel" role="dialog" aria-label="Chat với Neo">
+  <div class="chead">
+    <img src="assets/cat.jpg" alt="">
+    <div><div class="nm" data-i18n="catRole">Neo - Mèo trực deck</div><div class="st" id="catStatus">ONLINE - PRR PROTOCOL</div></div>
+    <button class="cx" id="catClose" type="button" aria-label="Đóng chat">x</button>
+  </div>
+  <div id="catMsgs" aria-live="polite"></div>
+  <div id="catChips">
+    <button type="button" data-i18n="catChip1">antiRea là gì?</button>
+    <button type="button" data-i18n="catChip2">Danny nhận việc gì?</button>
+    <button type="button" data-i18n="catChip3">Liên hệ Danny sao?</button>
+  </div>
+  <form id="catForm">
+    <input id="catInput" type="text" placeholder="Hỏi Neo gì đó..." autocomplete="off" maxlength="500" data-i18n-ph="catPlaceholder">
+    <button type="submit" data-i18n="catSend">GỬI</button>
+  </form>
+</div>
+
+<script>
+
+(function(){
+'use strict';
+var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var finePointer = window.matchMedia('(pointer: fine)').matches;
+var motionOn = !reduced;
+var $ = function(s, c){ return (c||document).querySelector(s); };
+var $$ = function(s, c){ return Array.prototype.slice.call((c||document).querySelectorAll(s)); };
+
+/* ---------- i18n: VI default, EN auto by viewer IP (Cloudflare trace) ---------- */
+var LANG = 'vi';
+try { LANG = localStorage.getItem('deck_lang') || 'vi'; } catch (e) {}
+var I18N = {
+vi: {
+  hstat: 'HÀ NỘI, VN - <b>ĐANG TRỰC TUYẾN</b>',
+  ctaModules: 'XEM CÁC MODULE', ctaCat: 'HỎI NEO - MÈO AI',
+  wordKinds: 'loại', meta2: 'SIGNAL KINDS ĐANG CHẠY', meta3: 'RECORD BUDGET MỖI DANH TÍNH', meta4: 'FLAGSHIP MODULES TRÊN DECK',
+  opsBeat: 'HEARTBEAT - GIẢ LẬP NHỊP SINH HỌC', opsTok: 'TOKEN BURN - HÔM NAY (AI CREW)', opsCrew: 'AI CREW - GHẾ ĐANG TRỰC',
+  tokRateL: 'TỐC ĐỘ', tokPeakL: 'ĐỈNH HÔM NAY', crewArgon: 'MEDIA / MODEL / RED TEAM', crewNeo: 'MÈO TRỰC DECK',
+  heatTitle: 'NHỊP SHIP HÀNG - 26 TUẦN GẦN NHẤT', heatStreakL: 'TUẦN ĐANG CHÁY', heatTotalL: 'NGÀY CÓ PUSH',
+  heroSub: 'Kỹ sư bảo mật, đầu óc không chịu ngồi yên. Thấy hệ thống là muốn mở ra xem nó chạy thế nào, thấy giới hạn là muốn gỡ. Tự động hóa, dữ liệu, web, bảo mật, media - trong từ điển của tôi không có cụm <b>"không làm được"</b>.',
+  modsNote: 'BỐN HỆ THỐNG ĐANG CHẠY THẬT.<br>CÓ NGƯỜI DÙNG THẬT, SỐ LIỆU THẬT.<br>KHÔNG CÓ HÀNG TRƯNG BÀY.',
+  mod1Desc: 'Thư viện TypeScript phía server chống cào dữ liệu: đo lượng theo từng danh tính, phát hiện bầy bot phối hợp, để lại bằng chứng điều tra được. Đã publish npm, JSR và MCP Registry - 812 test, 0 dependency, đang gác cổng cho cả deck này.',
+  mod2Desc: 'Hệ tra cứu dữ liệu dược cho đội BaoAn Pharma: 9.237 dòng, 82 công ty, chuẩn hóa từ giấy và brochure thật thành dữ liệu tìm được trong vài giây theo công ty, sản phẩm, hoạt chất, hàm lượng.',
+  mod3Desc: 'Wiki mèo song ngữ Việt - Anh: từ điển giống mèo, chăm sóc, nhận nuôi gần bạn. Next.js trên Cloudflare, toàn bộ hạ tầng chạy với chi phí bắt buộc 0 đồng - vẫn nhanh, vẫn miễn phí cho người đọc.',
+  mod4Desc: 'Đường ống tin tự chạy: AI chọn bài đáng đọc, dịch, rồi Playwright tự đăng. Không biên tập viên, không người gác - một hệ thống xuất bản vận hành một mình từ đầu tới cuối.',
+  goOpen: 'MỞ MODULE <b>-></b>', goAsk: 'HỎI THÊM <b>-></b>',
+  methTitle: 'Phương thức<br><span class="acid">tự cook</span>',
+  methNote: 'CHỈ NÓI SƠ BỘ.<br>QUY TRÌNH GIỮ KÍN.<br>KẾT QUẢ THÌ CÔNG KHAI.',
+  m1Name: 'Quét sâu theo dấu vết',
+  m1Desc: 'Không quét bề mặt. Hệ thống nào cũng để lại dấu vết - version, cấu hình, thói quen vận hành. Tôi đi theo dấu vết đó, dựng lại bức tranh thật, rồi mới kết luận.',
+  m2Name: 'Chứng minh đầu - cuối',
+  m2Desc: 'Không có chuyện "có vẻ là lỗ hổng". Một vấn đề chỉ được gọi tên khi đã khai thác được thật, từ đầu tới cuối, bằng chứng chụp thật. Còn lại, tất cả chỉ là gia cố.',
+  m3Name: 'Đọc bằng mắt kẻ tấn công',
+  m3Desc: 'Nhìn một website như người muốn phá nó - rồi ra tay như người muốn cứu nó. Hai góc nhìn trong cùng một cái đầu. Đó là chỗ khác biệt.',
+  bSite: 'WEBSITE ĐÃ GIÚP', bProb: 'VẤN ĐỀ', bMeth: 'PHƯƠNG THỨC', bStat: 'TRẠNG THÁI',
+  r1Site: 'Khách sạn quốc tế - Hà Nội', r1Prob: 'Chứng chỉ TLS hết hạn ngay mùa cao điểm', r1Stat: 'Đã cảnh báo trước hạn',
+  r2Site: 'Chuỗi nha khoa - TP.HCM', r2Prob: 'CORS phản chiếu mọi origin, kèm credentials', r2Stat: 'Xác minh 2 vòng - báo riêng',
+  r3Site: 'Website thương mại điện tử', r3Prob: 'Vẫn bật TLS 1.0 / 1.1 lỗi thời', r3Stat: 'Đã gửi khuyến nghị gia cố',
+  r4Site: 'Khách sạn - Đà Nẵng', r4Prob: 'Luồng đặt phòng cần rà soát bảo mật', r4Stat: 'Đã báo riêng, kèm bằng chứng',
+  bFoot: 'Hiển thị 4 ca tiêu biểu. Tên khách hàng và hồ sơ đầy đủ giữ riêng - đó cũng là một phần của phương thức.',
+  opTitle: 'Người giữ<br><span class="acid">buồng lái</span>',
+  opP1: 'Ban ngày tôi làm <b>bảo mật vận hành</b> trên hệ thống thật. Thời gian còn lại là để xây: thư viện chống cào dữ liệu, công cụ tra cứu dược, wiki song ngữ, pipeline tin tự động. Chuẩn không đổi: <b>làm kỹ, kiểm chứng bằng số, chưa ngon là chưa ship</b>.',
+  opP2: 'Deck này nhận việc một lần và bounty: tự động hóa, xử lý dữ liệu, web và bảo mật, media và thiết kế. Muốn biết tôi gỡ được tới đâu, cứ đưa bài toán. Hoặc hỏi Neo trước cũng được - nó trực deck 24/7.',
+  cap1D: 'Python, API, crawler, tool và bot tự động hóa quy trình.',
+  cap2D: 'Excel, SQL, PowerBI, làm sạch và phân tích dữ liệu lớn.',
+  cap3D: 'Thiết kế web, IAM, Azure, Jenkins, audit bảo mật thực chiến.',
+  cap4D: 'Edit video và ảnh, banner, logo, nhận diện thương hiệu, slide.',
+  ctTitle: 'Mở kênh<br><span class="acid">liên lạc</span>',
+  catTeaser: 'Prr... tớ là Neo, mèo trực deck. Hỏi tớ về Danny và các module nhé!',
+  catRole: 'Neo - Mèo trực deck', catChip1: 'antiRea là gì?', catChip2: 'Danny nhận việc gì?', catChip3: 'Liên hệ Danny sao?',
+  catPlaceholder: 'Hỏi Neo gì đó...', catSend: 'GỬI', sayHead: 'DANNY // ĐANG NÓI',
+  greet1: 'Prr, chào mừng lên deck. Tớ là Neo - hỏi tớ về Danny, antiRea hay bất kỳ module nào nhé.',
+  greetBack: 'Prr, cậu quay lại rồi. Mình nói tới đâu cứ tiếp tục nhé.',
+  kbDefault: 'Câu này ngoài vùng phủ sóng của tớ rồi, prr. Tớ rành nhất là chuyện về Danny, antiRea và các module trên deck - bạn thử hỏi tớ một câu trong vùng đó nhé, hoặc để lại lời nhắn ở mục liên hệ, Danny trả lời nhanh lắm.',
+  boot: ['> quét giới hạn . . . . . . không thấy cái nào', '> tò mò: MAX - sáng tạo: UNLOCKED', '> antiRea gác cổng: 150 bản ghi / ngày', '> Hà Nội đang mưa - deck vẫn chạy ngon'],
+  danny: [
+    'Giới hạn là để gỡ. Cậu đang kẹt ở đâu, nói đi.',
+    'Click nữa cũng được. Ở deck này, tò mò là điểm cộng.',
+    'Không hệ thống nào kín tuyệt đối. Chỉ có người chưa tìm đủ lâu thôi.',
+    'Tớ không chạy theo deadline. Tớ chạy theo chuẩn: chưa ngon là chưa xong.',
+    'antiRea đang gác cổng ngoài kia. Bot nào tham, nó ghi sổ hết.',
+    'Muốn biết tớ làm được tới đâu à? Đưa bài toán đây.'
+  ]
+},
+en: {
+  hstat: 'HANOI, VN - <b>SYSTEMS ONLINE</b>',
+  ctaModules: 'VIEW MODULES', ctaCat: 'ASK NEO - AI CAT',
+  wordKinds: 'kinds', meta2: 'SIGNAL KINDS RUNNING', meta3: 'RECORD BUDGET PER IDENTITY', meta4: 'FLAGSHIP MODULES ON DECK',
+  opsBeat: 'HEARTBEAT - SIMULATED VITALS', opsTok: 'TOKEN BURN - TODAY (AI CREW)', opsCrew: 'AI CREW - ON DUTY',
+  tokRateL: 'RATE', tokPeakL: 'PEAK TODAY', crewArgon: 'MEDIA / MODEL / RED TEAM', crewNeo: 'DECK CAT',
+  heatTitle: 'SHIPPING RHYTHM - LAST 26 WEEKS', heatStreakL: 'WEEK STREAK', heatTotalL: 'ACTIVE DAYS',
+  heroSub: 'Security engineer, restless mind. Show me a system and I want to open it up and see how it runs. Show me a limit and I want it gone. Automation, data, web, security, media - "can\'t be done" is not in my dictionary.',
+  modsNote: 'FOUR SYSTEMS, LIVE IN PRODUCTION.<br>REAL USERS, REAL NUMBERS.<br>NO SHOWROOM PIECES.',
+  mod1Desc: 'Server-side TypeScript library against data scraping: per-identity metering, coordinated bot-herd detection, investigation-grade evidence. Published on npm, JSR and the MCP Registry - 812 tests, zero dependencies, and it guards this very deck.',
+  mod2Desc: 'Pharma data search for the BaoAn Pharma team: 9,237 rows, 82 companies, standardized from real paper and brochures into answers in seconds - by company, product, active ingredient, dosage.',
+  mod3Desc: 'A bilingual Vietnamese - English cat wiki: breed encyclopedia, care guides, adoptions near you. Next.js on Cloudflare, the whole infrastructure runs at a mandatory cost of exactly zero - still fast, still free to read.',
+  mod4Desc: 'A news pipeline that runs itself: AI picks the stories worth reading, translates them, then Playwright publishes. No editor, no gatekeeper - a publishing system operating alone, end to end.',
+  goOpen: 'OPEN MODULE <b>-></b>', goAsk: 'ASK MORE <b>-></b>',
+  methTitle: 'Methods<br><span class="acid">home-cooked</span>',
+  methNote: 'HIGH LEVEL ONLY.<br>THE PROCESS STAYS PRIVATE.<br>THE RESULTS ARE PUBLIC.',
+  m1Name: 'Deep-trace scanning',
+  m1Desc: 'No surface scans. Every system leaves traces - versions, configs, operating habits. I follow the traces, rebuild the real picture, then draw conclusions.',
+  m2Name: 'Prove it, end to end',
+  m2Desc: 'There is no "looks like a vulnerability". An issue earns its name only when it has been exploited for real, end to end, with real screenshot evidence. Everything else is just hardening.',
+  m3Name: "Attacker's eye",
+  m3Desc: 'Look at a website the way someone who wants to break it would - then act like someone who wants to save it. Two viewpoints in one head. That is the difference.',
+  bSite: 'WEBSITES HELPED', bProb: 'THE PROBLEM', bMeth: 'METHOD', bStat: 'STATUS',
+  r1Site: 'International hotel - Hanoi', r1Prob: 'TLS certificate expiring right before peak season', r1Stat: 'Flagged before the deadline',
+  r2Site: 'Dental chain - Ho Chi Minh City', r2Prob: 'CORS reflecting every origin, with credentials', r2Stat: 'Verified twice - reported privately',
+  r3Site: 'E-commerce website', r3Prob: 'Still running outdated TLS 1.0 / 1.1', r3Stat: 'Hardening recommendation sent',
+  r4Site: 'Hotel - Da Nang', r4Prob: 'Booking flow needed a security review', r4Stat: 'Reported privately, with evidence',
+  bFoot: 'Four representative cases shown. Client names and full files stay private - that is part of the method too.',
+  opTitle: 'The one at<br><span class="acid">the controls</span>',
+  opP1: 'By day I run <b>security operations</b> on real systems. The rest of the time goes into building: an anti-scraping library, a pharma search tool, a bilingual wiki, an automated news pipeline. One standard, unchanged: <b>do it properly, verify with numbers - if it is not good yet, it does not ship</b>.',
+  opP2: 'This deck takes one-off work and bounties: automation, data, web and security, media and design. Want to know how far I can push it? Bring the problem. Or ask Neo first - it is on deck duty 24/7.',
+  cap1D: 'Python, APIs, crawlers, tools and bots that automate the process.',
+  cap2D: 'Excel, SQL, PowerBI - cleaning and analyzing data at scale.',
+  cap3D: 'Web design, IAM, Azure, Jenkins, hands-on security audits.',
+  cap4D: 'Video and photo editing, banners, logos, brand identity, slides.',
+  ctTitle: 'Open a<br><span class="acid">channel</span>',
+  catTeaser: 'Prr... I am Neo, the deck cat. Ask me about Danny and the modules!',
+  catRole: 'Neo - Deck cat', catChip1: 'What is antiRea?', catChip2: 'What work does Danny take?', catChip3: 'How do I contact Danny?',
+  catPlaceholder: 'Ask Neo something...', catSend: 'SEND', sayHead: 'DANNY // TALKING',
+  greet1: 'Prr, welcome to the deck. I am Neo - ask me about Danny, antiRea or any module here.',
+  greetBack: 'Prr, you are back. We pick up right where we left off.',
+  kbDefault: 'That one is outside my territory, prr. I know Danny, antiRea and the modules on this deck best - try me there, or leave a message in the contact section below. Danny replies fast.',
+  boot: ['> scanning for limits . . . . . . none found', '> curiosity: MAX - creativity: UNLOCKED', '> antiRea on gate duty: 150 records / day', '> Hanoi is raining - the deck runs fine'],
+  danny: [
+    'Limits are meant to be removed. Where are you stuck?',
+    'Keep clicking. Around here, curiosity scores points.',
+    'No system is perfectly sealed. Some people just stop looking too early.',
+    'I do not chase deadlines. I chase a standard: not good enough means not done.',
+    'antiRea is on gate duty out there. Greedy bots get logged. All of them.',
+    'Wondering how far I can go? Bring the problem.'
+  ]
+}
+};
+function T(k){ return I18N[LANG][k]; }
+function applyLang(l){
+  LANG = l;
+  try { localStorage.setItem('deck_lang', l); } catch (e) {}
+  document.documentElement.setAttribute('lang', l === 'vi' ? 'vi' : 'en');
+  $$('[data-i18n]').forEach(function(el){ var v = I18N[l][el.getAttribute('data-i18n')]; if (v != null) el.innerHTML = v; });
+  $$('[data-i18n-ph]').forEach(function(el){ var v = I18N[l][el.getAttribute('data-i18n-ph')]; if (v != null) el.setAttribute('placeholder', v); });
+  var lb = $('#langBtn'); if (lb) lb.textContent = l === 'vi' ? 'EN' : 'VI';
+  if (typeof opsTick === 'function') opsTick();
+}
+var KB_EN = [
+  [/antirea|anti-rea/i, 'antiRea is the gate system Danny cooked himself: a server-side TypeScript library that meters dataset access per identity and catches coordinated scraping herds. Published on npm, JSR and the MCP Registry - 812 tests, zero dependencies, and it stands guard over this deck too: 150 records per identity per day, greedy bots get a 429.'],
+  [/baoan|pharma|drug|medicine/i, 'BaoAnSearch is the pharma data search Danny built for the BaoAn Pharma team: 9,237 standardized rows across 82 companies, searchable in seconds by company, product, active ingredient and dosage.'],
+  [/catopedia|cat wiki/i, 'Catopedia is a bilingual Vietnamese - English cat wiki: breed encyclopedia, care guides, adoptions near you. It runs on Cloudflare with a mandatory running cost of zero. That is Danny showing off a little.'],
+  [/news|translator|articles/i, 'News Translator is a news pipeline that runs itself: AI picks the stories worth reading, translates them, then Playwright publishes. No editor, no gatekeeper.'],
+  [/service|work|hire|freelance|job/i, 'Danny takes one-off work and bounties in four areas: automation (Python, APIs, crawlers, bots), data (Excel, SQL, PowerBI), web and security (web design, IAM, Azure, audits), and media and design (video, photos, logos, brand identity). Tell me what you need, I will pass it on.'],
+  [/price|cost|budget|fee/i, 'Pricing is not mine to lock in, prr. Tell me what you need and your budget range, Danny will answer straight. Bundling several items usually comes with a better deal.'],
+  [/contact|email|github|linkedin|facebook/i, 'You can reach Danny at the bottom of this page: GitHub dankezo, LinkedIn dannyphan1909, Facebook Phan Dung, email dannyphan190@gmail.com. Or tell me the message, I will log it and pass it on.'],
+  [/danny|who is|operator/i, 'Danny Phan, security engineer in Hanoi, owner of this deck and of me. By day he runs security operations on real systems; the rest of the time he builds. His standard: do it properly, verify with numbers, never race the clock. I am Neo, black cat, official co-pilot.'],
+  [/hello|hi\b|hey/i, 'Prr, hello. I am Neo, the deck cat. Which module do you want to see first: antiRea, BaoAnSearch, Catopedia or News Translator?'],
+  [/thank/i, 'Prr, anytime. Call me whenever - I am on deck 24/7, except when napping on the keyboard.'],
+  [/neo|cat\b/i, 'That is me: Neo, black cat with a glowing tag, co-pilot of this deck. I know almost everything about Danny and the modules - ask away.']
+];
+
+
+/* grain */
+$('#grainEl').style.backgroundImage = 'url(assets/grain.png)';
+
+/* ---------- title split ---------- */
+$$('[data-split]').forEach(function(row){
+  var txt = row.textContent; row.textContent = '';
+  Array.prototype.forEach.call(txt, function(chr){
+    var s = document.createElement('span'); s.className = 'ch'; s.textContent = chr;
+    row.appendChild(s);
+  });
+});
+
+/* ---------- boot ---------- */
+var boot = $('#boot'), bootDone = false;
+function finishBoot(){
+  if (bootDone) return; bootDone = true;
+  boot.classList.add('done');
+  $('#megaTitle').classList.add('play');
+  $$('#megaTitle .ch').forEach(function(ch, i){
+    ch.style.transition = 'transform 950ms cubic-bezier(.22,1,.36,1) ' + (i * 45) + 'ms';
+    requestAnimationFrame(function(){ ch.style.transform = 'translateY(0)'; });
+  });
+  setTimeout(function(){ boot.style.display = 'none'; }, 800);
+}
+if (!motionOn) { boot.style.display = 'none'; $$('#megaTitle .ch').forEach(function(ch){ ch.style.transform = 'none'; }); bootDone = true; }
+else {
+  var lines = I18N[LANG].boot;
+  var bl = $('#bootLines'), bp = $('#bootPct'), bb = $('#bootBar'), t0 = performance.now(), DUR = 1150;
+  (function step(now){
+    var p = Math.min(1, (now - t0) / DUR);
+    bp.textContent = Math.round(p * 100) + '%';
+    bb.style.transform = 'scaleX(' + p + ')';
+    var n = Math.min(lines.length, Math.floor(p * (lines.length + 0.99)));
+    bl.textContent = lines.slice(0, n).join('\n');
+    if (p < 1) requestAnimationFrame(step); else setTimeout(finishBoot, 120);
+  })(t0);
+  setTimeout(finishBoot, 2600); /* failsafe */
+}
+
+/* ---------- glitch on title hover ---------- */
+var mega = $('#megaTitle');
+if (finePointer && motionOn) mega.addEventListener('mouseenter', function(){
+  var chs = $$('.ch', mega); if (!chs.length) return;
+  var c = chs[Math.floor(Math.random() * chs.length)];
+  c.classList.remove('glitching'); void c.offsetWidth; c.classList.add('glitching');
+});
+
+/* ---------- WebGL aurora underlay ---------- */
+var glCanvas = $('#gl'), glOK = false, glProg = null, glTime = null, glMouse = null;
+try {
+  var gl = glCanvas.getContext('webgl', { antialias: false, alpha: true });
+  if (gl) {
+    var vs = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+    var fs = [
+      'precision highp float;uniform float t;uniform vec2 r;uniform vec2 m;',
+      'float w(vec2 uv,float s,float f,float sp){return sin(uv.x*f + t*sp + sin(uv.y*s + t*.3)*1.4)*.5+.5;}',
+      'void main(){vec2 uv=gl_FragCoord.xy/r;uv.x+=(m.x-.5)*.05;',
+      'float a=w(uv,3.,6.,.22)*w(uv,5.,11.,.16);',
+      'float band=smoothstep(.62,.95,a)*smoothstep(1.,.7,uv.y);',
+      'vec3 acid=vec3(.639,.902,.208);vec3 deep=vec3(.016,.03,.05);',
+      'vec3 col=deep + acid*band*.16;',
+      'float grid=step(.985,fract(uv.y*26. - t*.05))*.05 + step(.992,fract(uv.x*44.))*.03;',
+      'col+=acid*grid*band;',
+      'float vig=smoothstep(1.25,.35,length(uv-vec2(.5,.42)));',
+      'gl_FragColor=vec4(col*vig,1.);}'
+    ].join('\n');
+    function sh(type, src){ var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; }
+    glProg = gl.createProgram();
+    gl.attachShader(glProg, sh(gl.VERTEX_SHADER, vs));
+    gl.attachShader(glProg, sh(gl.FRAGMENT_SHADER, fs));
+    gl.linkProgram(glProg);
+    if (gl.getProgramParameter(glProg, gl.LINK_STATUS)) {
+      gl.useProgram(glProg);
+      var buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+      var loc = gl.getAttribLocation(glProg, 'p');
+      gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      glTime = gl.getUniformLocation(glProg, 't');
+      glMouse = gl.getUniformLocation(glProg, 'm');
+      gl.uniform2f(gl.getUniformLocation(glProg, 'r'), glCanvas.width, glCanvas.height);
+      glOK = true; glCanvas._gl = gl;
+    }
+  }
+} catch (e) { glOK = false; }
+if (!glOK) glCanvas.style.display = 'none';
+
+/* ---------- particle fx ---------- */
+var fx = $('#fx'), fxCtx = fx.getContext('2d'), stars = [], bursts = [], fxRun = true;
+function fxSize(){
+  var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  [glCanvas, fx].forEach(function(c){ c.width = c.clientWidth * dpr; c.height = c.clientHeight * dpr; });
+  if (glOK) { var gl = glCanvas._gl; gl.viewport(0, 0, glCanvas.width, glCanvas.height); gl.uniform2f(gl.getUniformLocation(glProg, 'r'), glCanvas.width, glCanvas.height); }
+  stars = [];
+  var n = window.innerWidth < 760 ? 34 : 74;
+  for (var i = 0; i < n; i++) stars.push({ x: Math.random(), y: Math.random(), s: Math.random() * 1.7 + .4, v: Math.random() * .014 + .004, tw: Math.random() * 6.28 });
+}
+fxSize();
+
+/* ---------- pointer / parallax state ---------- */
+var px = .5, py = .5, tx = .5, ty = .5, scrollY = window.scrollY || 0;
+if (finePointer) window.addEventListener('pointermove', function(e){ document.body.classList.add('cur-on'); tx = e.clientX / window.innerWidth; ty = e.clientY / window.innerHeight; }, { passive: true });
+window.addEventListener('scroll', function(){ scrollY = window.scrollY || 0; }, { passive: true });
+var heroFrame = $('#heroFrame'), skyEl = $('.sky'), bandImg = $('#bandImg'), dannyWrap = $('#dannyWrap');
+var heroVisible = true, bandVisible = false;
+new IntersectionObserver(function(en){ heroVisible = en[0].isIntersecting; }, { threshold: 0 }).observe($('#hero'));
+new IntersectionObserver(function(en){ bandVisible = en[0].isIntersecting; }, { threshold: 0 }).observe($('.band'));
+
+/* hero click burst (the toy) */
+$('#hero').addEventListener('pointerdown', function(e){
+  if (e.target.closest('a,button')) return;
+  var r = fx.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+  var cx = (e.clientX - r.left) * dpr, cy = (e.clientY - r.top) * dpr;
+  for (var i = 0; i < 16; i++) {
+    var a = (i / 16) * 6.283 + Math.random() * .3, sp = (Math.random() * 2.4 + 1.6) * dpr;
+    bursts.push({ x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 1 });
+  }
+  sfx('sparkle');
+});
+
+/* ---------- Danny himself reacts: click the operator ---------- */
+var dannyClicks = 0, sayTimer = null;
+var DANNY_LINES = I18N.vi.danny;
+var sayTw = null;
+function typeSay(text){
+  dannySay.innerHTML = '<div class="say-head"><i class="dot"></i>' + T('sayHead') + '<span class="eq"><i></i><i></i><i></i></span></div><div class="say-text"><span class="say-body"></span><i class="caret"></i></div>';
+  dannySay.classList.add('show');
+  var bodyEl = dannySay.querySelector('.say-body'), caret = dannySay.querySelector('.caret');
+  clearInterval(sayTw);
+  if (!motionOn) { bodyEl.textContent = text; if (caret) caret.remove(); return; }
+  var i = 0;
+  sayTw = setInterval(function(){
+    i = Math.min(text.length, i + 2);
+    bodyEl.textContent = text.slice(0, i);
+    if (i >= text.length) { clearInterval(sayTw); setTimeout(function(){ if (caret) caret.remove(); }, 700); }
+  }, 18);
+}
+window.DECK_DANNY = function(){ return dannyClicks; };
+var dannyHot = $('#dannyHot'), dannySay = $('#dannySay'), dannyFx = $('#dannyFx');
+function dannyReact(e){
+  dannyClicks++;
+  var hero = $('#hero'), hr = hero.getBoundingClientRect();
+  var x = (e && e.clientX) ? e.clientX - hr.left : hr.width * .18;
+  var y = (e && e.clientY) ? e.clientY - hr.top : hr.height * .42;
+  for (var i = 0; i < 3; i++) {
+    var ring = document.createElement('i'); ring.className = 'danny-ring';
+    ring.style.left = x + 'px'; ring.style.top = y + 'px';
+    ring.style.animationDelay = (i * 110) + 'ms';
+    dannyFx.appendChild(ring);
+    setTimeout((function(el){ return function(){ el.remove(); }; })(ring), 1500 + i * 120);
+  }
+  hero.classList.remove('react'); void hero.offsetWidth; hero.classList.add('react');
+  setTimeout(function(){ hero.classList.remove('react'); }, 900);
+  var dl = I18N[LANG].danny; typeSay(dl[(dannyClicks - 1) % dl.length]);
+  clearTimeout(sayTimer); sayTimer = setTimeout(function(){ dannySay.classList.remove('show'); }, 5200);
+  var c1 = $('.hero .chip.c1');
+  if (c1) c1.innerHTML = 'DANNY - <b>ĐÃ BỊ CLICK x' + dannyClicks + '</b>';
+  var catB = $('#catBtn');
+  catB.classList.remove('excited'); void catB.offsetWidth; catB.classList.add('excited');
+  setTimeout(function(){ catB.classList.remove('excited'); }, 700);
+  if (dannyClicks % 3 === 0) {
+    document.body.classList.add('overdrive');
+    var mega = $('#megaTitle'); mega.classList.remove('glitching'); void mega.offsetWidth; mega.classList.add('glitching');
+    sfx('sparkle');
+    setTimeout(function(){ document.body.classList.remove('overdrive'); }, 3600);
+  } else sfx('confirm');
+}
+if (dannyHot) {
+  dannyHot.addEventListener('click', dannyReact);
+  dannyHot.addEventListener('mouseenter', function(){ document.body.classList.add('danny-hover'); });
+  dannyHot.addEventListener('mouseleave', function(){ document.body.classList.remove('danny-hover'); });
+}
+
+/* ---------- main loop ---------- */
+var mX = .5, mY = .5;
+function loop(now){
+  requestAnimationFrame(loop);
+  if (!motionOn || document.hidden) return;
+  px += (tx - px) * .06; py += (ty - py) * .06;
+  if (heroVisible) {
+    if (skyEl) skyEl.style.transform = 'translate3d(' + ((px - .5) * -14) + 'px,' + (scrollY * .10 + (py - .5) * -8) + 'px,0)';
+    if (heroFrame) heroFrame.style.transform = 'translate3d(' + ((px - .5) * -12) + 'px,' + ((py - .5) * -8 + Math.min(scrollY * .05, 34)) + 'px,0) scale(' + (1.07 + Math.min(scrollY * .00006, .06)) + ')';
+    if (dannyWrap) dannyWrap.style.transform = 'translate3d(' + ((px - .5) * -25) + 'px,' + ((py - .5) * -14 + Math.min(scrollY * .03, 20)) + 'px,0) scale(1.045)';
+    var hInner = $('.hero-inner');
+    if (hInner && scrollY < window.innerHeight) hInner.style.transform = 'scale(' + (1 - Math.min(scrollY / 1100, 1) * .035) + ')';
+    if (glOK) { var gl = glCanvas._gl; gl.uniform1f(glTime, now * .001); gl.uniform2f(glMouse, px, py); gl.drawArrays(gl.TRIANGLES, 0, 3); }
+    /* particles */
+    var w = fx.width, h = fx.height; fxCtx.clearRect(0, 0, w, h);
+    stars.forEach(function(s){
+      s.y -= s.v / 100; if (s.y < -.01) { s.y = 1.01; s.x = Math.random(); }
+      var tw = .45 + .55 * Math.abs(Math.sin(now * .001 + s.tw));
+      fxCtx.globalAlpha = tw * .8; fxCtx.fillStyle = '#CFEF9A';
+      fxCtx.beginPath(); fxCtx.arc(s.x * w + (px - .5) * 10 * s.s, s.y * h, s.s * 1.4, 0, 6.283); fxCtx.fill();
+    });
+    fxCtx.globalAlpha = 1; fxCtx.strokeStyle = '#A3E635'; fxCtx.lineWidth = 1.6;
+    bursts = bursts.filter(function(b){ return b.life > 0; });
+    bursts.forEach(function(b){
+      fxCtx.globalAlpha = b.life;
+      fxCtx.beginPath(); fxCtx.moveTo(b.x, b.y); fxCtx.lineTo(b.x - b.vx * 6, b.y - b.vy * 6); fxCtx.stroke();
+      b.x += b.vx; b.y += b.vy; b.vx *= .96; b.vy *= .96; b.life -= .022;
+    });
+    fxCtx.globalAlpha = 1;
+  }
+  if (bandVisible && bandImg) {
+    var r = bandImg.parentElement.getBoundingClientRect();
+    var p = (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight;
+    bandImg.style.transform = 'translateY(' + (p * -26) + 'px) scale(' + (1.1 - Math.abs(p) * .12) + ')';
+  }
+  /* cursor */
+  mX += (tx * window.innerWidth - mX) * .35; mY += (ty * window.innerHeight - mY) * .35;
+  var cur = $('#cur'), curR = $('#curR');
+  cur.style.transform = 'translate(' + (tx * window.innerWidth - 3) + 'px,' + (ty * window.innerHeight - 3) + 'px)';
+  curR.style.transform = 'translate(' + (mX - curR.offsetWidth / 2) + 'px,' + (mY - curR.offsetHeight / 2) + 'px)';
+}
+requestAnimationFrame(loop);
+
+/* cursor states */
+if (finePointer) $$('a, button, [data-cur]').forEach(function(el){
+  el.addEventListener('mouseenter', function(){ $('#curR').classList.add('big'); $('#curLab').textContent = el.getAttribute('data-cur') || 'OPEN'; });
+  el.addEventListener('mouseleave', function(){ $('#curR').classList.remove('big'); });
+});
+
+/* ---------- reveals + counters ---------- */
+var lastWhoosh = 0;
+var io = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){ if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target);
+    var n = Date.now(); if (n - lastWhoosh > 700) { lastWhoosh = n; sfx('whoosh'); } } });
+}, { threshold: .16 });
+$$('.reveal').forEach(function(el){ io.observe(el); });
+setTimeout(function(){ $$('.reveal').forEach(function(el){ el.classList.add('in'); }); }, 4000); /* safety: content can never stay hidden */
+var cio = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){
+    if (!en.isIntersecting) return; cio.unobserve(en.target);
+    var end = parseInt(en.target.getAttribute('data-count'), 10), t0 = performance.now();
+    (function tick(now){ var p = Math.min(1, (now - t0) / 1300), e = 1 - Math.pow(1 - p, 3);
+      en.target.textContent = Math.round(end * e);
+      if (p < 1) requestAnimationFrame(tick); })(t0);
+  });
+}, { threshold: .5 });
+$$('[data-count]').forEach(function(el){ cio.observe(el); });
+
+/* ---------- tilt cards ---------- */
+if (finePointer) $$('[data-tilt]').forEach(function(card){
+  card.addEventListener('pointermove', function(e){
+    var r = card.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+    card.style.setProperty('--mx', (x * 100) + '%'); card.style.setProperty('--my', (y * 100) + '%');
+    if (motionOn) card.style.transform = 'perspective(900px) rotateY(' + ((x - .5) * 6) + 'deg) rotateX(' + ((.5 - y) * 6) + 'deg) translateY(-3px)';
+  });
+  card.addEventListener('pointerleave', function(){ card.style.transform = ''; });
+});
+
+/* ---------- motion toggle ---------- */
+var mBtn = $('#motionBtn');
+function setMotion(on){
+  motionOn = on && !reduced;
+  document.documentElement.classList.toggle('no-motion', !motionOn);
+  mBtn.textContent = 'MOTION: ' + (motionOn ? 'ON' : 'OFF');
+  if (!motionOn) { $$('#megaTitle .ch').forEach(function(ch){ ch.style.transform = 'none'; }); }
+}
+mBtn.addEventListener('click', function(){ setMotion(!motionOn); });
+if (reduced) setMotion(false);
+
+/* ---------- Neo the cat ---------- */
+var panel = $('#catPanel'), msgs = $('#catMsgs'), input = $('#catInput'), opened = false, prrFlip = false, history = [];
+function neoSession(){
+  try {
+    var s = localStorage.getItem('neo_session');
+    if (!s) { s = 's-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); localStorage.setItem('neo_session', s); }
+    return s;
+  } catch (e) { return ''; }
+}
+function saveTranscript(role, text){
+  try {
+    var t = JSON.parse(localStorage.getItem('neo_transcript') || '[]');
+    t.push({ role: role, text: text }); if (t.length > 30) t = t.slice(-30);
+    localStorage.setItem('neo_transcript', JSON.stringify(t));
+  } catch (e) { /* private mode: chat simply does not persist */ }
+}
+function addMsg(text, who){
+  var d = document.createElement('div'); d.className = 'msg ' + who; d.textContent = text;
+  msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight; return d;
+}
+function neoSay(text){
+  sfx('reply');
+  prrFlip = !prrFlip;
+  history.push({ role: 'assistant', content: text });
+  saveTranscript('neo', text);
+  var d = addMsg('', 'neo');
+  if (!motionOn || text.length < 24) { d.textContent = text; msgs.scrollTop = msgs.scrollHeight; return; }
+  /* simulated streaming so Neo feels alive even behind a non-streaming API */
+  var i = 0;
+  var tw = setInterval(function(){
+    i = Math.min(text.length, i + 3);
+    d.textContent = text.slice(0, i);
+    msgs.scrollTop = msgs.scrollHeight;
+    if (i >= text.length) clearInterval(tw);
+  }, 14);
+}
+var KB = [
+  [/antirea|anti-rea/i, 'antiRea là hệ thống gác cổng do Danny tự cook: thư viện TypeScript phía server đo lượng dữ liệu mỗi danh tính được lấy, phát hiện bầy bot cào có phối hợp, vượt ngân sách 150 bản ghi mỗi 24h là bị ghi sổ. Đã lên npm, JSR và MCP Registry - 812 test, 0 dependency. Prr, chính nó đang gác cổng cho cả deck này đấy.'],
+  [/catopedia|wiki|mèo.*wiki/i, 'Catopedia là wiki mèo song ngữ Việt - Anh của Danny: giống mèo, cách chăm sóc, nhận nuôi mèo gần bạn. Chạy Next.js trên Cloudflare, chi phí vận hành 0 đồng. Tớ là mèo nên tớ duyệt module này đầu tiên.'],
+  [/baoan|search|dược|pharma/i, 'BaoAnSearch là hệ tra cứu dữ liệu dược Danny xây cho đội BaoAn Pharma: 9.237 dòng, 82 công ty, tìm theo công ty, sản phẩm, hoạt chất, hàm lượng - vài giây là ra.'],
+  [/news|tin tức|translator|dịch/i, 'News Translator là đường ống tin tự động: AI chọn bài đáng đọc, dịch rồi dùng Playwright tự đăng luôn. Danny gọi điểm hay nhất là AI chọn báo cộng xuất bản tự động, không cần người gác.'],
+  [/dịch vụ|nhận việc|làm gì|freelance|thuê/i, 'Danny nhận việc một lần và bounty ở 4 mảng: tự động hóa (Python, API, crawler, bot), dữ liệu (Excel, SQL, PowerBI), web và bảo mật (thiết kế web, IAM, Azure, audit), media và design (video, ảnh, logo, nhận diện). Cứ để lại nhu cầu, tớ chuyển lời cho anh ấy.'],
+  [/giá|bao nhiêu|phí|budget|ngân sách/i, 'Chuyện giá thì tớ không tự chốt được, prr. Bạn cứ nói nhu cầu và khoảng ngân sách của bạn, Danny sẽ trả lời thẳng. Làm combo nhiều hạng mục thường có ưu đãi đấy.'],
+  [/liên hệ|contact|email|facebook|github|linkedin/i, 'Mở kênh với Danny ở cuối trang có đủ: GitHub dankezo, LinkedIn dannyphan1909, Facebook Phan Dũng, email dannyphan190@gmail.com. Hoặc nhắn tớ nội dung, tớ ghi sổ chuyển anh ấy.'],
+  [/danny|chủ|ai là/i, 'Danny Phan, kỹ sư bảo mật ở Hà Nội, chủ của deck này và của tớ. Anh ấy làm bảo mật vận hành, mê xây sản phẩm tử tế: làm kỹ, kiểm chứng kỹ, không chạy đua thời gian. Tớ là Neo, mèo đen, co-pilot chính thức.'],
+  [/chào|hello|hi\b|hey/i, 'Prr, chào bạn. Tớ là Neo, mèo trực deck của Danny. Bạn muốn xem module nào trước: antiRea, BaoAnSearch, Catopedia hay News Translator?'],
+  [/cảm ơn|thank/i, 'Prr, không có chi. Cần gì cứ gọi tớ, tớ trực deck 24/7, trừ lúc ngủ gật trên bàn phím.'],
+  [/mèo|neo|cat/i, 'Đúng tớ đây: Neo, mèo đen đeo thẻ phát sáng, co-pilot của deck. Tớ biết gần hết về Danny và các module, hỏi gì tớ cũng ráng trả lời cho ra ngô ra khoai.']
+];
+function localBrain(q){
+  var kb = LANG === 'en' ? KB_EN : KB;
+  for (var i = 0; i < kb.length; i++) if (kb[i][0].test(q)) return kb[i][1];
+  return T('kbDefault');
+}
+function sendCat(text){
+  var q = (text || input.value || '').trim(); if (!q) return;
+  input.value = '';
+  addMsg(q, 'me'); history.push({ role: 'user', content: q }); saveTranscript('me', q);
+  var typing = document.createElement('div'); typing.className = 'msg neo typing';
+  typing.innerHTML = '<i></i><i></i><i></i>'; msgs.appendChild(typing); msgs.scrollTop = msgs.scrollHeight;
+  var done = function(reply){ typing.remove(); neoSay(reply); };
+  var ctrl = ('AbortController' in window) ? new AbortController() : null;
+  var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, 7000) : null;
+  fetch('/api/cat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: q, history: history.slice(-6), session: neoSession() }), signal: ctrl ? ctrl.signal : undefined })
+    .then(function(r){ if (timer) clearTimeout(timer); if (!r.ok) throw new Error('bad'); return r.json(); })
+    .then(function(j){ if (j && j.reply) done(j.reply); else throw new Error('empty'); })
+    .catch(function(){ setTimeout(function(){ done(localBrain(q)); }, 650); });
+}
+function openCat(){
+  sfx('meow');
+  panel.classList.add('open'); $('#catTeaser').classList.remove('show');
+  if (!opened) {
+    opened = true;
+    var saved = [];
+    try { saved = JSON.parse(localStorage.getItem('neo_transcript') || '[]'); } catch (e) { saved = []; }
+    if (saved.length) {
+      saved.forEach(function(m){ addMsg(m.text, m.role === 'me' ? 'me' : 'neo'); });
+      setTimeout(function(){ neoSay(T('greetBack')); }, 350);
+    } else {
+      setTimeout(function(){ neoSay(T('greet1')); }, 250);
+    }
+  }
+  setTimeout(function(){ input.focus(); }, 380);
+}
+function closeCat(){ panel.classList.remove('open'); }
+$('#catBtn').addEventListener('click', function(){ panel.classList.contains('open') ? closeCat() : openCat(); });
+$('#catClose').addEventListener('click', closeCat);
+$('#ctaCat').addEventListener('click', function(e){ e.preventDefault(); openCat(); });
+$('#catForm').addEventListener('submit', function(e){ e.preventDefault(); sendCat(); });
+$$('#catChips button').forEach(function(b){ b.addEventListener('click', function(){ sendCat(b.textContent); }); });
+setTimeout(function(){ if (!opened) { $('#catTeaser').classList.add('show'); setTimeout(function(){ $('#catTeaser').classList.remove('show'); }, 7000); } }, 2600);
+
+/* ---------- LIVE OPS simulation ---------- */
+function mulberry32(a){ return function(){ a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function bangkokNow(){ return new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })); }
+function daySegs(dow){
+  if (dow === 0 || dow === 6) return [
+    { from: 0,    label: 'STANDBY - SLEEP CYCLE', labV: 'STANDBY - ĐANG NGỦ', on: false, bpm: 48, rate: 6,  name: 'NGỦ', nameE: 'SLEEP' },
+    { from: 540,  label: 'ON DECK - WEEKEND OPS', labV: 'ON DECK - CUỐI TUẦN', on: true,  bpm: 72, rate: 220, name: 'ON DECK' },
+    { from: 1440, label: 'STANDBY - SLEEP CYCLE', labV: 'STANDBY - ĐANG NGỦ', on: false, bpm: 48, rate: 6,  name: 'NGỦ', nameE: 'SLEEP' }];
+  return [
+    { from: 0,    label: 'STANDBY - SLEEP CYCLE', labV: 'STANDBY - ĐANG NGỦ', on: false, bpm: 48, rate: 6,   name: 'NGỦ', nameE: 'SLEEP' },
+    { from: 420,  label: 'MORNING OPS - BOOT + TRAIN', labV: 'BUỔI SÁNG - KHỞI ĐỘNG + TẬP', on: true, bpm: 58, rate: 45,  name: 'BOOT', nameV: 'KHỞI ĐỘNG' },
+    { from: 480,  label: 'AT HQ - DEEP WORK', labV: 'TẠI HQ - DEEP WORK', on: true,  bpm: 64, rate: 150, name: 'DEEP WORK' },
+    { from: 1050, label: 'ON DECK - BUILD MODE', labV: 'ON DECK - CHẾ ĐỘ BUILD', on: true,  bpm: 76, rate: 260, name: 'ON DECK' },
+    { from: 1440, label: 'STANDBY - SLEEP CYCLE', labV: 'STANDBY - ĐANG NGỦ', on: false, bpm: 48, rate: 6,   name: 'NGỦ', nameE: 'SLEEP' }];
+}
+function segAt(dow, mins){ var segs = daySegs(dow), cur = segs[0]; for (var i = 0; i < segs.length; i++) if (mins >= segs[i].from) cur = segs[i]; return cur; }
+function nextSeg(dow, mins){ var segs = daySegs(dow); for (var i = 0; i < segs.length; i++) if (segs[i].from > mins) return segs[i]; return daySegs((dow + 1) % 7)[1] || daySegs((dow + 1) % 7)[0]; }
+var opsEls = { dot: $('#opDot'), state: $('#opState'), clock: $('#opClock'), next: $('#opNext'), bpm: $('#bpm'), bpmState: $('#bpmState'), tok: $('#tokToday'), rate: $('#tokRate'), peak: $('#tokPeak'), bars: $('#tokBars') };
+var tokBase = 0, tokLive = 0, tokSeedDay = -1;
+function fmtTok(n){ return Math.floor(n).toLocaleString('vi-VN'); }
+function computeTokBase(now){
+  var dow = now.getDay(), mins = now.getHours() * 60 + now.getMinutes();
+  var seed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+  var rnd = mulberry32(seed), total = 0, peak = 0;
+  for (var m = 0; m < mins; m++) { var r = segAt(dow, m).rate * (0.72 + rnd() * 0.56); total += r; if (r > peak) peak = r; }
+  /* bars: 12 blocks of 2h */
+  if (opsEls.bars && !opsEls.bars.children.length) {
+    var rnd2 = mulberry32(seed + 7);
+    for (var b = 0; b < 12; b++) {
+      var segR = segAt(dow, b * 120 + 60).rate, h = Math.max(8, Math.min(100, segR / 2.9)) * (0.8 + rnd2() * 0.4);
+      var bar = document.createElement('i'); bar.style.height = Math.min(100, h) + '%';
+      if (b === Math.floor(mins / 120)) bar.className = 'now';
+      opsEls.bars.appendChild(bar);
+    }
+  }
+  if (opsEls.peak) opsEls.peak.textContent = fmtTok(peak * 60) + (LANG === 'vi' ? ' tok/giờ' : ' tok/hr');
+  return total;
+}
+function pad2(n){ return (n < 10 ? '0' : '') + n; }
+function opsTick(){
+  var now = bangkokNow(), dow = now.getDay(), mins = now.getHours() * 60 + now.getMinutes(), secs = mins * 60 + now.getSeconds();
+  var seg = segAt(dow, mins), nxt = nextSeg(dow, mins);
+  var dayKey = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+  if (dayKey !== tokSeedDay) { tokSeedDay = dayKey; tokBase = computeTokBase(now); tokLive = 0; }
+  tokLive += seg.rate / 60 * (0.75 + Math.random() * 0.5);
+  if (opsEls.state) {
+    opsEls.state.textContent = LANG === 'vi' ? (seg.labV || seg.label) : seg.label;
+    opsEls.dot.className = 'odot' + (seg.on ? '' : ' off');
+    opsEls.clock.textContent = pad2(now.getHours()) + ':' + pad2(now.getMinutes()) + ':' + pad2(now.getSeconds());
+    var remain = nxt.from * 60 - secs; if (remain < 0) remain += 86400;
+    opsEls.next.textContent = (LANG === 'vi' ? 'CHUYỂN CA: ' : 'NEXT SHIFT: ') + (LANG === 'vi' ? (nxt.nameV || nxt.name) : (nxt.nameE || nxt.name)) + (LANG === 'vi' ? ' SAU ' : ' IN ') + pad2(Math.floor(remain / 3600)) + ':' + pad2(Math.floor(remain % 3600 / 60)) + ':' + pad2(remain % 60);
+    var bpmNow = Math.round(seg.bpm + Math.sin(Date.now() / 9000) * 3 + Math.random() * 1.6);
+    opsEls.bpm.textContent = bpmNow;
+    opsEls.bpmState.textContent = LANG === 'vi' ? (seg.nameV || seg.name) : (seg.nameE || seg.name);
+    opsEls.tok.textContent = fmtTok(tokBase + tokLive);
+    opsEls.rate.textContent = '~' + seg.rate + (LANG === 'vi' ? ' tok/phút' : ' tok/min');
+    window.__deckSeg = seg; window.__deckBpm = bpmNow;
+  }
+}
+opsTick(); setInterval(opsTick, 1000);
+/* ECG */
+var ecgC = $('#ecg'), ecgX = ecgC ? ecgC.getContext('2d') : null, ecgPts = [], ecgPhase = 0, ecgVisible = false, ecgLast = 0;
+function ecgSize(){ if (!ecgC) return; var d = Math.min(window.devicePixelRatio || 1, 2); ecgC.width = ecgC.clientWidth * d; ecgC.height = ecgC.clientHeight * d; }
+ecgSize();
+if (ecgC) new IntersectionObserver(function(en){ ecgVisible = en[0].isIntersecting; }, { threshold: .05 }).observe(ecgC);
+function ecgWave(p){ var g = function(c, w){ var d = p - c; return Math.exp(-(d * d) / (2 * w * w)); }; return .16 * g(.14, .03) + 1.0 * g(.26, .009) - .3 * g(.288, .012) + .3 * g(.52, .05); }
+function ecgDraw(ts){
+  requestAnimationFrame(ecgDraw);
+  if (!ecgX || !ecgVisible || document.hidden) return;
+  var bpm = window.__deckBpm || 64, dt = Math.min(.05, (ts - ecgLast) / 1000 || .016); ecgLast = ts;
+  if (motionOn) { ecgPhase += dt * bpm / 60; if (ecgPhase >= 1) ecgPhase -= 1; ecgPts.push(ecgWave(ecgPhase)); if (ecgPts.length > 110) ecgPts.shift(); }
+  else if (!ecgPts.length) { for (var i = 0; i < 110; i++) ecgPts.push(ecgWave(i / 110 * 2 % 1)); }
+  var w = ecgC.width, h = ecgC.height; ecgX.clearRect(0, 0, w, h);
+  ecgX.beginPath(); ecgX.strokeStyle = '#A3E635'; ecgX.lineWidth = Math.max(1.4, h / 34); ecgX.shadowColor = 'rgba(163,230,53,.8)'; ecgX.shadowBlur = 7;
+  ecgPts.forEach(function(v, i){ var x = i / 109 * w, y = h * .62 - v * h * .5; i ? ecgX.lineTo(x, y) : ecgX.moveTo(x, y); });
+  ecgX.stroke(); ecgX.shadowBlur = 0;
+}
+requestAnimationFrame(ecgDraw);
+window.addEventListener('resize', function(){ ecgSize(); });
+
+/* ---------- pixel jazz + SFX (WebAudio, opt-in) ---------- */
+var AC = window.AudioContext || window.webkitAudioContext;
+var actx = null, master = null, soundOn = false, jazzTimer = null, jazzNext = 0, jazzStep = 0, noiseBuf = null;
+var sBtn = $('#soundBtn');
+function mf(m){ return 440 * Math.pow(2, (m - 69) / 12); }
+function tone(type, freq, t, dur, vol, glideTo){
+  if (!actx) return;
+  var o = actx.createOscillator(), g = actx.createGain();
+  o.type = type; o.frequency.setValueAtTime(freq, t);
+  if (glideTo) o.frequency.exponentialRampToValueAtTime(glideTo, t + dur);
+  g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + .02);
+}
+function hat(t, vol){
+  if (!actx || !noiseBuf) return;
+  var src = actx.createBufferSource(); src.buffer = noiseBuf;
+  var f = actx.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = 6200;
+  var g = actx.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + .04);
+  src.connect(f); f.connect(g); g.connect(master); src.start(t); src.stop(t + .05);
+}
+var CHORDS = [[50,53,57,60,64],[55,59,62,65,71],[48,52,55,59,62],[57,61,64,67,71]];
+var BASS = [38, 43, 36, 45];
+var STEPD = 60 / 112 / 2;
+function jazzSched(){
+  if (!actx) return;
+  while (jazzNext < actx.currentTime + .16) {
+    var s = jazzStep, bar = Math.floor(s / 8) % 4, e = s % 8, t = jazzNext + (e % 2 ? STEPD * .32 : 0);
+    var chord = CHORDS[bar], root = BASS[bar];
+    if (e === 0) tone('triangle', mf(root), t, .34, .16);
+    if (e === 4) tone('triangle', mf(root + (bar % 2 ? 12 : 7)), t, .26, .13);
+    if (e === 6) tone('triangle', mf(root + (bar % 2 ? 10 : 9)), t, .2, .1);
+    if (e === 2 || e === 7) { var st = actx.createBiquadFilter(); st.type = 'lowpass'; st.frequency.value = 1900; st.connect(master);
+      [1, 2, 3].forEach(function(k){ var o = actx.createOscillator(), g = actx.createGain(); o.type = 'square'; o.frequency.value = mf(chord[k]); g.gain.setValueAtTime(.028, t); g.gain.exponentialRampToValueAtTime(.0001, t + .13); o.connect(g); g.connect(st); o.start(t); o.stop(t + .15); }); }
+    if (e % 2) hat(t, .02); else hat(t, .009);
+    var rnd = mulberry32(9000 + Math.floor(s / 8))();
+    if (e !== 0 && rnd < .3) { var pool = [chord[2] + 12, chord[3] + 12, chord[1] + 24, chord[4] + 12]; tone('triangle', mf(pool[Math.floor(rnd * 13) % 4]), t, .22, .05); }
+    jazzNext += STEPD; jazzStep++;
+  }
+}
+function sfx(kind){
+  if (!soundOn || !actx) return;
+  var t = actx.currentTime;
+  if (kind === 'blip') tone('square', 1180, t, .05, .018);
+  else if (kind === 'confirm') { tone('square', 660, t, .07, .05); tone('square', 990, t + .07, .09, .05); }
+  else if (kind === 'pop') tone('sine', 320, t, .09, .09, 90);
+  else if (kind === 'reply') tone('sine', 540, t, .08, .04, 720);
+  else if (kind === 'sparkle') { [1318, 1760, 2210].forEach(function(f, i){ tone('triangle', f, t + i * .045, .12, .035); }); }
+  else if (kind === 'meow') { tone('sawtooth', 610, t, .16, .07, 880); tone('sawtooth', 880, t + .15, .2, .07, 430); }
+  else if (kind === 'whoosh') { if (noiseBuf) { var src = actx.createBufferSource(); src.buffer = noiseBuf; var f = actx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1.1; f.frequency.setValueAtTime(380, t); f.frequency.exponentialRampToValueAtTime(2500, t + .32); var g = actx.createGain(); g.gain.setValueAtTime(.05, t); g.gain.exponentialRampToValueAtTime(.0001, t + .36); src.connect(f); f.connect(g); g.connect(master); src.start(t); src.stop(t + .4); } }
+}
+window.DECK = { sound: function(){ return soundOn; }, ctxState: function(){ return actx ? actx.state : 'none'; }, sfx: sfx };
+if (!AC && sBtn) sBtn.style.display = 'none';
+function initAudio(){
+  if (!AC || actx) return;
+  actx = new AC(); master = actx.createGain(); master.gain.value = .9; master.connect(actx.destination);
+  noiseBuf = actx.createBuffer(1, actx.sampleRate * .5, actx.sampleRate);
+  var d = noiseBuf.getChannelData(0); for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+}
+var soundArmed = false;
+function refreshSoundBtn(){ if (!sBtn) return; var on = soundOn || soundArmed; sBtn.textContent = 'SOUND: ' + (on ? 'ON' : 'OFF'); sBtn.classList.toggle('on', on); }
+function setSound(on){
+  if (!AC) return;
+  initAudio(); if (!actx) return;
+  soundOn = on; soundArmed = on;
+  try { localStorage.setItem('deck_sound', on ? 'on' : 'off'); } catch (e) {}
+  if (on) { actx.resume(); if (!jazzTimer) { jazzNext = actx.currentTime + .06; jazzTimer = setInterval(jazzSched, 42); } sfx('confirm'); }
+  else { clearInterval(jazzTimer); jazzTimer = null; }
+  refreshSoundBtn();
+}
+if (sBtn) sBtn.addEventListener('click', function(){ setSound(!(soundOn || soundArmed)); });
+/* wire SFX to interactions */
+var lastBlip = 0;
+$$('header nav a, .mod, .links a').forEach(function(el){ el.addEventListener('mouseenter', function(){ var n = Date.now(); if (n - lastBlip > 90) { lastBlip = n; sfx('blip'); } }); });
+document.addEventListener('click', function(e){ if (e.target.closest('.btn, .links a, .mod')) sfx('confirm'); });
+$('#catForm').addEventListener('submit', function(){ sfx('pop'); });
+
+/* ---------- heatmap: shipping rhythm, seeded so it looks the same for everyone ---------- */
+function renderHeat(){
+  var g = $('#heatGrid'); if (!g || g.children.length) return;
+  var rnd = mulberry32(20261109);
+  var total = 0, run = 0;
+  for (var i = 0; i < 182; i++) {
+    var recent = i >= 140, r = rnd();
+    var lv = r < (recent ? .16 : .36) ? 0 : r < .55 ? 1 : r < .76 ? 2 : r < .9 ? 3 : 4;
+    if (i >= 175 && lv === 0) lv = 2;
+    if (i === 181) lv = 4;
+    var c = document.createElement('i');
+    if (i === 181) c.className = 'today'; else if (lv) c.className = 'l' + lv;
+    g.appendChild(c);
+    if (lv > 0) { total++; run++; } else run = 0;
+  }
+  var st = $('#heatStreak'), tt = $('#heatTotal');
+  if (st) st.textContent = Math.max(1, Math.round(run / 7));
+  if (tt) tt.textContent = total;
+}
+renderHeat();
+
+/* ---------- language: saved choice wins, else IP country via Cloudflare trace ---------- */
+var savedLang = null; try { savedLang = localStorage.getItem('deck_lang'); } catch (e) {}
+applyLang(savedLang || LANG || 'vi');
+if (!savedLang && window.fetch) {
+  fetch('/cdn-cgi/trace').then(function(r){ return r.text(); }).then(function(t){
+    var m = /loc=([A-Z]+)/.exec(t); if (m) applyLang(m[1] === 'VN' ? 'vi' : 'en');
+  }).catch(function(){ applyLang((navigator.language || '').toLowerCase().indexOf('vi') === 0 ? 'vi' : 'en'); });
+}
+var langBtn = $('#langBtn');
+if (langBtn) langBtn.addEventListener('click', function(){ applyLang(LANG === 'vi' ? 'en' : 'vi'); sfx('confirm'); });
+if (window.DECK) { window.DECK.setLang = applyLang; window.DECK.lang = function(){ return LANG; }; }
+
+/* ---------- music: on by default, starts the moment the deck is entered ---------- */
+var soundPref = 'on'; try { soundPref = localStorage.getItem('deck_sound') || 'on'; } catch (e) {}
+if (AC && soundPref !== 'off') {
+  initAudio(); soundArmed = true; refreshSoundBtn();
+  if (actx && actx.state === 'running') setSound(true);
+  else {
+    var unlock = function(){ setSound(true); window.removeEventListener('pointerdown', unlock); window.removeEventListener('keydown', unlock); };
+    window.addEventListener('pointerdown', unlock);
+    window.addEventListener('keydown', unlock);
+  }
+} else refreshSoundBtn();
+
+window.addEventListener('resize', fxSize);
+})();
+</script>
 </body>
 </html>
