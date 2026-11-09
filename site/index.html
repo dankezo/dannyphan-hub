@@ -90,7 +90,7 @@ header .hstat b{color:var(--acid);font-weight:400}
 @keyframes catBreathe{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.013) translateY(-2px)}}
 .hero.cat-wiggle .cat-layer{animation:catWiggle .6s var(--ease)}
 @keyframes catWiggle{0%{transform:rotate(0)}25%{transform:rotate(-1.6deg) translateY(-3px)}55%{transform:rotate(1.2deg)}100%{transform:rotate(0)}}
-#rain{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;opacity:.5}
+#rain{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none;opacity:.38}
 #physGL{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
 /* Portrait (mobile-native) layer stack - hidden on desktop */
 .key-p{display:none;width:100%;height:100%;object-fit:cover;object-position:50% 38%}
@@ -1347,26 +1347,37 @@ $$('header nav a, .mod, .links a').forEach(function(el){ el.addEventListener('mo
 document.addEventListener('click', function(e){ if (e.target.closest('.btn, .links a, .mod')) sfx('confirm'); });
 $('#catForm').addEventListener('submit', function(){ sfx('pop'); });
 
-/* ---------- rain: a live weather layer over the scene ---------- */
+/* ---------- rain: OUTSIDE the window only, light - the deck stays dry ---------- */
 var rainCv = $('#rain'), rainCtx = rainCv ? rainCv.getContext('2d') : null, drops = [];
+function rainZone(){
+  var m = rainCv.width <= 700;
+  return m ? { x0: .50, x1: .99, y0: .02, y1: .52 } : { x0: .45, x1: .99, y0: .02, y1: .79 };
+}
+function rainSpawn(d, top){
+  var z = rainZone(), W = rainCv.width, H = rainCv.height;
+  d.x = (z.x0 + Math.random() * (z.x1 - z.x0)) * W;
+  d.y = top ? z.y0 * H - Math.random() * 24 : (z.y0 + Math.random() * (z.y1 - z.y0)) * H;
+  return d;
+}
 function rainSize(){
   if (!rainCv) return;
   var hero = $('#hero'); var r = hero.getBoundingClientRect();
   rainCv.width = Math.max(300, r.width); rainCv.height = Math.max(300, r.height);
   drops = [];
-  var n = Math.min(140, Math.floor(rainCv.width / 10));
-  for (var i = 0; i < n; i++) drops.push({ x: Math.random() * rainCv.width, y: Math.random() * rainCv.height, l: 10 + Math.random() * 16, s: 9 + Math.random() * 10, o: .07 + Math.random() * .2 });
+  var n = Math.min(46, Math.floor(rainCv.width / 30));
+  for (var i = 0; i < n; i++) drops.push(rainSpawn({ l: 8 + Math.random() * 12, s: 7 + Math.random() * 8, o: .06 + Math.random() * .16 }, false));
 }
 function rainTick(){
   if (rainCtx && motionOn && heroVisible && !document.hidden && !window.__physLive) {
     rainCtx.clearRect(0, 0, rainCv.width, rainCv.height);
     rainCtx.lineWidth = 1;
+    var yBot = rainZone().y1 * rainCv.height;
     for (var i = 0; i < drops.length; i++) {
       var d = drops[i];
       rainCtx.strokeStyle = 'rgba(190,230,255,' + d.o + ')';
       rainCtx.beginPath(); rainCtx.moveTo(d.x, d.y); rainCtx.lineTo(d.x - 2, d.y + d.l); rainCtx.stroke();
       d.y += d.s; d.x -= .6;
-      if (d.y > rainCv.height) { d.y = -20; d.x = Math.random() * (rainCv.width + 40); }
+      if (d.y > yBot) rainSpawn(d, true);
     }
   }
   requestAnimationFrame(rainTick);
@@ -1543,12 +1554,14 @@ try {
     bodies.push({ o: grp, x, y, z: -1 - Math.random() * 3, hx: x, hy: y, vx: (Math.random() - .5) * .8, vy: (Math.random() - .5) * .6, wx: (Math.random() - .5) * 1.4, wy: (Math.random() - .5) * 1.4, ph: Math.random() * 6.28 });
   }
 
-  /* rain as line streaks */
-  const NR = isMobile ? 360 : 700, rPos = new Float32Array(NR * 6), rDat = [];
-  for (let i = 0; i < NR; i++) rDat.push({ x: (Math.random() * 2 - 1) * halfW * 1.1, y: (Math.random() * 2 - 1) * halfH, s: 9 + Math.random() * 9 });
+  /* rain as line streaks - OUTSIDE the window only (right of the operator), light */
+  const NR = isMobile ? 110 : 200, rPos = new Float32Array(NR * 6), rDat = [];
+  const rXMin = ((isMobile ? 0.50 : 0.45) * 2 - 1) * halfW, rXMax = (0.99 * 2 - 1) * halfW;
+  const rYTop = (1 - 0.02 * 2) * halfH, rYBot = (1 - (isMobile ? 0.52 : 0.79) * 2) * halfH;
+  for (let i = 0; i < NR; i++) rDat.push({ x: rXMin + Math.random() * (rXMax - rXMin), y: rYBot + Math.random() * (rYTop - rYBot), s: 8 + Math.random() * 7 });
   const rainGeo = new THREE.BufferGeometry();
   rainGeo.setAttribute('position', new THREE.BufferAttribute(rPos, 3));
-  scene.add(new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: 0x8fd0ff, transparent: true, opacity: 0.32 })));
+  scene.add(new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: 0x8fd0ff, transparent: true, opacity: 0.22 })));
 
   /* rising motes */
   const NM = 110, mPos = new Float32Array(NM * 3), mSeed = [];
@@ -1619,9 +1632,10 @@ try {
     for (let i = 0; i < NR; i++) {
       const d = rDat[i];
       d.y -= d.s * dt; d.x += pvx * 0.05 * dt * d.s * 0.14;
-      if (d.y < -halfH) { d.y = halfH + Math.random() * 2; d.x = (Math.random() * 2 - 1) * halfW * 1.1; }
+      if (d.y < rYBot) { d.y = rYTop + Math.random() * 0.5; d.x = rXMin + Math.random() * (rXMax - rXMin); }
+      if (d.x > rXMax) d.x = rXMin + (d.x - rXMax); if (d.x < rXMin) d.x = rXMax - (rXMin - d.x);
       rPos[i * 6] = d.x; rPos[i * 6 + 1] = d.y; rPos[i * 6 + 2] = -2.5;
-      rPos[i * 6 + 3] = d.x + pvx * 0.02; rPos[i * 6 + 4] = d.y + 0.75; rPos[i * 6 + 5] = -2.5;
+      rPos[i * 6 + 3] = d.x + pvx * 0.02; rPos[i * 6 + 4] = d.y + 0.55; rPos[i * 6 + 5] = -2.5;
     }
     rainGeo.attributes.position.needsUpdate = true;
     for (let i = 0; i < NM; i++) {
