@@ -1514,6 +1514,8 @@ try {
   const hero = document.getElementById('hero'), art = document.getElementById('heroFrame'), cv = document.getElementById('physGL');
   const renderer = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
   camera.position.set(0, 0, 30);
@@ -1578,7 +1580,7 @@ try {
      Mixamo-rigged GLB in the same scene as the holograms. Desktop only;
      mobile keeps its painted portrait band. If the GLB fails to load the
      painted pose stack simply stays - nothing breaks. */
-  let danny = null, mixer = null, dActions = {}, dCur = null, parX = 0, parY = 0;
+  let danny = null, mixer = null, dActions = {}, dCur = null, parX = 0, parY = 0, dShadow = null;
   function playClip(name) {
     const a = dActions[name];
     if (!a || a === dCur) return;
@@ -1596,15 +1598,26 @@ try {
   };
   function placeDanny() {
     if (!danny) return;
-    danny.scale.setScalar(halfH * 1.09);
-    danny.position.set(-0.66 * halfW + parX, -0.94 * halfH + parY, 0.5);
+    danny.scale.setScalar(halfH * 1.04);
+    danny.position.set(-0.66 * halfW + parX, -0.92 * halfH + parY, 0.5);
     danny.rotation.y = 0.5;
+    if (dShadow) {
+      dShadow.position.set(danny.position.x + halfH * 0.10, -0.97 * halfH + parY * 0.35, 0.32);
+      dShadow.scale.set(halfH * 1.05, halfH * 0.24, 1);
+    }
   }
   window.__placeDanny = placeDanny;
-  if (!isMobile) {
-    scene.add(new THREE.HemisphereLight(0xdfeaff, 0x1a2016, 1.25));
-    const dKey = new THREE.DirectionalLight(0xfff2df, 1.5); dKey.position.set(6, 10, 12); scene.add(dKey);
-    const dRim = new THREE.DirectionalLight(0xa3e635, 0.8); dRim.position.set(-9, 4, -6); scene.add(dRim);
+  if (!isMobile && renderer.capabilities.isWebGL2) {
+    /* scene-matched lighting: cool window key from the right, dim teal
+       ambient, strong acid rim from back-left, warm lotus spill fill */
+    scene.add(new THREE.HemisphereLight(0x9fc8e8, 0x0e1a12, 0.85));
+    const dKey = new THREE.DirectionalLight(0xcfe6ff, 1.35); dKey.position.set(8, 9, 10); scene.add(dKey);
+    const dRim = new THREE.DirectionalLight(0xa3e635, 1.6); dRim.position.set(-8, 5, -7); scene.add(dRim);
+    const dFill = new THREE.DirectionalLight(0xffd9a0, 0.35); dFill.position.set(10, 2, 6); scene.add(dFill);
+    /* soft contact shadow so he sits IN the deck, not pasted on it */
+    const shTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'); const gr = x.createRadialGradient(64, 64, 4, 64, 64, 62); gr.addColorStop(0, 'rgba(2,8,6,0.62)'); gr.addColorStop(0.6, 'rgba(2,8,6,0.28)'); gr.addColorStop(1, 'rgba(2,8,6,0)'); x.fillStyle = gr; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+    dShadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: shTex, transparent: true, depthWrite: false }));
+    scene.add(dShadow);
     import('three/addons/loaders/GLTFLoader.js').then(({ GLTFLoader }) => {
       new GLTFLoader().load('assets/danny-hero.glb', g => {
         danny = g.scene;
@@ -1614,6 +1627,7 @@ try {
         g.animations.forEach(c => { const a = mixer.clipAction(c); a.stop(); a.weight = 0; a.enabled = false; dActions[c.name] = a; });
         placeDanny();
         playClip(window.__poseReq === 'think' ? 'Thinking' : window.__poseReq === 'lean' ? 'LeanBack' : 'Typing');
+        mixer.update(2.2); /* land mid-clip: first visible frame is a real pose, never bind pose */
         hero.classList.add('gl3d');
       });
     }).catch(() => {});
