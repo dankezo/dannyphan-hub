@@ -1,0 +1,15 @@
+# Danny Phan
+
+> Danny Phan is a security operations and automation engineer based in Hanoi, Vietnam. This site is his project hub.
+
+## Projects
+
+- [antiRea](https://antirea.dannyphan.me/): Open-source TypeScript library that meters dataset access per identity and flags coordinated bot abuse for web apps and SaaS. Server-side, zero dependencies, advisory only. Current release: 2.8.0, MIT license. npm: @dannyphan190/anti-rea.
+- BaoAnSearch: Pharmaceutical product search and catalog tooling (internal tool).
+- [Catopedia](https://catopedia.space/): Free bilingual cat encyclopedia in Vietnamese and English.
+- News Translator: AI-curated news translation and automated publishing pipeline (AI curation, translation, Playwright posting).
+
+## Links
+
+- GitHub: https://github.com/dankezo
+- LinkedIn: https://www.linkedin.com/in/dannyphan1909
