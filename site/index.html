@@ -191,8 +191,13 @@ h1.mega .acid{color:var(--acid);text-shadow:0 0 34px rgba(163,230,53,.35)}
 }
 
 /* ---------- methods + field results ---------- */
-.meths{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-@media(max-width:900px){.meths{grid-template-columns:1fr}}
+.meth-wrap{position:relative}
+.meths{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;scrollbar-width:none}
+.meths::-webkit-scrollbar{display:none}
+.meths .meth{flex:0 0 min(350px,84vw);scroll-snap-align:start}
+.meth-arrow{position:absolute;top:42%;z-index:5;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(7,9,12,.55);color:var(--paper);font-family:var(--mono);font-size:16px;cursor:pointer;opacity:.38;transition:opacity 250ms,border-color 250ms;backdrop-filter:blur(3px)}
+.meth-arrow:hover{opacity:.9;border-color:var(--acid);color:var(--acid)}
+.meth-arrow.prev{left:-8px}.meth-arrow.next{right:-8px}
 .meth{border:1px solid var(--line2);background:rgba(12,15,19,.55);padding:0 20px 20px;overflow:hidden}
 .mviz{height:118px;margin:0 -20px 16px;position:relative;overflow:hidden;background:radial-gradient(300px 130px at 50% 120%,rgba(163,230,53,.12),transparent 70%),#0A0D10;border-bottom:1px solid var(--line2)}
 .mviz .rings i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1px solid rgba(163,230,53,.35);border-radius:50%}
@@ -403,10 +408,10 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
   <!-- HERO -->
   <section class="hero" id="hero">
     <div class="hero-art" id="heroFrame">
-      <img class="key" src="assets/hero.jpg" alt="Danny Phan tại buồng chỉ huy nhìn xuống Neo-Hanoi, mèo đen ngồi cạnh bàn điều khiển" fetchpriority="high">
-      <div class="lotus-wrap" id="lotusWrap"><img class="lotus-layer" src="assets/lotus-cut.png" alt="" aria-hidden="true"></div>
-      <div class="danny-wrap" id="dannyWrap"><img class="danny-layer" src="assets/danny-cut.png" alt="" aria-hidden="true"></div>
-      <div class="cat-wrap" id="catWrap"><img class="cat-layer" src="assets/cat-cut.png" alt="" aria-hidden="true"></div>
+      <img class="key" src="assets/hero-clean.jpg" alt="Danny Phan tại buồng chỉ huy nhìn xuống Neo-Hanoi, mèo đen ngồi cạnh bàn điều khiển" fetchpriority="high">
+      <div class="lotus-wrap" id="lotusWrap"><img class="lotus-layer" src="assets/lotus-cut.webp" alt="" aria-hidden="true"></div>
+      <div class="danny-wrap" id="dannyWrap"><img class="danny-layer" src="assets/danny-cut.webp" alt="" aria-hidden="true"></div>
+      <div class="cat-wrap" id="catWrap"><img class="cat-layer" src="assets/cat-cut.webp" alt="" aria-hidden="true"></div>
       <div class="scan"><i></i></div>
     </div>
     <canvas id="gl" aria-hidden="true"></canvas>
@@ -548,32 +553,36 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
       </div>
       <div class="idx" style="max-width:300px;line-height:2" data-i18n="methNote">CHỈ NÓI SƠ BỘ.<br>QUY TRÌNH GIỮ KÍN.<br>KẾT QUẢ THÌ CÔNG KHAI.</div>
     </div>
-    <div class="meths">
+    <div class="meth-wrap">
+      <button class="meth-arrow prev" id="methPrev" type="button" aria-label="Cuộn trái">&lt;</button>
+      <div class="meths" id="methTrack">
       <div class="meth reveal">
         <div class="mviz"><div class="rings"><i></i><i></i><i></i></div><div class="sweep"></div><div class="blip"></div></div>
-        <div class="mname">DEEP TRACE</div>
-        <h3 data-i18n="m1Name">Quét sâu theo dấu vết</h3>
-        <p data-i18n="m1Desc">Không quét bề mặt. Hệ thống nào cũng để lại dấu vết - version, cấu hình, thói quen vận hành. Tôi đi theo dấu vết đó, dựng lại bức tranh thật, rồi mới kết luận.</p>
+        <div class="mname">THE HERD LENS</div>
+        <h3 data-i18n="m1Name">Nhìn cả bầy, không soi từng con</h3>
+        <p data-i18n="m1Desc">Ai cũng soi từng request nên bot lẻ luôn lọt. Tôi đo cả bầy theo thời gian: bầy có phối hợp tự lộ nhịp chung, dù mỗi con trông vô hại. Đây là lõi của antiRea - thứ tôi và đội của mình cook ra sau hàng trăm vòng thí nghiệm đo được.</p>
       </div>
       <div class="meth reveal">
         <div class="mviz"><div class="chain"><i></i><i></i><i></i><i></i></div></div>
-        <div class="mname">PROVE IT, END TO END</div>
-        <h3 data-i18n="m2Name">Chứng minh đầu - cuối</h3>
-        <p data-i18n="m2Desc">Không có chuyện "có vẻ là lỗ hổng". Một vấn đề chỉ được gọi tên khi đã khai thác được thật, từ đầu tới cuối, bằng chứng chụp thật. Còn lại, tất cả chỉ là gia cố.</p>
+        <div class="mname">THE METER</div>
+        <h3 data-i18n="m2Name">Đồng hồ đo theo danh tính</h3>
+        <p data-i18n="m2Desc">Mọi danh tính có một ngân sách dữ liệu. Trong ngân sách thì cứ lấy, vượt là bị ghi sổ và nhận 429. Không chặn bừa theo linh cảm: đo trước, tính sau - và người dùng thật không bao giờ bị đụng tới.</p>
       </div>
       <div class="meth reveal">
         <div class="mviz"><div class="tg"><i></i><i></i><i></i><b></b></div></div>
-        <div class="mname">ATTACKER'S EYE</div>
-        <h3 data-i18n="m3Name">Đọc bằng mắt kẻ tấn công</h3>
-        <p data-i18n="m3Desc">Nhìn một website như người muốn phá nó - rồi ra tay như người muốn cứu nó. Hai góc nhìn trong cùng một cái đầu. Đó là chỗ khác biệt.</p>
+        <div class="mname">PROVE IT, END TO END</div>
+        <h3 data-i18n="m3Name">Chứng minh đầu - cuối</h3>
+        <p data-i18n="m3Desc">Không có chuyện "có vẻ là lỗ hổng". Một vấn đề chỉ được gọi tên khi đã khai thác được thật, từ đầu tới cuối, bằng chứng chụp thật. Còn lại, tất cả chỉ là gia cố. Chuẩn này tôi áp cho mọi ca nhận vào.</p>
       </div>
+      </div>
+      <button class="meth-arrow next" id="methNext" type="button" aria-label="Cuộn phải">&gt;</button>
     </div>
     <div class="board reveal">
       <div class="brow bhead"><span data-i18n="bSite">WEBSITE ĐÃ GIÚP</span><span data-i18n="bProb">VẤN ĐỀ</span><span data-i18n="bMeth">PHƯƠNG THỨC</span><span data-i18n="bStat">TRẠNG THÁI</span></div>
-      <div class="brow"><span data-i18n="r1Site">Khách sạn quốc tế - Hà Nội</span><span data-i18n="r1Prob">Chứng chỉ TLS hết hạn ngay mùa cao điểm</span><span>DEEP TRACE</span><span class="bst" data-i18n="r1Stat">Đã cảnh báo trước hạn</span></div>
+      <div class="brow"><span data-i18n="r1Site">Khách sạn quốc tế - Hà Nội</span><span data-i18n="r1Prob">Chứng chỉ TLS hết hạn ngay mùa cao điểm</span><span>THE HERD LENS</span><span class="bst" data-i18n="r1Stat">Đã cảnh báo trước hạn</span></div>
       <div class="brow"><span data-i18n="r2Site">Chuỗi nha khoa - TP.HCM</span><span data-i18n="r2Prob">CORS phản chiếu mọi origin, kèm credentials</span><span>PROVE IT, END TO END</span><span class="bst" data-i18n="r2Stat">Xác minh 2 vòng - báo riêng</span></div>
-      <div class="brow"><span data-i18n="r3Site">Website thương mại điện tử</span><span data-i18n="r3Prob">Vẫn bật TLS 1.0 / 1.1 lỗi thời</span><span>DEEP TRACE</span><span class="bst" data-i18n="r3Stat">Đã gửi khuyến nghị gia cố</span></div>
-      <div class="brow"><span data-i18n="r4Site">Khách sạn - Đà Nẵng</span><span data-i18n="r4Prob">Luồng đặt phòng cần rà soát bảo mật</span><span>ATTACKER'S EYE</span><span class="bst" data-i18n="r4Stat">Đã báo riêng, kèm bằng chứng</span></div>
+      <div class="brow"><span data-i18n="r3Site">Website thương mại điện tử</span><span data-i18n="r3Prob">Vẫn bật TLS 1.0 / 1.1 lỗi thời</span><span>THE HERD LENS</span><span class="bst" data-i18n="r3Stat">Đã gửi khuyến nghị gia cố</span></div>
+      <div class="brow"><span data-i18n="r4Site">Khách sạn - Đà Nẵng</span><span data-i18n="r4Prob">Luồng đặt phòng cần rà soát bảo mật</span><span>THE METER</span><span class="bst" data-i18n="r4Stat">Đã báo riêng, kèm bằng chứng</span></div>
       <div class="bfoot" data-i18n="bFoot">Hiển thị 4 ca tiêu biểu. Tên khách hàng và hồ sơ đầy đủ giữ riêng - đó cũng là một phần của phương thức.</div>
     </div>
   </section>
@@ -680,12 +689,12 @@ vi: {
   goOpen: 'MỞ MODULE <b>-></b>', goAsk: 'HỎI THÊM <b>-></b>',
   methTitle: 'Phương thức<br><span class="acid">tự cook</span>',
   methNote: 'CHỈ NÓI SƠ BỘ.<br>QUY TRÌNH GIỮ KÍN.<br>KẾT QUẢ THÌ CÔNG KHAI.',
-  m1Name: 'Quét sâu theo dấu vết',
-  m1Desc: 'Không quét bề mặt. Hệ thống nào cũng để lại dấu vết - version, cấu hình, thói quen vận hành. Tôi đi theo dấu vết đó, dựng lại bức tranh thật, rồi mới kết luận.',
-  m2Name: 'Chứng minh đầu - cuối',
-  m2Desc: 'Không có chuyện "có vẻ là lỗ hổng". Một vấn đề chỉ được gọi tên khi đã khai thác được thật, từ đầu tới cuối, bằng chứng chụp thật. Còn lại, tất cả chỉ là gia cố.',
-  m3Name: 'Đọc bằng mắt kẻ tấn công',
-  m3Desc: 'Nhìn một website như người muốn phá nó - rồi ra tay như người muốn cứu nó. Hai góc nhìn trong cùng một cái đầu. Đó là chỗ khác biệt.',
+  m1Name: 'Nhìn cả bầy, không soi từng con',
+  m1Desc: 'Ai cũng soi từng request nên bot lẻ luôn lọt. Tôi đo cả bầy theo thời gian: bầy có phối hợp tự lộ nhịp chung, dù mỗi con trông vô hại. Đây là lõi của antiRea - thứ tôi và đội của mình cook ra sau hàng trăm vòng thí nghiệm đo được.',
+  m2Name: 'Đồng hồ đo theo danh tính',
+  m2Desc: 'Mọi danh tính có một ngân sách dữ liệu. Trong ngân sách thì cứ lấy, vượt là bị ghi sổ và nhận 429. Không chặn bừa theo linh cảm: đo trước, tính sau - và người dùng thật không bao giờ bị đụng tới.',
+  m3Name: 'Chứng minh đầu - cuối',
+  m3Desc: 'Không có chuyện "có vẻ là lỗ hổng". Một vấn đề chỉ được gọi tên khi đã khai thác được thật, từ đầu tới cuối, bằng chứng chụp thật. Còn lại, tất cả chỉ là gia cố. Chuẩn này tôi áp cho mọi ca nhận vào.',
   bSite: 'WEBSITE ĐÃ GIÚP', bProb: 'VẤN ĐỀ', bMeth: 'PHƯƠNG THỨC', bStat: 'TRẠNG THÁI',
   r1Site: 'Khách sạn quốc tế - Hà Nội', r1Prob: 'Chứng chỉ TLS hết hạn ngay mùa cao điểm', r1Stat: 'Đã cảnh báo trước hạn',
   r2Site: 'Chuỗi nha khoa - TP.HCM', r2Prob: 'CORS phản chiếu mọi origin, kèm credentials', r2Stat: 'Xác minh 2 vòng - báo riêng',
@@ -732,12 +741,12 @@ en: {
   goOpen: 'OPEN MODULE <b>-></b>', goAsk: 'ASK MORE <b>-></b>',
   methTitle: 'Methods<br><span class="acid">home-cooked</span>',
   methNote: 'HIGH LEVEL ONLY.<br>THE PROCESS STAYS PRIVATE.<br>THE RESULTS ARE PUBLIC.',
-  m1Name: 'Deep-trace scanning',
-  m1Desc: 'No surface scans. Every system leaves traces - versions, configs, operating habits. I follow the traces, rebuild the real picture, then draw conclusions.',
-  m2Name: 'Prove it, end to end',
-  m2Desc: 'There is no "looks like a vulnerability". An issue earns its name only when it has been exploited for real, end to end, with real screenshot evidence. Everything else is just hardening.',
-  m3Name: "Attacker's eye",
-  m3Desc: 'Look at a website the way someone who wants to break it would - then act like someone who wants to save it. Two viewpoints in one head. That is the difference.',
+  m1Name: 'Watch the herd, not the individual',
+  m1Desc: 'Everyone inspects single requests, so lone bots slip through. I measure the whole herd over time: a coordinated herd gives itself away by its shared rhythm, even when each member looks harmless. That is the core of antiRea - cooked by me and my crew over hundreds of measured lab rounds.',
+  m2Name: 'A budget for every identity',
+  m2Desc: 'Every identity gets a data budget. Inside the budget, take what you need; cross it and you are logged and served a 429. No gut-feel blocking: measure first, charge later - and real users are never touched.',
+  m3Name: 'Prove it, end to end',
+  m3Desc: 'There is no "looks like a vulnerability". An issue earns its name only when it has been exploited for real, end to end, with real screenshot evidence. Everything else is just hardening. I hold every case I take to this standard.',
   bSite: 'WEBSITES HELPED', bProb: 'THE PROBLEM', bMeth: 'METHOD', bStat: 'STATUS',
   r1Site: 'International hotel - Hanoi', r1Prob: 'TLS certificate expiring right before peak season', r1Stat: 'Flagged before the deadline',
   r2Site: 'Dental chain - Ho Chi Minh City', r2Prob: 'CORS reflecting every origin, with credentials', r2Stat: 'Verified twice - reported privately',
@@ -975,7 +984,7 @@ function loop(now){
   px += (tx - px) * .06; py += (ty - py) * .06;
   if (heroVisible) {
     if (skyEl) skyEl.style.transform = 'translate3d(' + ((px - .5) * -14) + 'px,' + (scrollY * .10 + (py - .5) * -8) + 'px,0)';
-    if (heroFrame) heroFrame.style.transform = 'translate3d(' + ((px - .5) * -12) + 'px,' + ((py - .5) * -8 + Math.min(scrollY * .05, 34)) + 'px,0) scale(' + (1.07 + Math.min(scrollY * .00006, .06)) + ')';
+    if (heroFrame) heroFrame.style.transform = 'translate3d(' + ((px - .5) * -7) + 'px,' + ((py - .5) * -5 + Math.min(scrollY * .025, 16)) + 'px,0) scale(' + (1.03 + Math.min(scrollY * .00003, .025)) + ')';
     if (lotusWrap) lotusWrap.style.transform = 'translate3d(' + ((px - .5) * -9) + 'px,' + ((py - .5) * -5 + Math.min(scrollY * .012, 8)) + 'px,0) scale(1.02)';
     if (dannyWrap) dannyWrap.style.transform = 'translate3d(' + ((px - .5) * -25) + 'px,' + ((py - .5) * -14 + Math.min(scrollY * .03, 20)) + 'px,0) scale(1.045)';
     if (catWrap) catWrap.style.transform = 'translate3d(' + ((px - .5) * -38) + 'px,' + ((py - .5) * -21 + Math.min(scrollY * .05, 26)) + 'px,0) scale(1.06)';
@@ -1341,6 +1350,32 @@ if (catHot) catHot.addEventListener('click', function(){
   sfx('meow');
   setTimeout(openCat, 350);
 });
+
+/* ---------- methods carousel: auto-scrolls, rests under your cursor ---------- */
+(function(){
+  var track = $('#methTrack'); if (!track) return;
+  var origCount = track.children.length;
+  for (var ci = 0; ci < origCount; ci++) { var cl = track.children[ci].cloneNode(true); cl.setAttribute('aria-hidden', 'true'); cl.classList.remove('reveal'); track.appendChild(cl); }
+  var half = 0, paused = false, resumeAt = 0;
+  function measure(){ half = track.scrollWidth / 2; }
+  setTimeout(measure, 600);
+  window.addEventListener('resize', measure);
+  track.addEventListener('pointerenter', function(){ paused = true; });
+  track.addEventListener('pointerleave', function(){ paused = false; });
+  track.addEventListener('pointerdown', function(){ resumeAt = Date.now() + 4000; });
+  track.addEventListener('wheel', function(){ resumeAt = Date.now() + 4000; }, { passive: true });
+  function step(){
+    if (motionOn && !paused && Date.now() > resumeAt && half > track.clientWidth && !document.hidden) {
+      track.scrollLeft += .55;
+      if (track.scrollLeft >= half) track.scrollLeft -= half;
+    }
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+  var prev = $('#methPrev'), next = $('#methNext');
+  if (prev) prev.addEventListener('click', function(){ resumeAt = Date.now() + 4000; track.scrollBy({ left: -370, behavior: 'smooth' }); });
+  if (next) next.addEventListener('click', function(){ resumeAt = Date.now() + 4000; track.scrollBy({ left: 370, behavior: 'smooth' }); });
+})();
 
 /* ---------- heatmap: shipping rhythm, seeded so it looks the same for everyone ---------- */
 function renderHeat(){
