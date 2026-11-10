@@ -189,6 +189,30 @@ h1.mega .acid{color:var(--acid);text-shadow:0 0 34px rgba(163,230,53,.35)}
 .scrollcue{position:absolute;right:clamp(16px,4vw,44px);bottom:110px;z-index:6;font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--mut);writing-mode:vertical-rl;display:flex;align-items:center;gap:10px}
 .scrollcue::after{content:"";width:1px;height:52px;background:linear-gradient(var(--acid),transparent);animation:cue 1.8s var(--ease) infinite}
 @keyframes cue{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+/* ---------- M7 hero: slogan + contact chips, live 3D room stage ---------- */
+.hero-slogan{display:none}
+.cta-chips{display:none}
+@media(min-width:901px){
+  .hero-sub{display:none}
+  .cta-row{display:none}
+  .hero-slogan{display:flex;align-items:center;gap:12px;margin-top:18px;font-family:var(--mono);font-size:clamp(12px,1.25vw,15px);letter-spacing:.24em;color:var(--acid);text-transform:uppercase}
+  .hero-slogan::before{content:"";width:9px;height:9px;background:var(--acid);box-shadow:0 0 10px var(--acid);flex:none}
+  .cta-chips{display:flex;gap:12px;margin-top:26px;flex-wrap:wrap}
+  .hchip{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-decoration:none;padding:13px 20px;border:1px solid var(--line);color:var(--paper);background:rgba(7,9,12,.55);backdrop-filter:blur(4px);transition:border-color 250ms,color 250ms,transform 250ms var(--ease),box-shadow 250ms}
+  .hchip:hover{border-color:var(--acid);color:var(--acid);transform:translateY(-2px)}
+  .hchip.solid{background:var(--acid);border-color:var(--acid);color:#0B0E11;font-weight:700}
+  .hchip.solid:hover{color:#0B0E11;box-shadow:0 12px 30px rgba(163,230,53,.25)}
+  /* live room: the canvas becomes the left stage (copy owns the right) */
+  .hero.gl3d #physGL{inset:auto;left:0;top:0;width:55%;height:100%;opacity:1;mix-blend-mode:normal;
+    -webkit-mask-image:linear-gradient(90deg,#000 88%,transparent 100%);mask-image:linear-gradient(90deg,#000 88%,transparent 100%)}
+  .hero.gl3d .cat-wrap{visibility:hidden}
+  .hero.gl3d #catHot{display:none}
+  .hero.gl3d .hero-grid{grid-template-columns:55% 1fr}
+  .hero.gl3d .hero-copy{padding-left:clamp(8px,1.6vw,28px)}
+  .hero.gl3d #dannySay{left:36%;top:11.5%}
+  .hero.gl3d #dannyHot{left:26%;bottom:auto;top:29%;width:9%;height:34%}
+  .hero.gl3d .chip.c3{top:134px;bottom:auto;right:clamp(16px,4vw,44px)}
+}
 @media(max-width:900px){
   /* Mobile gets its own composition instead of a squeezed desktop frame:
      the scene is a full-bleed band on top, the copy lives below it on solid
@@ -206,6 +230,9 @@ h1.mega .acid{color:var(--acid);text-shadow:0 0 34px rgba(163,230,53,.35)}
   .scrollcue{display:none}
   .hero-grid{grid-template-columns:1fr}
   .hero-copy{grid-column:auto;text-shadow:none}
+  /* keep the CTA row clear of the fixed cat chat button (bottom-right):
+     buttons wrap inside the safe width instead of sliding under it */
+  .cta-row{padding-right:104px}
   .hero-inner{padding-top:6px}
   #dannyHot{left:0;bottom:auto;top:5svh;width:60vw;height:46svh}
   #catHot{left:73%;top:31svh;width:27%;height:21svh}
@@ -461,15 +488,20 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
             <span class="row" data-split>DANNY</span>
             <span class="row acid" data-split>PHAN</span>
           </h1>
+          <div class="hero-slogan" data-i18n="slogan">Trai Indie nhà nghèo</div>
           <p class="hero-sub" data-i18n="heroSub">Kỹ sư bảo mật, đầu óc không chịu ngồi yên. Thấy hệ thống là muốn mở ra xem nó chạy thế nào, thấy giới hạn là muốn gỡ. Tự động hóa, dữ liệu, web, bảo mật, media - trong từ điển của tôi không có cụm <b>"không làm được"</b>.</p>
           <div class="cta-row">
             <a class="btn" href="#modules" data-cur="GO" data-i18n="ctaModules">XEM CÁC MODULE</a>
             <a class="btn ghost" href="#" id="ctaCat" data-cur="CHAT" data-i18n="ctaCat">HỎI NEO - MÈO AI</a>
           </div>
+          <div class="cta-chips">
+            <a class="hchip solid" href="#contact" data-cur="GO" data-i18n="ctaContact">CONTACT</a>
+            <a class="hchip" href="#contact" data-cur="GO" data-i18n="ctaCollab">COLLAB</a>
+          </div>
         </div>
       </div>
       <div class="hero-meta">
-        <div><div class="n"><span data-count="812">0</span></div><div class="l">TEST CASES - ANTIREA SUITE</div></div>
+        <div><div class="n"><span data-count="817">0</span></div><div class="l">TEST CASES - ANTIREA SUITE</div></div>
         <div><div class="n"><span data-count="8">0</span> <em data-i18n="wordKinds">loại</em></div><div class="l" data-i18n="meta2">SIGNAL KINDS ĐANG CHẠY</div></div>
         <div><div class="n"><span data-count="150">0</span><em>/24h</em></div><div class="l" data-i18n="meta3">RECORD BUDGET MỖI DANH TÍNH</div></div>
         <div><div class="n"><span data-count="4">0</span></div><div class="l" data-i18n="meta4">FLAGSHIP MODULES TRÊN DECK</div></div>
@@ -540,7 +572,7 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
       <a class="mod reveal" href="https://antirea.dannyphan.me" target="_blank" rel="noopener" data-cur="OPEN" data-tilt>
         <div class="mid"><span>MOD-01 // SECURITY LIBRARY</span><span class="st">v2.8.0 - LIVE</span></div>
         <h3>antiRea</h3>
-        <p data-i18n="mod1Desc">Thư viện TypeScript phía server chống cào dữ liệu: đo lượng theo từng danh tính, phát hiện bầy bot phối hợp, để lại bằng chứng điều tra được. Đã publish npm, JSR và MCP Registry - 812 test, 0 dependency, đang gác cổng cho cả deck này.</p>
+        <p data-i18n="mod1Desc">Thư viện TypeScript phía server chống cào dữ liệu: đo lượng theo từng danh tính, phát hiện bầy bot phối hợp, để lại bằng chứng điều tra được. Đã publish npm, JSR và MCP Registry - 817 test, 0 dependency, đang gác cổng cho cả deck này.</p>
         <div class="tags"><i>TYPESCRIPT</i><i>ZERO-DEP</i><i>NPM + JSR</i><i>MCP</i></div>
         <div class="go" data-i18n="goOpen">MỞ MODULE <b>-&gt;</b></div>
         <div class="bignum">01</div><div class="shine"></div>
@@ -705,13 +737,14 @@ var I18N = {
 vi: {
   hstat: 'HÀ NỘI, VN - <b>ĐANG TRỰC TUYẾN</b>',
   ctaModules: 'XEM CÁC MODULE', ctaCat: 'HỎI NEO - MÈO AI',
+  slogan: 'Trai Indie nhà nghèo', ctaContact: 'CONTACT', ctaCollab: 'COLLAB',
   wordKinds: 'loại', meta2: 'SIGNAL KINDS ĐANG CHẠY', meta3: 'RECORD BUDGET MỖI DANH TÍNH', meta4: 'FLAGSHIP MODULES TRÊN DECK',
   opsBeat: 'HEARTBEAT - GIẢ LẬP NHỊP SINH HỌC', opsTok: 'TOKEN BURN - HÔM NAY (AI CREW)', opsCrew: 'AI CREW - GHẾ ĐANG TRỰC',
   tokRateL: 'TỐC ĐỘ', tokPeakL: 'ĐỈNH HÔM NAY', crewArgon: 'MEDIA / MODEL / RED TEAM', crewNeo: 'MÈO TRỰC DECK',
   heatTitle: 'NHỊP SHIP HÀNG - 26 TUẦN GẦN NHẤT', heatStreakL: 'TUẦN ĐANG CHÁY', heatTotalL: 'NGÀY CÓ PUSH',
   heroSub: 'Kỹ sư bảo mật, đầu óc không chịu ngồi yên. Thấy hệ thống là muốn mở ra xem nó chạy thế nào, thấy giới hạn là muốn gỡ. Tự động hóa, dữ liệu, web, bảo mật, media - trong từ điển của tôi không có cụm <b>"không làm được"</b>.',
   modsNote: 'BỐN HỆ THỐNG ĐANG CHẠY THẬT.<br>CÓ NGƯỜI DÙNG THẬT, SỐ LIỆU THẬT.<br>KHÔNG CÓ HÀNG TRƯNG BÀY.',
-  mod1Desc: 'Thư viện TypeScript phía server chống cào dữ liệu: đo lượng theo từng danh tính, phát hiện bầy bot phối hợp, để lại bằng chứng điều tra được. Đã publish npm, JSR và MCP Registry - 812 test, 0 dependency, đang gác cổng cho cả deck này.',
+  mod1Desc: 'Thư viện TypeScript phía server chống cào dữ liệu: đo lượng theo từng danh tính, phát hiện bầy bot phối hợp, để lại bằng chứng điều tra được. Đã publish npm, JSR và MCP Registry - 817 test, 0 dependency, đang gác cổng cho cả deck này.',
   mod2Desc: 'Hệ tra cứu dữ liệu dược cho đội BaoAn Pharma: 9.237 dòng, 82 công ty, chuẩn hóa từ giấy và brochure thật thành dữ liệu tìm được trong vài giây theo công ty, sản phẩm, hoạt chất, hàm lượng.',
   mod3Desc: 'Wiki mèo song ngữ Việt - Anh: từ điển giống mèo, chăm sóc, nhận nuôi gần bạn. Next.js trên Cloudflare, toàn bộ hạ tầng chạy với chi phí bắt buộc 0 đồng - vẫn nhanh, vẫn miễn phí cho người đọc.',
   mod4Desc: 'Đường ống tin tự chạy: AI chọn bài đáng đọc, dịch, rồi Playwright tự đăng. Không biên tập viên, không người gác - một hệ thống xuất bản vận hành một mình từ đầu tới cuối.',
@@ -757,13 +790,14 @@ vi: {
 en: {
   hstat: 'HANOI, VN - <b>SYSTEMS ONLINE</b>',
   ctaModules: 'VIEW MODULES', ctaCat: 'ASK NEO - AI CAT',
+  slogan: 'Broke indie kid, building anyway', ctaContact: 'CONTACT', ctaCollab: 'COLLAB',
   wordKinds: 'kinds', meta2: 'SIGNAL KINDS RUNNING', meta3: 'RECORD BUDGET PER IDENTITY', meta4: 'FLAGSHIP MODULES ON DECK',
   opsBeat: 'HEARTBEAT - SIMULATED VITALS', opsTok: 'TOKEN BURN - TODAY (AI CREW)', opsCrew: 'AI CREW - ON DUTY',
   tokRateL: 'RATE', tokPeakL: 'PEAK TODAY', crewArgon: 'MEDIA / MODEL / RED TEAM', crewNeo: 'DECK CAT',
   heatTitle: 'SHIPPING RHYTHM - LAST 26 WEEKS', heatStreakL: 'WEEK STREAK', heatTotalL: 'ACTIVE DAYS',
   heroSub: 'Security engineer, restless mind. Show me a system and I want to open it up and see how it runs. Show me a limit and I want it gone. Automation, data, web, security, media - "can\'t be done" is not in my dictionary.',
   modsNote: 'FOUR SYSTEMS, LIVE IN PRODUCTION.<br>REAL USERS, REAL NUMBERS.<br>NO SHOWROOM PIECES.',
-  mod1Desc: 'Server-side TypeScript library against data scraping: per-identity metering, coordinated bot-herd detection, investigation-grade evidence. Published on npm, JSR and the MCP Registry - 812 tests, zero dependencies, and it guards this very deck.',
+  mod1Desc: 'Server-side TypeScript library against data scraping: per-identity metering, coordinated bot-herd detection, investigation-grade evidence. Published on npm, JSR and the MCP Registry - 817 tests, zero dependencies, and it guards this very deck.',
   mod2Desc: 'Pharma data search for the BaoAn Pharma team: 9,237 rows, 82 companies, standardized from real paper and brochures into answers in seconds - by company, product, active ingredient, dosage.',
   mod3Desc: 'A bilingual Vietnamese - English cat wiki: breed encyclopedia, care guides, adoptions near you. Next.js on Cloudflare, the whole infrastructure runs at a mandatory cost of exactly zero - still fast, still free to read.',
   mod4Desc: 'A news pipeline that runs itself: AI picks the stories worth reading, translates them, then Playwright publishes. No editor, no gatekeeper - a publishing system operating alone, end to end.',
@@ -818,7 +852,7 @@ function applyLang(l){
   if (typeof opsTick === 'function') opsTick();
 }
 var KB_EN = [
-  [/antirea|anti-rea/i, 'antiRea is the gate system Danny cooked himself: a server-side TypeScript library that meters dataset access per identity and catches coordinated scraping herds. Published on npm, JSR and the MCP Registry - 812 tests, zero dependencies, and it stands guard over this deck too: 150 records per identity per day, greedy bots get a 429.'],
+  [/antirea|anti-rea/i, 'antiRea is the gate system Danny cooked himself: a server-side TypeScript library that meters dataset access per identity and catches coordinated scraping herds. Published on npm, JSR and the MCP Registry - 817 tests, zero dependencies, and it stands guard over this deck too: 150 records per identity per day, greedy bots get a 429.'],
   [/baoan|pharma|drug|medicine/i, 'BaoAnSearch is the pharma data search Danny built for the BaoAn Pharma team: 9,237 standardized rows across 82 companies, searchable in seconds by company, product, active ingredient and dosage.'],
   [/catopedia|cat wiki/i, 'Catopedia is a bilingual Vietnamese - English cat wiki: breed encyclopedia, care guides, adoptions near you. It runs on Cloudflare with a mandatory running cost of zero. That is Danny showing off a little.'],
   [/news|translator|articles/i, 'News Translator is a news pipeline that runs itself: AI picks the stories worth reading, translates them, then Playwright publishes. No editor, no gatekeeper.'],
@@ -1136,7 +1170,7 @@ function neoSay(text){
   }, 14);
 }
 var KB = [
-  [/antirea|anti-rea/i, 'antiRea là hệ thống gác cổng do Danny tự cook: thư viện TypeScript phía server đo lượng dữ liệu mỗi danh tính được lấy, phát hiện bầy bot cào có phối hợp, vượt ngân sách 150 bản ghi mỗi 24h là bị ghi sổ. Đã lên npm, JSR và MCP Registry - 812 test, 0 dependency. Prr, chính nó đang gác cổng cho cả deck này đấy.'],
+  [/antirea|anti-rea/i, 'antiRea là hệ thống gác cổng do Danny tự cook: thư viện TypeScript phía server đo lượng dữ liệu mỗi danh tính được lấy, phát hiện bầy bot cào có phối hợp, vượt ngân sách 150 bản ghi mỗi 24h là bị ghi sổ. Đã lên npm, JSR và MCP Registry - 817 test, 0 dependency. Prr, chính nó đang gác cổng cho cả deck này đấy.'],
   [/catopedia|wiki|mèo.*wiki/i, 'Catopedia là wiki mèo song ngữ Việt - Anh của Danny: giống mèo, cách chăm sóc, nhận nuôi mèo gần bạn. Chạy Next.js trên Cloudflare, chi phí vận hành 0 đồng. Tớ là mèo nên tớ duyệt module này đầu tiên.'],
   [/baoan|search|dược|pharma/i, 'BaoAnSearch là hệ tra cứu dữ liệu dược Danny xây cho đội BaoAn Pharma: 9.237 dòng, 82 công ty, tìm theo công ty, sản phẩm, hoạt chất, hàm lượng - vài giây là ra.'],
   [/news|tin tức|translator|dịch/i, 'News Translator là đường ống tin tự động: AI chọn bài đáng đọc, dịch rồi dùng Playwright tự đăng luôn. Danny gọi điểm hay nhất là AI chọn báo cộng xuất bản tự động, không cần người gác.'],
@@ -1409,7 +1443,7 @@ function setPose(name){ if (!poseEls[name]) return; dannyState = name; for (var 
 function setCatPose(name){ if (!catEls[name]) return; catState = name; for (var k in catEls) catEls[k].forEach(function(el){ el.classList.toggle('on', k === name); }); heroEl2.classList.toggle('cat-sleep', name === 'sleep'); }
 function directorTick(){
   if (motionOn && heroVisible && !document.hidden) {
-    if (!dannyBusy) {
+    if (!dannyBusy && !window.__physLive) {
       if (dannyState === 'type') { lastAlt = (lastAlt === 'think') ? 'lean' : 'think'; setPose(lastAlt); }
       else setPose('type');
     }
@@ -1424,7 +1458,7 @@ function directorTick(){
 setPose('type'); setCatPose('sit');
 setTimeout(directorTick, 5000);
 (window.innerWidth <= 900 ? ['assets/p-danny-think.webp','assets/p-danny-lean.webp','assets/p-cat-groom.webp','assets/p-cat-sleep.webp'] : ['assets/danny-think.webp','assets/danny-lean.webp','assets/cat-groom.webp','assets/cat-sleep.webp']).forEach(function(s){ var im = new Image(); im.src = s; });
-if (window.DECK) { window.DECK.act = function(name){ if (poseEls[name]) { setPose(name); return 'danny:' + name; } if (catEls[name]) { setCatPose(name); return 'cat:' + name; } return 'unknown'; }; window.DECK.pose = function(){ return dannyState + '/' + catState; }; }
+if (window.DECK) { window.DECK.act = function(name){ if (poseEls[name]) { setPose(name); return 'danny:' + name; } if (catEls[name]) { setCatPose(name); return 'cat:' + name; } return 'unknown'; }; window.DECK.pose = function(){ return dannyState + '/' + catState; }; window.DECK.say = typeSay; window.DECK.i18n = function(){ return I18N[LANG]; }; }
 
 /* ---------- methods carousel: auto-scrolls, rests under your cursor ---------- */
 (function(){
@@ -1502,226 +1536,685 @@ window.addEventListener('resize', fxSize);
 </script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module">
-/* ---------- DECK PHYSICS: a real-time interactive 3D layer ----------
-   Three.js scene over the painted deck: holographic shards with simple
-   rigid-body physics (home spring, cursor repulsion + wind, grab and
-   fling, click shockwaves, wall/floor bounces), a wireframe lotus
-   hologram, 3D rain and rising data motes. Move your cursor to stir it,
-   drag a shard to throw it, click for a shockwave. If the CDN or WebGL
-   is unavailable the painted scene simply carries on without it. */
+/* ---------- DECK ROOM (M7.3): the real 3D lab ----------
+   Danny's lab as a live three.js scene in the left half of the hero:
+   the authored room (room-lab.glb), Danny himself (danny-hero-high.glb)
+   directed by a small state machine, and Neo the cat (neo-hero.glb)
+   roaming waypoints on the floor. Click Danny for a shuffled desk
+   routine; click the desk, bed, guitar, messy papers or Neo for their
+   own beats. Reactions look up clip names in a registry - clips that
+   are not in the GLB yet fall back to an existing clip + speech line,
+   so dropping the real Mixamo clips in later is a one-line change.
+   Desktop only, WebGL2 only, lazy-init after first paint. If anything
+   fails, the painted deck simply carries on without it. */
+const heroEl = document.getElementById('hero');
+const cvEl = document.getElementById('physGL');
+let pendingPose = null;
+window.__setPose3D = function (name) { pendingPose = name; if (window.__roomDir) window.__roomDir.legacy(name); };
+
 try {
   const THREE = await import('three');
-  const hero = document.getElementById('hero'), art = document.getElementById('heroFrame'), cv = document.getElementById('physGL');
-  const renderer = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: true, powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
-  camera.position.set(0, 0, 30);
-  const ACID = 0xa3e635, PAPER = 0xf5f1e6, CYAN = 0x67e8f9;
-  let halfW = 12, halfH = 8;
+  const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
 
-  /* wireframe lotus hologram */
-  const lotus = new THREE.Group();
-  const profile = [[0.02,-1.15],[0.7,-1.0],[1.12,-0.6],[1.34,0.02],[1.22,0.58],[0.82,1.0],[0.38,1.26],[0.04,1.38]].map(p => new THREE.Vector2(p[0], p[1]));
-  const lotusGeo = new THREE.LatheGeometry(profile, 14);
-  lotus.add(new THREE.LineSegments(new THREE.EdgesGeometry(lotusGeo, 12), new THREE.LineBasicMaterial({ color: ACID, transparent: true, opacity: 0.55 })));
-  lotus.add(new THREE.Mesh(lotusGeo, new THREE.MeshBasicMaterial({ color: ACID, transparent: true, opacity: 0.05 })));
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(2.0, 0.025, 6, 64), new THREE.MeshBasicMaterial({ color: CYAN, transparent: true, opacity: 0.5 }));
-  ring.rotation.x = Math.PI / 2.4; lotus.add(ring);
-  lotus.scale.setScalar(1.5); scene.add(lotus);
-
-  function fit() {
-    const w = art.clientWidth, h = art.clientHeight;
-    if (!w || !h) return;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h; camera.updateProjectionMatrix();
-    halfH = Math.tan(THREE.MathUtils.degToRad(20)) * 30;
-    halfW = halfH * camera.aspect;
-    lotus.position.set(halfW * (camera.aspect < 1 ? 0.33 : 0.29), halfH * 0.30, -3);
-    if (window.__placeDanny) window.__placeDanny();
-  }
-  fit();
-
-  /* shards */
-  const isMobile = matchMedia('(max-width: 900px)').matches;
-  if (isMobile) { lotus.visible = false; ring.visible = false; }
-  const geos = [new THREE.IcosahedronGeometry(0.55, 0), new THREE.OctahedronGeometry(0.62), new THREE.TetrahedronGeometry(0.68), new THREE.TorusGeometry(0.5, 0.15, 8, 20), new THREE.BoxGeometry(0.72, 0.72, 0.72)];
-  const bodies = [];
-  const NB = isMobile ? 6 : 10;
-  for (let i = 0; i < NB; i++) {
-    const g = geos[i % geos.length], col = [ACID, ACID, PAPER, CYAN][i % 4];
-    const grp = new THREE.Group();
-    grp.add(new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0.06 })));
-    grp.add(new THREE.LineSegments(new THREE.EdgesGeometry(g), new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: 0.85 })));
-    scene.add(grp);
-    const x = (Math.random() * 2 - 1) * halfW * 0.88, y = (Math.random() * 2 - 1) * halfH * 0.72;
-    bodies.push({ o: grp, x, y, z: -1 - Math.random() * 3, hx: x, hy: y, vx: (Math.random() - .5) * .8, vy: (Math.random() - .5) * .6, wx: (Math.random() - .5) * 1.4, wy: (Math.random() - .5) * 1.4, ph: Math.random() * 6.28 });
-  }
-
-  /* rain as line streaks - OUTSIDE the window only (right of the operator), light */
-  const NR = isMobile ? 110 : 200, rPos = new Float32Array(NR * 6), rDat = [];
-  const rXMin = ((isMobile ? 0.50 : 0.45) * 2 - 1) * halfW, rXMax = (0.99 * 2 - 1) * halfW;
-  const rYTop = (1 - 0.02 * 2) * halfH, rYBot = (1 - (isMobile ? 0.52 : 0.79) * 2) * halfH;
-  for (let i = 0; i < NR; i++) rDat.push({ x: rXMin + Math.random() * (rXMax - rXMin), y: rYBot + Math.random() * (rYTop - rYBot), s: 8 + Math.random() * 7 });
-  const rainGeo = new THREE.BufferGeometry();
-  rainGeo.setAttribute('position', new THREE.BufferAttribute(rPos, 3));
-  scene.add(new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: 0x8fd0ff, transparent: true, opacity: 0.22 })));
-
-  /* rising motes */
-  const NM = 42, mPos = new Float32Array(NM * 3), mSeed = [];
-  for (let i = 0; i < NM; i++) { mPos[i * 3] = (Math.random() * 2 - 1) * halfW; mPos[i * 3 + 1] = (Math.random() * 2 - 1) * halfH; mPos[i * 3 + 2] = -2 - Math.random() * 3; mSeed.push(Math.random() * 6.28); }
-  const moteGeo = new THREE.BufferGeometry();
-  moteGeo.setAttribute('position', new THREE.BufferAttribute(mPos, 3));
-  scene.add(new THREE.Points(moteGeo, new THREE.PointsMaterial({ color: ACID, size: 0.13, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending, depthWrite: false })));
-
-  /* ---------- Danny himself: the real 3D operator ----------
-     Mixamo-rigged GLB in the same scene as the holograms. Desktop only;
-     mobile keeps its painted portrait band. If the GLB fails to load the
-     painted pose stack simply stays - nothing breaks. */
-  let danny = null, mixer = null, dActions = {}, dCur = null, parX = 0, parY = 0, dShadow = null;
-  function playClip(name) {
-    const a = dActions[name];
-    if (!a || a === dCur) return;
-    a.enabled = true;
-    a.weight = 1;
-    a.reset();
-    if (name === 'LeanBack') { a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; }
-    else { a.setLoop(THREE.LoopRepeat, Infinity); }
-    a.fadeIn(0.35); a.play();
-    if (dCur) dCur.fadeOut(0.35);
-    dCur = a;
-  }
-  window.__setPose3D = function (name) {
-    playClip(name === 'think' ? 'Thinking' : name === 'lean' ? 'LeanBack' : 'Typing');
+  /* ---------- bilingual lines owned by the room director ---------- */
+  const RL = {
+    vi: { saySleep: 'Ngủ chút đã...', sayGuitar: 'Làm một bản nhạc đã...', sayPapers: 'Bừa bộn thế này thì code sao nổi?!', sayPet: 'Neo, lại đây nào ♥', sayWork: 'Rồi, quay lại việc thôi.' },
+    en: { saySleep: 'Quick nap first...', sayGuitar: 'One quick song first...', sayPapers: 'How am I supposed to code in this mess?!', sayPet: 'Come here, Neo ♥', sayWork: 'Right, back to work.' }
   };
-  function placeDanny() {
-    if (!danny) return;
-    danny.scale.setScalar(halfH * 1.04);
-    danny.position.set(-0.66 * halfW + parX, -0.92 * halfH + parY, 0.5);
-    danny.rotation.y = 0.5;
-    if (dShadow) {
-      dShadow.position.set(danny.position.x + halfH * 0.10, -0.97 * halfH + parY * 0.35, 0.32);
-      dShadow.scale.set(halfH * 1.05, halfH * 0.24, 1);
-    }
+  const lang = () => (window.DECK && window.DECK.lang ? window.DECK.lang() : 'vi');
+  const sayEl = document.getElementById('dannySay');
+  let sayHideT = null;
+  function sayText(t) {
+    if (!t || !window.DECK || !window.DECK.say) return;
+    window.DECK.say(t);
+    clearTimeout(sayHideT);
+    sayHideT = setTimeout(() => { if (sayEl) sayEl.classList.remove('show'); }, 4700);
   }
-  window.__placeDanny = placeDanny;
-  if (!isMobile && renderer.capabilities.isWebGL2) {
-    /* scene-matched lighting: cool window key from the right, dim teal
-       ambient, strong acid rim from back-left, warm lotus spill fill */
-    scene.add(new THREE.HemisphereLight(0x9fc8e8, 0x0e1a12, 0.85));
-    const dKey = new THREE.DirectionalLight(0xcfe6ff, 1.35); dKey.position.set(8, 9, 10); scene.add(dKey);
-    const dRim = new THREE.DirectionalLight(0xa3e635, 1.6); dRim.position.set(-8, 5, -7); scene.add(dRim);
-    const dFill = new THREE.DirectionalLight(0xffd9a0, 0.35); dFill.position.set(10, 2, 6); scene.add(dFill);
-    /* soft contact shadow so he sits IN the deck, not pasted on it */
-    const shTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'); const gr = x.createRadialGradient(64, 64, 4, 64, 64, 62); gr.addColorStop(0, 'rgba(2,8,6,0.62)'); gr.addColorStop(0.6, 'rgba(2,8,6,0.28)'); gr.addColorStop(1, 'rgba(2,8,6,0)'); x.fillStyle = gr; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
-    dShadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: shTex, transparent: true, depthWrite: false }));
-    scene.add(dShadow);
-    import('three/addons/loaders/GLTFLoader.js').then(({ GLTFLoader }) => {
-      new GLTFLoader().load('assets/danny-hero.glb', g => {
-        danny = g.scene;
-        danny.traverse(o => { if (o.isMesh && o.material && 'roughness' in o.material) { o.material.roughness = 0.92; o.material.metalness = 0.0; } });
-        scene.add(danny);
-        mixer = new THREE.AnimationMixer(danny);
-        g.animations.forEach(c => { const a = mixer.clipAction(c); a.stop(); a.weight = 0; a.enabled = false; dActions[c.name] = a; });
-        placeDanny();
-        playClip(window.__poseReq === 'think' ? 'Thinking' : window.__poseReq === 'lean' ? 'LeanBack' : 'Typing');
-        mixer.update(2.2); /* land mid-clip: first visible frame is a real pose, never bind pose */
-        hero.classList.add('gl3d');
-      });
-    }).catch(() => {});
+  function sayKey(k) { const d = RL[lang()] || RL.vi; sayText(d[k]); }
+  function pickDannyLine() {
+    const pool = (window.DECK && window.DECK.i18n && window.DECK.i18n().danny) || [];
+    return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
   }
 
-  /* pointer + physics */
-  let px = 0, py = 0, pvx = 0, inside = false, grabbed = null, gdx = 0, gdy = 0, lastPX = null, lastPY = null;
-  function toWorld(e) {
-    const r = hero.getBoundingClientRect();
-    return { x: ((e.clientX - r.left) / r.width * 2 - 1) * halfW, y: -((e.clientY - r.top) / r.height * 2 - 1) * halfH };
-  }
-  function shockwave(x, y, power) {
-    for (const b of bodies) {
-      const dx = b.x - x, dy = b.y - y, d = Math.hypot(dx, dy);
-      if (d < 8 && d > 0.01) { const f = (1 - d / 8) * power; b.vx += dx / d * f; b.vy += dy / d * f; b.wx += (Math.random() - .5) * 4; }
-    }
-  }
-  hero.addEventListener('pointermove', e => {
-    const w = toWorld(e);
-    if (lastPX !== null) pvx = pvx * 0.7 + ((w.x - lastPX) * 30) * 0.3;
-    lastPX = w.x; lastPY = w.y; px = w.x; py = w.y; inside = true;
-    if (grabbed) { grabbed.vx += ((px + gdx) - grabbed.x) * 2.2; grabbed.vy += ((py + gdy) - grabbed.y) * 2.2; }
-  });
-  hero.addEventListener('pointerleave', () => { inside = false; grabbed = null; });
-  hero.addEventListener('pointerdown', e => {
-    const w = toWorld(e); px = w.x; py = w.y;
-    shockwave(w.x, w.y, 5);
-    if (!e.target.closest('button, a, input, textarea')) {
-      let best = null, bd = 2.4;
-      for (const b of bodies) { const d = Math.hypot(b.x - w.x, b.y - w.y); if (d < bd) { bd = d; best = b; } }
-      if (best) { grabbed = best; gdx = best.x - w.x; gdy = best.y - w.y; }
-    }
-  });
-  addEventListener('pointerup', () => { grabbed = null; });
+  let booted = false;
+  function boot() { if (booted) return; booted = true; init().catch(() => {}); }
+  if (document.readyState === 'complete') requestAnimationFrame(() => setTimeout(boot, 60));
+  else { addEventListener('load', () => requestAnimationFrame(() => setTimeout(boot, 60)), { once: true }); setTimeout(boot, 3200); }
 
-  let heroOn = true;
-  new IntersectionObserver(en => { heroOn = en[0].isIntersecting; }, { threshold: 0 }).observe(hero);
-  new ResizeObserver(fit).observe(art);
-  addEventListener('resize', fit);
+  async function init() {
+    if (matchMedia('(max-width: 900px)').matches) return; /* mobile keeps its painted band */
+    const renderer = new THREE.WebGLRenderer({ canvas: cvEl, alpha: true, antialias: true, powerPreference: 'high-performance' });
+    if (!renderer.capabilities.isWebGL2) return; /* gate: painted fallback stays */
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.16;
 
-  const clock = new THREE.Clock();
-  let live = false;
-  function frame() {
-    requestAnimationFrame(frame);
-    const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
-    if (!heroOn || document.hidden || window.__motionOn === false) return;
-    if (!live) { live = true; window.__physLive = true; const rc = document.getElementById('rain'); if (rc) rc.style.display = 'none'; }
-    if (mixer) {
-      mixer.update(dt);
-      parX += ((inside ? px * 0.03 : 0) - parX) * Math.min(1, dt * 3);
-      parY += ((inside ? py * 0.015 : 0) - parY) * Math.min(1, dt * 3);
-      placeDanny();
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0x07090c, 15, 32);
+    const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 80);
+    const CAM_TGT = new THREE.Vector3(-0.8, 0.85, -0.7);
+    const CAM_POS = new THREE.Vector3(3.4, 2.3, 4.4);
+    const camDir = CAM_POS.clone().sub(CAM_TGT);
+    const camDist = camDir.length(); camDir.normalize();
+
+    /* ---------- lights: matched to the Blender room ---------- */
+    scene.add(new THREE.HemisphereLight(0x9fc8e8, 0x16210f, 0.62));
+    const key = new THREE.DirectionalLight(0xcfe6ff, 2.3); key.position.set(1.5, 3.4, -4.6); scene.add(key);
+    const fill = new THREE.DirectionalLight(0xbfd4e6, 0.5); fill.position.set(4.5, 2.6, 5.5); scene.add(fill);
+    const pt = (c, i, d, x, y, z) => { const L = new THREE.PointLight(c, i, d, 2); L.position.set(x, y, z); scene.add(L); };
+    pt(0xe8f1ff, 15, 11, -0.4, 2.75, -0.2);  /* ceiling LED bar */
+    pt(0xffc46b, 5, 5.5, -0.7, 2.3, -1.45);  /* lotus lamp */
+    pt(0xa3e635, 6, 6.5, -3.0, 1.7, 0.6);    /* acid lab glow, left wall */
+    pt(0xffd9a0, 9, 6.5, 1.2, 1.5, 1.9);     /* bench lamp, foreground */
+    pt(0x35d3e0, 4, 5.5, 2.45, 1.4, -0.85);  /* server rack cyan */
+
+    /* ---------- soft blob shadows ---------- */
+    const blobTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'); const g = x.createRadialGradient(64, 64, 4, 64, 64, 62); g.addColorStop(0, 'rgba(0,0,0,0.55)'); g.addColorStop(0.6, 'rgba(0,0,0,0.25)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
+    function blob(rx, rz) { const m = new THREE.Mesh(new THREE.PlaneGeometry(rx, rz), new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false })); m.rotation.x = -Math.PI / 2; scene.add(m); return m; }
+
+    const loader = new GLTFLoader();
+    const load = (p) => new Promise((res, rej) => loader.load(p, res, undefined, rej));
+
+    /* ---------- the room ---------- */
+    const roomG = await load('assets/room-lab.glb');
+    const STANDIN = ['catBody', 'catHead', 'catEar', 'catEar.001', 'catTail'];
+    roomG.scene.traverse(o => { if (STANDIN.indexOf(o.name) >= 0) o.visible = false; });
+    scene.add(roomG.scene);
+
+    /* ---------- Danny ---------- */
+    const dannyG = await load('assets/danny-hero-high.glb');
+    const dannyRoot = new THREE.Group(); scene.add(dannyRoot);
+    dannyRoot.add(dannyG.scene);
+    dannyG.scene.traverse(o => { if (o.isMesh && o.material && 'roughness' in o.material) { o.material.roughness = 0.92; o.material.metalness = 0.0; } });
+    const dMixer = new THREE.AnimationMixer(dannyG.scene);
+    const dAct = {};
+    dannyG.animations.forEach(c => { const a = dMixer.clipAction(c); a.stop(); a.weight = 0; a.enabled = false; dAct[c.name] = a; });
+    const dBones = {};
+    dannyG.scene.traverse(o => { if (o.name && o.name.indexOf('mixamorig') === 0) dBones[o.name] = o; });
+    const dShadow = blob(1.15, 0.85);
+    const dMats = [];
+    dannyG.scene.traverse(o => { if (o.isMesh) { (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { if (m && dMats.indexOf(m) < 0) dMats.push(m); }); } });
+
+    /* ---------- Neo (optional: room + Danny still go live without her) ---------- */
+    let neoRoot = null, nMixer = null; const nAct = {};
+    try {
+      const neoG = await load('assets/neo-hero.glb');
+      neoRoot = new THREE.Group(); scene.add(neoRoot);
+      const inner = new THREE.Group(); inner.scale.setScalar(0.42 / 1.847); neoRoot.add(inner); inner.add(neoG.scene);
+      neoG.scene.traverse(o => { if (o.isMesh && o.material && 'roughness' in o.material) { o.material.metalness = 0.0; } });
+      nMixer = new THREE.AnimationMixer(neoG.scene);
+      neoG.animations.forEach(c => { const a = nMixer.clipAction(c); a.stop(); a.weight = 0; a.enabled = false; nAct[c.name] = a; });
+    } catch (e) { neoRoot = null; }
+    const nShadow = neoRoot ? blob(0.55, 0.55) : null;
+
+    /* ---------- clip registry: one line per interaction ---------- */
+    const CLIPMAP = { typing: 'Typing', idle: 'SittingIdle', think: 'Thinking', lean: 'LeanBack', sleep: 'Sleeping', guitar: 'Guitar', frustrated: 'Frustrated', walk: 'Walking', stand: 'StandUp', sit: 'SitDown', pet: 'Petting' };
+    const ONCE = { LeanBack: 1, Sleeping: 1, Guitar: 1, Frustrated: 1, Petting: 1, StandUp: 1, SitDown: 1 };
+    const dHas = (k) => !!dAct[CLIPMAP[k]];
+    const dDur = (k) => { const a = dAct[CLIPMAP[k]]; return a ? a.getClip().duration : 0; };
+    let dCur = null;
+    function dPlay(key, fade) {
+      const a = dAct[CLIPMAP[key] || key]; if (!a || a === dCur) return a;
+      /* at most two actions may ever blend: hard-stop anything that is not
+         the new action or the one fading out, so stale clips cannot keep
+         accumulating weight and contaminate the pose */
+      for (const k in dAct) { const o = dAct[k]; if (o !== a && o !== dCur && o.enabled) { o.stop(); o.enabled = false; o.weight = 0; } }
+      a.enabled = true; a.weight = 1; a.reset();
+      if (ONCE[a.getClip().name]) { a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true; }
+      else { a.setLoop(THREE.LoopRepeat, Infinity); a.clampWhenFinished = false; }
+      a.fadeIn(fade == null ? 0.35 : fade); a.play();
+      if (dCur) dCur.fadeOut(fade == null ? 0.35 : fade);
+      dCur = a; return a;
     }
-    const damp = Math.exp(-1.7 * dt), floorY = -halfH + 1.0;
-    for (const b of bodies) {
-      b.vx += (b.hx - b.x) * 0.85 * dt + Math.sin(t * 0.7 + b.ph) * 0.10 * dt + pvx * 0.10 * dt;
-      b.vy += (b.hy - b.y) * 0.85 * dt + Math.cos(t * 0.6 + b.ph * 1.7) * 0.08 * dt;
-      if (inside) {
-        const dx = b.x - px, dy = b.y - py, d2 = dx * dx + dy * dy;
-        if (d2 < 26) { const d = Math.sqrt(d2) + 0.001; const f = (1 - d / 5.1) * 30 * dt / d; b.vx += dx * f; b.vy += dy * f; }
+    let nCur = null;
+    function nPlay(name, fade) {
+      const a = nAct[name]; if (!a || a === nCur) return;
+      for (const k in nAct) { const o = nAct[k]; if (o !== a && o !== nCur && o.enabled) { o.stop(); o.enabled = false; o.weight = 0; } }
+      a.enabled = true; a.weight = 1; a.reset(); a.setLoop(THREE.LoopRepeat, Infinity); a.clampWhenFinished = false;
+      a.fadeIn(fade == null ? 0.3 : fade); a.play();
+      if (nCur) nCur.fadeOut(fade == null ? 0.3 : fade);
+      nCur = a;
+    }
+
+    function dPlayLoop(key) { const a = dPlay(key); if (a) { a.setLoop(THREE.LoopRepeat, Infinity); a.clampWhenFinished = false; } return a; }
+    /* Walking carries real root motion (~1.39 m per 1.067 s loop). WALK_BASE
+       is the Hips offset at loop start in root space, precomputed from the
+       clip's position track, so the frame loop can subtract the in-clip
+       travel each frame and drive the root along the path instead. */
+    let WALK_BASE = null;
+    {
+      const wa = dAct[CLIPMAP.walk], hb = dBones['mixamorigHips'];
+      if (wa && hb && hb.parent) {
+        const tracks = wa.getClip().tracks;
+        const trk = tracks.find(t => t.name === hb.name + '.position') || tracks.find(t => t.name.endsWith('.position') && t.name.indexOf('Hips') >= 0);
+        if (trk) {
+          const v = new THREE.Vector3().fromArray(trk.values, 0);
+          const m = new THREE.Matrix4(); const chain = []; let n = hb.parent;
+          while (n && n !== dannyG.scene) { chain.unshift(n); n = n.parent; }
+          chain.forEach(o => { o.updateMatrix(); m.multiply(o.matrix); });
+          WALK_BASE = v.applyMatrix4(m);
+        }
       }
-      if (grabbed === b) { b.vx += ((px + gdx) - b.x) * 26 * dt; b.vy += ((py + gdy) - b.y) * 26 * dt; }
-      b.vx *= damp; b.vy *= damp;
-      b.x += b.vx * dt; b.y += b.vy * dt;
-      if (b.x < -halfW + 0.4) { b.x = -halfW + 0.4; b.vx *= -0.55; } if (b.x > halfW - 0.4) { b.x = halfW - 0.4; b.vx *= -0.55; }
-      if (b.y < floorY) { b.y = floorY; b.vy *= -0.55; } if (b.y > halfH - 0.5) { b.y = halfH - 0.5; b.vy *= -0.55; }
-      b.o.position.set(b.x, b.y, b.z);
-      b.o.rotation.x += b.wx * dt; b.o.rotation.y += b.wy * dt;
     }
-    pvx *= Math.exp(-3 * dt);
-    for (let i = 0; i < NR; i++) {
-      const d = rDat[i];
-      d.y -= d.s * dt; d.x += pvx * 0.05 * dt * d.s * 0.14;
-      if (d.y < rYBot) { d.y = rYTop + Math.random() * 0.5; d.x = rXMin + Math.random() * (rXMax - rXMin); }
-      if (d.x > rXMax) d.x = rXMin + (d.x - rXMax); if (d.x < rXMin) d.x = rXMax - (rXMin - d.x);
-      rPos[i * 6] = d.x; rPos[i * 6 + 1] = d.y; rPos[i * 6 + 2] = -2.5;
-      rPos[i * 6 + 3] = d.x + pvx * 0.02; rPos[i * 6 + 4] = d.y + 0.55; rPos[i * 6 + 5] = -2.5;
+
+    /* ---------- anchors (room space, recovered from room_lab.py) ---------- */
+    const ANCHORS = {
+      desk: { pos: new THREE.Vector3(-0.85, 0.06, -0.90), yaw: 0 }, /* faces the room, as in the approved Blender render; y calibrated by QA */
+      bed: { pos: new THREE.Vector3(-2.12, 0, 1.45), yaw: -Math.PI / 2 },
+      guitar: { pos: new THREE.Vector3(-1.42, 0, 1.40), yaw: -0.22 },
+      papers: { pos: new THREE.Vector3(1.02, 0, 0.42), yaw: -2.36 }, /* beside the floor spill, facing the mess */
+      center: { pos: new THREE.Vector3(-0.45, 0, 0.30), yaw: 0 } /* open-floor routing waypoint */
+    };
+    /* Sleeping ON the bed: mattress top measured from room-lab.glb (mattress
+       bbox max = 0.450). The clip's body axis runs along local X (head -X,
+       feet +X, bone-sampled), so yaw pi/2 lays it along the bed's long axis
+       (three Z) with the head toward the pillow and his face to the room. */
+    const BED_POSE = { pos: new THREE.Vector3(-3.01, 0.45, 1.74), yaw: Math.PI / 2 };
+    /* furniture footprints (three XZ) that walking paths must not cross */
+    const BLOCK = [
+      { x0: -2.30, x1: 0.90, z0: -1.98, z1: -0.93 },  /* desk */
+      { x0: -3.50, x1: -2.35, z0: 0.50, z1: 2.60 },   /* bed */
+      { x0: -0.65, x1: 2.75, z0: 1.80, z1: 2.80 },    /* foreground bench */
+      { x0: 2.61, x1: 3.49, z0: -1.66, z1: -0.94 },   /* server rack */
+      { x0: 1.60, x1: 2.70, z0: -2.28, z1: -1.63 },   /* printer cabinet */
+      { x0: -3.03, x1: -2.41, z0: -2.09, z1: -1.47 }  /* cat tree */
+    ];
+    function inBlock(p, m) { return BLOCK.some(bb => p.x > bb.x0 - m && p.x < bb.x1 + m && p.z > bb.z0 - m && p.z < bb.z1 + m); }
+    function segHits(ax, az, bx, bz, bb, m) {
+      const x0 = bb.x0 - m, x1 = bb.x1 + m, z0 = bb.z0 - m, z1 = bb.z1 + m;
+      let t0 = 0, t1 = 1;
+      const dx = bx - ax, dz = bz - az;
+      if (Math.abs(dx) < 1e-9) { if (ax < x0 || ax > x1) return false; }
+      else { let ta = (x0 - ax) / dx, tb = (x1 - ax) / dx; if (ta > tb) { const q = ta; ta = tb; tb = q; } t0 = Math.max(t0, ta); t1 = Math.min(t1, tb); if (t0 > t1) return false; }
+      if (Math.abs(dz) < 1e-9) { if (az < z0 || az > z1) return false; }
+      else { let ta = (z0 - az) / dz, tb = (z1 - az) / dz; if (ta > tb) { const q = ta; ta = tb; tb = q; } t0 = Math.max(t0, ta); t1 = Math.min(t1, tb); if (t0 > t1) return false; }
+      return true;
     }
-    rainGeo.attributes.position.needsUpdate = true;
-    for (let i = 0; i < NM; i++) {
-      mPos[i * 3 + 1] += 0.35 * dt; mPos[i * 3] += Math.sin(t * 0.8 + mSeed[i]) * 0.15 * dt;
-      if (mPos[i * 3 + 1] > halfH) mPos[i * 3 + 1] = -halfH;
+    function segBlocked(a, b) { return BLOCK.some(bb => segHits(a.x, a.z, b.x, b.z, bb, 0.22)); }
+    function pathPts(from, to) {
+      const pts = [];
+      if (segBlocked(from, to)) pts.push(ANCHORS.center.pos.clone());
+      pts.push(to.clone());
+      return pts;
     }
-    moteGeo.attributes.position.needsUpdate = true;
-    lotus.rotation.y = t * 0.25; ring.rotation.z = t * 0.4;
-    lotus.position.y = halfH * 0.30 + Math.sin(t * 0.8) * 0.18;
-    camera.position.x += (px * 0.05 - camera.position.x) * Math.min(1, dt * 3);
-    camera.position.y += (py * 0.035 - camera.position.y) * Math.min(1, dt * 3);
-    camera.lookAt(0, 0, 0);
-    renderer.render(scene, camera);
+    dannyRoot.position.copy(ANCHORS.desk.pos); dannyRoot.rotation.y = ANCHORS.desk.yaw;
+
+    /* ---------- director v2 ---------- */
+    const D = { mode: 'typing', busy: false, holdT: 0, next: null, travel: null, at: 'desk', standing: false, standK: 0, seated: true, onBed: false, compWalk: false, fadeK: 1, fadeTgt: 1 };
+    const STANDKEY = { think: 1, lean: 1 }; /* standing clips: ease out of the desk corner while they play */
+    const STAND_OFF = { x: 0.20, z: 0.50 };
+    const walkAnchor = ANCHORS.desk.pos.clone(); /* logical floor position; the rendered root adds the walk-cycle compensation on top */
+    function after(sec, fn) { D.holdT = sec; D.next = fn; }
+    function yawLerp(a, b, t) { let d = (b - a) % (Math.PI * 2); if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2; return a + d * t; }
+    function cancelTimers() { D.next = null; D.holdT = 0; }
+
+    /* ---------- walking: path drive + in-clip root-motion compensation ---------- */
+    function travelTo(anchor, keyName, done) {
+      D.standing = false;
+      const from = walkAnchor.clone();
+      const to = anchor.pos.clone();
+      const dist = Math.hypot(to.x - from.x, to.z - from.z);
+      if (dHas('walk') && dist > 0.05) {
+        D.travel = { pts: pathPts(from, to), i: 0, pos: from.clone(), yawT: anchor.yaw, keyName, done };
+        D.compWalk = true;
+        dPlay('walk');
+      } else {
+        walkAnchor.copy(to); dannyRoot.position.copy(to); dannyRoot.rotation.y = anchor.yaw;
+        D.at = keyName; done();
+      }
+    }
+    function travelUpdate(dt) {
+      const tr = D.travel; if (!tr) return;
+      let target = tr.pts[tr.i];
+      let dx = target.x - tr.pos.x, dz = target.z - tr.pos.z;
+      let dist = Math.hypot(dx, dz);
+      if (dist < 0.04) {
+        tr.pos.copy(target); tr.i++;
+        if (tr.i >= tr.pts.length) { finishTravel(); return; }
+        target = tr.pts[tr.i]; dx = target.x - tr.pos.x; dz = target.z - tr.pos.z; dist = Math.hypot(dx, dz);
+      }
+      const last = tr.i === tr.pts.length - 1;
+      const speed = 1.30 * (last ? Math.min(1, Math.max(0.30, dist / 0.6)) : 1); /* 1.30 m/s = the clip's natural pace */
+      if (dist > 0.001) {
+        const step = Math.min(dist, speed * dt);
+        tr.pos.x += dx / dist * step; tr.pos.z += dz / dist * step;
+        tr.pos.y += (target.y - tr.pos.y) * Math.min(1, dt * 4);
+      }
+      walkAnchor.copy(tr.pos);
+      dannyRoot.position.copy(tr.pos);
+      const wantYaw = (last && dist < 0.55) ? tr.yawT : Math.atan2(dx, dz);
+      dannyRoot.rotation.y = yawLerp(dannyRoot.rotation.y, wantYaw, 1 - Math.exp(-6 * dt));
+      if (last && dist <= 0.001) finishTravel();
+    }
+    function finishTravel() {
+      const tr = D.travel; if (!tr) return;
+      D.travel = null;
+      const endP = tr.pts[tr.pts.length - 1];
+      tr.pos.copy(endP); walkAnchor.copy(endP); dannyRoot.position.copy(endP);
+      dannyRoot.rotation.y = tr.yawT;
+      D.at = tr.keyName;
+      const dn = tr.done; if (dn) dn();
+    }
+    const _hv = new THREE.Vector3();
+    function hipsRootSpace() {
+      const hb = dBones['mixamorigHips']; if (!hb) return null;
+      hb.getWorldPosition(_hv);
+      const dx = _hv.x - dannyRoot.position.x, dz = _hv.z - dannyRoot.position.z;
+      const c = Math.cos(dannyRoot.rotation.y), sn = Math.sin(dannyRoot.rotation.y);
+      return { x: dx * c - dz * sn, z: dx * sn + dz * c };
+    }
+    function applyWalkComp() {
+      const wa = dAct[CLIPMAP.walk];
+      if (!D.compWalk || !wa || !WALK_BASE) return;
+      const w = wa.enabled ? wa.weight : 0;
+      if (w <= 0.003) { D.compWalk = false; dannyRoot.position.x = walkAnchor.x; dannyRoot.position.z = walkAnchor.z; return; }
+      const h = hipsRootSpace(); if (!h) return;
+      const dx = (h.x - WALK_BASE.x) * w, dz = (h.z - WALK_BASE.z) * w;
+      const c = Math.cos(dannyRoot.rotation.y), sn = Math.sin(dannyRoot.rotation.y);
+      dannyRoot.position.x = walkAnchor.x - (dx * c + dz * sn);
+      dannyRoot.position.z = walkAnchor.z - (-dx * sn + dz * c);
+    }
+
+    /* ---------- step sequencer for the reaction chains ---------- */
+    const Q = { list: [], active: false, onDone: null };
+    function pump() {
+      const st = Q.list.shift();
+      if (!st) { Q.active = false; const f = Q.onDone; Q.onDone = null; if (f) f(); return; }
+      st(pump);
+    }
+    function runChain(steps) {
+      D.busy = true; D.mode = 'react';
+      Q.list = steps.slice(); Q.active = true;
+      Q.onDone = () => { D.busy = false; if (D.mode === 'react') D.mode = 'typing'; };
+      pump();
+    }
+    function killChain() { Q.list = []; Q.active = false; Q.onDone = null; cancelTimers(); D.travel = null; }
+    const sTravel = (anchor, keyName) => (next) => travelTo(anchor, keyName, next);
+    const sWait = (sec) => (next) => after(sec, next);
+    const sSay = (k) => (next) => { sayKey(k); next(); };
+    const sOnce = (key, ts) => (next) => { const a = dPlay(key); if (a && ts) a.timeScale = ts; after(Math.max(0.25, dDur(key) / (ts || 1) - 0.12), next); };
+    const sFade = (v) => (next) => { setFade(v); after(0.26, next); };
+    function setFade(v) { D.fadeTgt = v; if (v < 1) dMats.forEach(m => { m.transparent = true; }); }
+    function departSteps() {
+      if (D.at === 'desk' && D.seated) return [sOnce('stand', 1.4), (next) => { D.seated = false; next(); }];
+      return [];
+    }
+    function returnSteps() {
+      return [sTravel(ANCHORS.desk, 'desk'), sOnce('sit', 1.2), (next) => { D.seated = true; dPlay('typing'); next(); }];
+    }
+    function toDesk(user) {
+      if (Q.active || D.travel || D.onBed || D.at !== 'desk') { abortToDesk(user); return; }
+      cancelTimers(); D.busy = false; D.mode = 'typing'; D.standing = false;
+      dannyRoot.rotation.y = ANCHORS.desk.yaw;
+      dPlay('typing');
+      if (user) sayKey('sayWork');
+    }
+    function abortToDesk(user) {
+      killChain();
+      if (N.hold) { N.hold = false; N.t = 2.0; if (neoRoot) nPlay('Idle'); }
+      if (D.onBed) { D.onBed = false; dShadow.visible = true; dannyRoot.position.copy(ANCHORS.bed.pos); dannyRoot.rotation.y = ANCHORS.bed.yaw; walkAnchor.copy(ANCHORS.bed.pos); }
+      D.compWalk = false;
+      setFade(1);
+      const steps = returnSteps();
+      if (user) steps.push(sSay('sayWork'));
+      runChain(steps);
+    }
+    function beat(keyName) {
+      if (D.busy) return;
+      D.busy = true; D.mode = 'beat'; D.standing = !!STANDKEY[keyName]; dPlay(keyName);
+      if (keyName === 'lean') sayText(pickDannyLine());
+      after(keyName === 'lean' ? 4.4 : 3.6, () => toDesk(false));
+    }
+    function startRoutine() {
+      if (D.busy && D.mode !== 'beat') return;
+      cancelTimers();
+      if (D.at !== 'desk') { toDesk(false); return; }
+      D.busy = true; D.mode = 'routine';
+      const acts = ['think', 'idle', 'lean'].sort(() => Math.random() - 0.5);
+      let i = 0;
+      const stepFn = () => {
+        if (i >= acts.length) { toDesk(false); return; }
+        const k = acts[i++]; D.standing = !!STANDKEY[k]; dPlay(k);
+        if (k === 'lean') sayText(pickDannyLine());
+        after(k === 'lean' ? 4.2 : 3.4 + Math.random() * 1.2, stepFn);
+      };
+      stepFn();
+    }
+    const REACT = {
+      sleep: { clip: 'sleep', anchor: 'bed', fall: 'lean', line: 'saySleep', hold: 6 },
+      guitar: { clip: 'guitar', anchor: 'guitar', fall: 'think', line: 'sayGuitar', hold: 5 },
+      papers: { clip: 'frustrated', anchor: null, fall: 'think', line: 'sayPapers', hold: 3.6 },
+      pet: { clip: 'pet', anchor: 'neo', fall: 'think', line: 'sayPet', hold: 3.4 }
+    };
+    /* fallback path (a needed clip missing from the GLB): nearest existing
+       clip + the same speech line, exactly as M7.3 shipped */
+    function legacyReact(id) {
+      const r = REACT[id]; if (!r) return;
+      cancelTimers(); D.busy = true; D.mode = 'react';
+      if (id === 'pet') neoPetBeat();
+      const finish = () => toDesk(false);
+      if (dHas(r.clip)) {
+        const go = () => { D.standing = !!STANDKEY[r.clip]; dPlay(r.clip); sayKey(r.line); after(Math.max(2.5, Math.min(dDur(r.clip) || r.hold, r.hold + 4)), finish); };
+        if (r.anchor === 'neo' && neoRoot) {
+          const np = neoRoot.position, dp = ANCHORS.desk.pos;
+          const dir = new THREE.Vector3(dp.x - np.x, 0, dp.z - np.z).normalize();
+          const p = np.clone().addScaledVector(dir, 0.55); p.y = 0;
+          travelTo({ pos: p, yaw: Math.atan2(np.x - p.x, np.z - p.z) }, 'neo', go);
+        } else if (r.anchor && D.at !== r.anchor) travelTo(ANCHORS[r.anchor], r.anchor, go);
+        else go();
+      } else {
+        D.standing = !!STANDKEY[r.fall]; dPlay(r.fall); sayKey(r.line); after(r.hold, finish);
+      }
+    }
+    /* ---------- the real chains (M7.4): stand, walk, react, walk back, sit ---------- */
+    function chainReady(id) { return dHas('walk') && dHas('stand') && dHas('sit') && dHas(REACT[id].clip); }
+    function bedChain() {
+      return [
+        ...departSteps(),
+        sTravel(ANCHORS.bed, 'bed'),
+        sSay('saySleep'),
+        sFade(0),
+        (next) => { D.compWalk = false; D.onBed = true; dShadow.visible = false; dannyRoot.position.copy(BED_POSE.pos); dannyRoot.rotation.y = BED_POSE.yaw; walkAnchor.copy(BED_POSE.pos); dPlayLoop('sleep'); setFade(1); next(); },
+        sWait(6.2),
+        sFade(0),
+        (next) => { D.onBed = false; dShadow.visible = true; dannyRoot.position.copy(ANCHORS.bed.pos); dannyRoot.rotation.y = ANCHORS.bed.yaw; walkAnchor.copy(ANCHORS.bed.pos); setFade(1); next(); },
+        ...returnSteps()
+      ];
+    }
+    function guitarChain() {
+      return [
+        ...departSteps(),
+        sTravel(ANCHORS.guitar, 'guitar'),
+        (next) => { sayKey('sayGuitar'); dPlayLoop('guitar'); after(8, next); },
+        ...returnSteps()
+      ];
+    }
+    function papersChain() {
+      return [
+        ...departSteps(),
+        sTravel(ANCHORS.papers, 'papers'),
+        (next) => { sayKey('sayPapers'); dPlayLoop('frustrated'); after(5, next); },
+        ...returnSteps()
+      ];
+    }
+    function petAnchor() {
+      const np = neoRoot.position;
+      const from = walkAnchor;
+      let best = null;
+      for (let k = 0; k < 8 && !best; k++) {
+        const a = Math.atan2(from.x - np.x, from.z - np.z) + k * Math.PI / 4;
+        const p = new THREE.Vector3(np.x + Math.sin(a) * 0.55, 0, np.z + Math.cos(a) * 0.55);
+        if (!inBlock(p, 0.30)) best = p;
+      }
+      if (!best) best = new THREE.Vector3(np.x + 0.55, 0, np.z);
+      return { pos: best, yaw: Math.atan2(np.x - best.x, np.z - best.z) };
+    }
+    function petChain() {
+      const steps = [...departSteps()];
+      steps.push((next) => travelTo(petAnchor(), 'neo', next));
+      steps.push((next) => { sayKey('sayPet'); dPlayLoop('pet'); after(5, next); });
+      steps.push((next) => { if (neoRoot) { N.hold = false; N.t = 2.2; nPlay('Idle'); } next(); });
+      return steps.concat(returnSteps());
+    }
+    function react(id) {
+      if (id === 'work') { toDesk(true); return; }
+      if (!REACT[id]) return;
+      if (D.busy) return; /* one routine at a time; only the desk click interrupts */
+      if (!chainReady(id) || (id === 'pet' && !neoRoot)) { legacyReact(id); return; }
+      if (id === 'pet') { N.hold = true; nPlay('Groom'); }
+      if (id === 'sleep') runChain(bedChain());
+      else if (id === 'guitar') runChain(guitarChain());
+      else if (id === 'papers') runChain(papersChain());
+      else if (id === 'pet') runChain(petChain());
+    }
+
+    /* ---------- Neo's waypoint brain ---------- */
+    const NW = [
+      { p: [0.95, 0, -0.50] }, { p: [1.75, 0, -1.55] }, { p: [-2.35, 0, -1.40] },
+      { p: [-2.05, 0.10, -0.05], bed: true }, { p: [-2.05, 0, 1.25] }
+    ];
+    const NEO_YAW = 0; /* model forward offset, verified by QA render */
+    const N = { i: 0, mode: 'idle', t: 3.0, target: null, pauseT: 0, hold: false };
+    if (neoRoot) {
+      neoRoot.position.set(NW[N.i].p[0], NW[N.i].p[1], NW[N.i].p[2]);
+      neoRoot.rotation.y = -0.6;
+      nPlay('Idle');
+    }
+    function neoPetBeat() {
+      if (!neoRoot) return;
+      N.pauseT = 3.6; N.mode = 'idle'; N.t = 2.2; nPlay('Groom');
+    }
+    function neoArrive() {
+      const wp = NW[N.i];
+      if (wp.bed && Math.random() < 0.6) { N.mode = 'sleep'; nPlay('Sleep'); N.t = 7 + Math.random() * 4; }
+      else if (Math.random() < 0.35) { N.mode = 'groom'; nPlay('Groom'); N.t = 3.5; }
+      else { N.mode = 'idle'; nPlay('Idle'); N.t = 2.5 + Math.random() * 2.5; }
+    }
+    function neoUpdate(dt) {
+      if (!neoRoot) return;
+      if (N.hold) return; /* Danny is with her: she stays put */
+      if (N.pauseT > 0) { N.pauseT -= dt; return; }
+      if (N.mode === 'turn' || N.mode === 'walk') {
+        const tp = N.target.p;
+        const dx = tp[0] - neoRoot.position.x, dz = tp[2] - neoRoot.position.z;
+        const dist = Math.hypot(dx, dz);
+        const want = Math.atan2(dx, dz) + NEO_YAW;
+        neoRoot.rotation.y = yawLerp(neoRoot.rotation.y, want, 1 - Math.exp(-7 * dt));
+        if (N.mode === 'turn') {
+          let d = Math.abs(((want - neoRoot.rotation.y) % (Math.PI * 2) + Math.PI * 3) % (Math.PI * 2) - Math.PI);
+          if (d < 0.15) { N.mode = 'walk'; nPlay('Walk'); }
+          return;
+        }
+        const sp = Math.min(0.55, 0.16 + dist * 0.55);
+        if (dist < 0.05) {
+          neoRoot.position.set(tp[0], tp[1], tp[2]);
+          neoArrive(); return;
+        }
+        const step = Math.min(dist, sp * dt);
+        neoRoot.position.x += dx / dist * step;
+        neoRoot.position.z += dz / dist * step;
+        neoRoot.position.y += (tp[1] - neoRoot.position.y) * Math.min(1, dt * 5);
+        return;
+      }
+      N.t -= dt;
+      if (N.t <= 0) {
+        let ni = N.i;
+        while (ni === N.i) ni = Math.floor(Math.random() * NW.length);
+        N.i = ni; N.target = NW[ni]; N.mode = 'turn'; nPlay('Idle');
+      }
+    }
+
+    /* ---------- click proxies (invisible hit boxes in room space) ---------- */
+    let live = false;
+    const proxies = [];
+    function proxy(x, y, z, sx, sy, sz, act) {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
+      m.position.set(x, y, z); m.userData.act = act; scene.add(m); proxies.push(m); return m;
+    }
+    proxy(-0.70, 1.15, -1.72, 3.35, 1.50, 0.85, 'work');       /* desk + monitors (desk pile sits in front of this box) */
+    proxy(0.12, 0.92, -1.30, 0.55, 0.30, 0.55, 'papers');      /* desk pile */
+    proxy(0.45, 0.10, -0.15, 1.35, 0.22, 1.25, 'papers');      /* floor spill */
+    proxy(-2.92, 0.45, 1.55, 1.25, 0.95, 2.20, 'sleep');       /* bed */
+    proxy(-1.58, 0.62, 2.12, 0.75, 1.35, 0.65, 'guitar');      /* guitar */
+    const dannyProxy = new THREE.Mesh(new THREE.BoxGeometry(1.05, 1.9, 0.95), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
+    dannyProxy.position.set(0, 0.8, 0); dannyProxy.userData.act = 'danny'; dannyRoot.add(dannyProxy); proxies.push(dannyProxy);
+    let neoProxy = null;
+    if (neoRoot) {
+      neoProxy = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.6, 0.85), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
+      neoProxy.position.set(0, 0.24, 0); neoProxy.userData.act = 'pet'; neoRoot.add(neoProxy); proxies.push(neoProxy);
+    }
+    const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
+    heroEl.addEventListener('pointerdown', (e) => {
+      if (!live || e.target.closest('button, a, input, textarea')) return;
+      const r = cvEl.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+      ptr.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+      ptr.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+      ray.setFromCamera(ptr, camera);
+      const hits = ray.intersectObjects(proxies, false);
+      if (!hits.length) return;
+      const id = hits[0].object.userData.act;
+      if (id === 'danny') startRoutine();
+      else react(id);
+    });
+    const dannyHotEl = document.getElementById('dannyHot');
+    if (dannyHotEl) dannyHotEl.addEventListener('click', () => { if (live) startRoutine(); });
+
+    /* ---------- a few hologram shards drift inside the room ---------- */
+    const shards = [];
+    {
+      const geos = [new THREE.IcosahedronGeometry(0.16, 0), new THREE.OctahedronGeometry(0.19), new THREE.TetrahedronGeometry(0.21), new THREE.BoxGeometry(0.2, 0.2, 0.2)];
+      const cols = [0xa3e635, 0x67e8f9, 0xf5f1e6, 0xa3e635];
+      const homes = [[-1.7, 2.0, -1.3], [0.7, 2.25, -2.0], [2.3, 1.75, -0.7], [-3.0, 2.3, 0.7], [1.5, 2.5, 1.0]];
+      homes.forEach((h, i) => {
+        const g = geos[i % geos.length], grp = new THREE.Group();
+        grp.add(new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: cols[i % 4], transparent: true, opacity: 0.05 })));
+        grp.add(new THREE.LineSegments(new THREE.EdgesGeometry(g), new THREE.LineBasicMaterial({ color: cols[i % 4], transparent: true, opacity: 0.8 })));
+        grp.position.set(h[0], h[1], h[2]); scene.add(grp);
+        shards.push({ o: grp, hy: h[1], ph: Math.random() * 6.28, rs: 0.3 + Math.random() * 0.5 });
+      });
+    }
+
+    /* ---------- rain: outside the window only ---------- */
+    const NR = 110, rPos = new Float32Array(NR * 6), rDat = [];
+    for (let i = 0; i < NR; i++) rDat.push({ x: -3.5 + Math.random() * 7, y: 0.1 + Math.random() * 3.0, s: 2.0 + Math.random() * 1.4 });
+    const rainGeo = new THREE.BufferGeometry();
+    rainGeo.setAttribute('position', new THREE.BufferAttribute(rPos, 3));
+    const rainLines = new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: 0x8fd0ff, transparent: true, opacity: 0.26 }));
+    rainLines.position.z = -2.62; scene.add(rainLines);
+
+    /* ---------- camera fit + pointer parallax ---------- */
+    let nx = 0, ny = 0;
+    heroEl.addEventListener('pointermove', (e) => {
+      const r = heroEl.getBoundingClientRect();
+      nx = ((e.clientX - r.left) / r.width) * 2 - 1;
+      ny = ((e.clientY - r.top) / r.height) * 2 - 1;
+    });
+    function fit() {
+      const w = cvEl.clientWidth, h = cvEl.clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h, false);
+      const a = w / h;
+      camera.aspect = a;
+      const dolly = a >= 1.3 ? 1 : Math.min(1.8, 1.3 / a);
+      camera.position.copy(CAM_TGT).addScaledVector(camDir, camDist * dolly);
+      camera.fov = a >= 1.3 ? 36 : 42;
+      camera.updateProjectionMatrix();
+    }
+    new ResizeObserver(fit).observe(heroEl);
+    addEventListener('resize', fit);
+
+    /* ---------- director facade + QA hooks ---------- */
+    window.__roomDir = {
+      legacy(name) {
+        if (D.mode === 'beat' && name === 'type') { toDesk(false); return; }
+        if (D.busy) return;
+        if (name === 'think') beat('think');
+        else if (name === 'lean') beat('lean');
+      },
+      routine: startRoutine, react, toDesk
+    };
+    window.__room = {
+      state: () => ({ mode: D.mode, busy: D.busy, at: D.at, seated: D.seated, onBed: D.onBed, fade: Math.round(D.fadeK * 100) / 100, neo: neoRoot ? N.mode : 'none', dannyPos: dannyRoot.position.toArray().map(v => Math.round(v * 100) / 100), neoPos: neoRoot ? neoRoot.position.toArray().map(v => Math.round(v * 100) / 100) : null, dannyClips: Object.keys(dAct), neoClips: Object.keys(nAct) }),
+      danny: (k) => dPlay(k),
+      neo: (n) => nPlay(n),
+      react: (id) => react(id),
+      routine: () => startRoutine(),
+      neoGo: (i) => { if (neoRoot) { N.i = i; N.target = NW[i]; N.mode = 'turn'; N.pauseT = 0; nPlay('Idle'); } },
+      neoPlace: (i) => { if (neoRoot) { N.i = i; N.target = null; N.mode = 'idle'; N.t = 30; N.pauseT = 0; neoRoot.position.set(NW[i].p[0], NW[i].p[1], NW[i].p[2]); nPlay('Idle'); } },
+      neoStep: (sec) => { let n = Math.round(sec / 0.05); while (n-- > 0) neoUpdate(0.05); if (nMixer) nMixer.setTime(nMixer.time + sec); renderer.render(scene, camera); },
+      setDannyY: (v) => { dannyRoot.position.y = v; renderer.render(scene, camera); },
+      project: (what) => {
+        const o = what === 'neo' ? neoRoot : dannyRoot; if (!o) return null;
+        const v = o.position.clone(); if (what === 'danny') v.y += 0.9; else v.y += 0.25;
+        v.project(camera);
+        const r = cvEl.getBoundingClientRect();
+        return { x: Math.round(r.left + (v.x * 0.5 + 0.5) * r.width), y: Math.round(r.top + (-v.y * 0.5 + 0.5) * r.height) };
+      },
+      setTime: (t) => {
+        /* snap to the current action alone first: mixer.setTime rewinds
+           in-flight crossfades, which used to resurrect faded-out standing
+           clips at full weight and corrupt posed QA captures */
+        for (const k in dAct) { const a = dAct[k]; if (a !== dCur) { a.stop(); a.enabled = false; a.weight = 0; } }
+        if (dCur) { dCur.stopFading(); dCur.enabled = true; dCur.weight = 1; }
+        if (nMixer) for (const k in nAct) { const a = nAct[k]; if (a !== nCur) { a.stop(); a.enabled = false; a.weight = 0; } else { a.stopFading(); a.enabled = true; a.weight = 1; } }
+        dMixer.setTime(t); if (nMixer) nMixer.setTime(t); renderer.render(scene, camera);
+      },
+      bones: () => {
+        dannyG.scene.updateWorldMatrix(true, true);
+        const g = (n) => { const b = dBones[n]; if (!b) return null; const v = new THREE.Vector3(); b.getWorldPosition(v); return v.toArray().map(x => Math.round(x * 1000) / 1000); };
+        return { hips: g('mixamorigHips'), kneeL: g('mixamorigLeftLeg'), footL: g('mixamorigLeftFoot'), head: g('mixamorigHead'), handL: g('mixamorigLeftHand') };
+      },
+      acts: () => Object.fromEntries(Object.entries(dAct).map(([k, a]) => [k, { en: a.enabled, w: Math.round(a.weight * 100) / 100, t: Math.round(a.time * 100) / 100, run: a.isRunning() }])),
+      cur: () => dCur ? dCur.getClip().name : null
+    };
+    /* NOTE: a pose queued before go-live (pendingPose) is deliberately NOT
+       replayed - it is stale painted-deck auto-cycle state, and firing it
+       here would knock Danny out of the seated Typing default on frame one. */
+    if (pendingPose) pendingPose = null;
+
+    /* ---------- go live ---------- */
+    heroEl.classList.add('gl3d');
+    window.__physLive = true;
+    const rc2d = document.getElementById('rain'); if (rc2d) rc2d.style.display = 'none';
+    fit();
+    dPlay('typing', 0.1);
+    dMixer.update(2.2); /* land mid-clip: first visible frame is a real pose */
+    live = true;
+    window.__phys = { count: shards.length, room: true };
+
+    let heroOn = true;
+    new IntersectionObserver(en => { heroOn = en[0].isIntersecting; }, { threshold: 0 }).observe(heroEl);
+    const clock = new THREE.Clock();
+    function frame() {
+      requestAnimationFrame(frame);
+      const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
+      if (!heroOn || document.hidden) return;
+      const anim = window.__motionOn !== false;
+      if (anim) {
+        if (D.travel) {
+          travelUpdate(dt);
+        } else if (D.busy && D.next) {
+          D.holdT -= dt;
+          if (D.holdT <= 0) { const f = D.next; D.next = null; f(); }
+        }
+        /* standing desk beats ease Danny a step out into the room (and back
+           for Typing) so he never looks parked inside the desk corner */
+        D.standK += ((D.standing && D.at === 'desk' && !D.travel ? 1 : 0) - D.standK) * Math.min(1, dt / 0.35);
+        if (D.at === 'desk' && !D.travel) {
+          dannyRoot.position.x = ANCHORS.desk.pos.x + STAND_OFF.x * D.standK;
+          dannyRoot.position.z = ANCHORS.desk.pos.z + STAND_OFF.z * D.standK;
+        }
+        if (!D.travel && !D.onBed && !D.compWalk) walkAnchor.copy(dannyRoot.position);
+        dMixer.update(dt);
+        applyWalkComp();
+        if (D.fadeK !== D.fadeTgt) {
+          const dir = Math.sign(D.fadeTgt - D.fadeK);
+          D.fadeK = Math.max(0, Math.min(1, D.fadeK + dir * dt / 0.22));
+          dMats.forEach(m => { m.opacity = D.fadeK; });
+          if (D.fadeK === 1 && D.fadeTgt === 1) dMats.forEach(m => { m.transparent = false; });
+        }
+        if (nMixer) nMixer.update(dt);
+        neoUpdate(dt);
+        for (const s of shards) { s.o.rotation.y += s.rs * dt; s.o.rotation.x += s.rs * 0.6 * dt; s.o.position.y = s.hy + Math.sin(t * 0.8 + s.ph) * 0.07; }
+        for (let i = 0; i < NR; i++) {
+          const d = rDat[i];
+          d.y -= d.s * dt;
+          if (d.y < 0.05) { d.y = 3.1; d.x = -3.5 + Math.random() * 7; }
+          rPos[i * 6] = d.x; rPos[i * 6 + 1] = d.y; rPos[i * 6 + 2] = 0;
+          rPos[i * 6 + 3] = d.x - 0.03; rPos[i * 6 + 4] = d.y + 0.16; rPos[i * 6 + 5] = 0;
+        }
+        rainGeo.attributes.position.needsUpdate = true;
+        dShadow.position.set(dannyRoot.position.x, 0.012, dannyRoot.position.z + 0.04);
+        if (nShadow && neoRoot) nShadow.position.set(neoRoot.position.x, neoRoot.position.y + 0.012, neoRoot.position.z);
+        camera.position.x += ((CAM_TGT.x + camDir.x * camDist * (camera.aspect >= 1.3 ? 1 : Math.min(1.8, 1.3 / camera.aspect)) + nx * 0.16) - camera.position.x) * Math.min(1, dt * 3);
+        camera.lookAt(CAM_TGT.x + nx * 0.05, CAM_TGT.y - ny * 0.04, CAM_TGT.z);
+      }
+      renderer.render(scene, camera);
+    }
+    frame();
   }
-  frame();
-  window.__phys = { count: bodies.length, shock: shockwave, bodies: () => bodies.map(b => [Math.round(b.x * 10) / 10, Math.round(b.y * 10) / 10]) };
-} catch (err) { /* physics layer is an enhancement - the painted deck stands on its own */ }
+} catch (err) { /* room layer is an enhancement - the painted deck stands on its own */ }
 </script>
 <!-- Privacy-first website analytics -->
 <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
