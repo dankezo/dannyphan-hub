@@ -1534,7 +1534,7 @@ if (AC && soundPref !== 'off') {
 window.addEventListener('resize', fxSize);
 })();
 </script>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="importmap">{"imports":{"three":"assets/vendor/three.module.js","three/addons/":"assets/vendor/addons/"}}</script>
 <script type="module">
 /* ---------- DECK ROOM (M7.3): the real 3D lab ----------
    Danny's lab as a live three.js scene in the left half of the hero:
@@ -1587,7 +1587,7 @@ try {
     if (!renderer.capabilities.isWebGL2) return; /* gate: painted fallback stays */
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.16;
+    renderer.toneMappingExposure = 0.92;
 
     const scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0x07090c, 15, 32);
@@ -1598,15 +1598,15 @@ try {
     const camDist = camDir.length(); camDir.normalize();
 
     /* ---------- lights: matched to the Blender room ---------- */
-    scene.add(new THREE.HemisphereLight(0x9fc8e8, 0x16210f, 0.62));
-    const key = new THREE.DirectionalLight(0xcfe6ff, 2.3); key.position.set(1.5, 3.4, -4.6); scene.add(key);
+    scene.add(new THREE.HemisphereLight(0x9fc8e8, 0x16210f, 0.34));
+    const key = new THREE.DirectionalLight(0xcfe6ff, 1.7); key.position.set(1.5, 3.4, -4.6); scene.add(key);
     const fill = new THREE.DirectionalLight(0xbfd4e6, 0.5); fill.position.set(4.5, 2.6, 5.5); scene.add(fill);
     const pt = (c, i, d, x, y, z) => { const L = new THREE.PointLight(c, i, d, 2); L.position.set(x, y, z); scene.add(L); };
-    pt(0xe8f1ff, 15, 11, -0.4, 2.75, -0.2);  /* ceiling LED bar */
-    pt(0xffc46b, 5, 5.5, -0.7, 2.3, -1.45);  /* lotus lamp */
-    pt(0xa3e635, 6, 6.5, -3.0, 1.7, 0.6);    /* acid lab glow, left wall */
-    pt(0xffd9a0, 9, 6.5, 1.2, 1.5, 1.9);     /* bench lamp, foreground */
-    pt(0x35d3e0, 4, 5.5, 2.45, 1.4, -0.85);  /* server rack cyan */
+    pt(0xe8f1ff, 6, 11, -0.4, 2.75, -0.2);  /* ceiling LED bar */
+    pt(0xffc46b, 2.2, 5.5, -0.7, 2.3, -1.45);  /* lotus lamp */
+    pt(0xa3e635, 2.6, 6.5, -3.0, 1.7, 0.6);    /* acid lab glow, left wall */
+    pt(0xffd9a0, 4, 6.5, 1.2, 1.5, 1.9);     /* bench lamp, foreground */
+    pt(0x35d3e0, 1.8, 5.5, 2.45, 1.4, -0.85);  /* server rack cyan */
 
     /* ---------- soft blob shadows ---------- */
     const blobTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'); const g = x.createRadialGradient(64, 64, 4, 64, 64, 62); g.addColorStop(0, 'rgba(0,0,0,0.55)'); g.addColorStop(0.6, 'rgba(0,0,0,0.25)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
