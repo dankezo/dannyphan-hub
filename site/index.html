@@ -53,7 +53,8 @@ body.cur-on #cur,body.cur-on #curR{opacity:1}
 #curR.big .clab{opacity:1}
 
 /* ---------- header ---------- */
-header{position:fixed;top:0;left:0;right:0;z-index:90;display:flex;align-items:center;justify-content:space-between;padding:16px clamp(16px,4vw,44px);mix-blend-mode:normal}
+header{position:fixed;top:0;left:0;right:0;z-index:90;display:flex;align-items:center;justify-content:space-between;padding:16px clamp(16px,4vw,44px);mix-blend-mode:normal;border-bottom:1px solid transparent;transition:background 300ms,border-color 300ms}
+header.scrolled{background:rgba(7,9,12,.86);backdrop-filter:blur(10px);border-bottom-color:var(--line2)}
 header .brand{font-weight:900;font-size:17px;letter-spacing:.02em;text-decoration:none;display:flex;gap:10px;align-items:center}
 header .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--acid);box-shadow:0 0 12px var(--acid);animation:pulse 2.2s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
@@ -245,15 +246,22 @@ h1.mega .acid{color:var(--acid);text-shadow:0 0 34px rgba(163,230,53,.35)}
 }
 
 /* ---------- methods + field results ---------- */
-.meth-wrap{position:relative}
-.meths{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;scrollbar-width:none}
-.meths::-webkit-scrollbar{display:none}
-.meths .meth{flex:0 0 min(350px,84vw);scroll-snap-align:start}
-.meth-arrow{position:absolute;top:42%;z-index:5;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:rgba(7,9,12,.55);color:var(--paper);font-family:var(--mono);font-size:16px;cursor:pointer;opacity:.38;transition:opacity 250ms,border-color 250ms;backdrop-filter:blur(3px)}
-.meth-arrow:hover{opacity:.9;border-color:var(--acid);color:var(--acid)}
-.meth-arrow.prev{left:-8px}.meth-arrow.next{right:-8px}
-.meth{border:1px solid var(--line2);background:rgba(12,15,19,.55);padding:0 20px 20px;overflow:hidden}
-.mviz{height:118px;margin:0 -20px 16px;position:relative;overflow:hidden;background:radial-gradient(300px 130px at 50% 120%,rgba(163,230,53,.12),transparent 70%),#0A0D10;border-bottom:1px solid var(--line2)}
+.meths{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+.meth{border:1px solid var(--line2);background:rgba(12,15,19,.55);padding:0 20px 20px;overflow:hidden;grid-column:span 2}
+.meth.duo{grid-column:span 3}
+a.meth{display:block;color:inherit;text-decoration:none;transition:border-color 250ms}
+a.meth:hover{border-color:rgba(163,230,53,.55)}
+.meth.duo.collab{background:linear-gradient(180deg,rgba(163,230,53,.08),rgba(12,15,19,.55))}
+.mviz .duo-rings i{position:absolute;top:50%;width:76px;height:76px;margin-top:-38px;border:1.5px solid rgba(163,230,53,.55);border-radius:50%}
+.mviz .duo-rings i:nth-child(1){left:calc(50% - 70px)}
+.mviz .duo-rings i:nth-child(2){left:calc(50% - 6px);border-color:rgba(163,230,53,.3)}
+.mviz .duo-rings b{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:var(--acid);box-shadow:0 0 12px var(--acid);animation:pulse 1.8s infinite}
+.mviz.face img{width:100%;height:100%;object-fit:cover;object-position:center 21%;display:block}
+.mcta{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--acid)}
+section[id],footer[id]{scroll-margin-top:86px}
+@media(max-width:900px){.meths{grid-template-columns:1fr 1fr}.meth{grid-column:span 2}.meth.duo{grid-column:span 1}}
+@media(max-width:560px){.meths{grid-template-columns:1fr}.meth,.meth.duo{grid-column:span 1}}
+.mviz{height:132px;margin:0 -20px 16px;position:relative;overflow:hidden;background:radial-gradient(300px 130px at 50% 120%,rgba(163,230,53,.12),transparent 70%),#0A0D10;border-bottom:1px solid var(--line2)}
 .mviz .rings i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1px solid rgba(163,230,53,.35);border-radius:50%}
 .mviz .rings i:nth-child(1){width:36px;height:36px}.mviz .rings i:nth-child(2){width:72px;height:72px;opacity:.6}.mviz .rings i:nth-child(3){width:108px;height:108px;opacity:.35}
 .mviz .sweep{position:absolute;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;background:conic-gradient(from 0deg,rgba(163,230,53,.4),transparent 24%);border-radius:50%;animation:spin 5.5s linear infinite}
@@ -614,29 +622,39 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
       </div>
       <div class="idx" style="max-width:300px;line-height:2" data-i18n="methNote">CHỈ NÓI SƠ BỘ.<br>QUY TRÌNH GIỮ KÍN.<br>KẾT QUẢ THÌ CÔNG KHAI.</div>
     </div>
-    <div class="meth-wrap">
-      <button class="meth-arrow prev" id="methPrev" type="button" aria-label="Cuộn trái">&lt;</button>
-      <div class="meths" id="methTrack">
+    <div class="meths">
       <div class="meth reveal">
         <div class="mviz"><div class="rings"><i></i><i></i><i></i></div><div class="sweep"></div><div class="blip"></div></div>
         <div class="mname">THE HERD LENS</div>
         <h3 data-i18n="m1Name">Nhìn cả bầy, không soi từng con</h3>
-        <p data-i18n="m1Desc">Ai cũng soi từng request nên bot lẻ luôn lọt. Tôi đo cả bầy theo thời gian: bầy có phối hợp tự lộ nhịp chung, dù mỗi con trông vô hại. Đây là lõi của antiRea - thứ tôi và đội của mình cook ra sau hàng trăm vòng thí nghiệm đo được.</p>
+        <p data-i18n="m1Desc">Soi từng request thì bot lẻ luôn lọt. Tôi đo cả bầy theo thời gian - bầy phối hợp tự lộ nhịp chung, dù mỗi con trông vô hại.</p>
       </div>
       <div class="meth reveal">
         <div class="mviz"><div class="chain"><i></i><i></i><i></i><i></i></div></div>
         <div class="mname">THE METER</div>
         <h3 data-i18n="m2Name">Đồng hồ đo theo danh tính</h3>
-        <p data-i18n="m2Desc">Mọi danh tính có một ngân sách dữ liệu. Trong ngân sách thì cứ lấy, vượt là bị ghi sổ và nhận 429. Không chặn bừa theo linh cảm: đo trước, tính sau - và người dùng thật không bao giờ bị đụng tới.</p>
+        <p data-i18n="m2Desc">Mỗi danh tính có một ngân sách dữ liệu: trong ngân sách cứ lấy, vượt là bị ghi sổ và nhận 429. Người dùng thật không bao giờ bị đụng tới.</p>
       </div>
       <div class="meth reveal">
         <div class="mviz"><div class="tg"><i></i><i></i><i></i><b></b></div></div>
         <div class="mname">PROVE IT, END TO END</div>
         <h3 data-i18n="m3Name">Chứng minh đầu - cuối</h3>
-        <p data-i18n="m3Desc">Không có chuyện "có vẻ là lỗ hổng". Một vấn đề chỉ được gọi tên khi đã khai thác được thật, từ đầu tới cuối, bằng chứng chụp thật. Còn lại, tất cả chỉ là gia cố. Chuẩn này tôi áp cho mọi ca nhận vào.</p>
+        <p data-i18n="m3Desc">Chỉ gọi là lỗ hổng khi đã khai thác được thật, từ đầu tới cuối, bằng chứng chụp thật. Còn lại, tất cả chỉ là gia cố.</p>
       </div>
-      </div>
-      <button class="meth-arrow next" id="methNext" type="button" aria-label="Cuộn phải">&gt;</button>
+      <a class="meth duo collab reveal" href="#contact" data-cur="GO">
+        <div class="mviz"><div class="duo-rings"><i></i><i></i><b></b></div></div>
+        <div class="mname">COLLAB</div>
+        <h3 data-i18n="cName">Có hệ thống cần giữ?</h3>
+        <p data-i18n="cDesc">Tôi nhận rà soát bảo mật và dựng lớp chống cào dữ liệu cho web app / SaaS. Kể tôi nghe hệ thống của bạn - tôi nói thẳng làm được gì, mất bao lâu.</p>
+        <span class="mcta" data-i18n="cCta">BẮT ĐẦU TRAO ĐỔI -&gt;</span>
+      </a>
+      <a class="meth duo reveal" href="#operator" data-cur="GO">
+        <div class="mviz face"><img src="assets/operator.jpg" alt="" loading="lazy"></div>
+        <div class="mname">ABOUT ME</div>
+        <h3 data-i18n="aName">Danny Phan - Hà Nội</h3>
+        <p data-i18n="aDesc">Kỹ sư bảo mật, indie builder. Ban ngày giữ hệ thống cho công ty, ban đêm cook antiRea và nuôi cái deck này cùng một con mèo tên Neo.</p>
+        <span class="mcta" data-i18n="aCta">GẶP OPERATOR -&gt;</span>
+      </a>
     </div>
     <div class="board reveal">
       <div class="brow bhead"><span data-i18n="bSite">WEBSITE ĐÃ GIÚP</span><span data-i18n="bProb">VẤN ĐỀ</span><span data-i18n="bMeth">PHƯƠNG THỨC</span><span data-i18n="bStat">TRẠNG THÁI</span></div>
@@ -752,11 +770,17 @@ vi: {
   methTitle: 'Phương thức<br><span class="acid">tự cook</span>',
   methNote: 'CHỈ NÓI SƠ BỘ.<br>QUY TRÌNH GIỮ KÍN.<br>KẾT QUẢ THÌ CÔNG KHAI.',
   m1Name: 'Nhìn cả bầy, không soi từng con',
-  m1Desc: 'Ai cũng soi từng request nên bot lẻ luôn lọt. Tôi đo cả bầy theo thời gian: bầy có phối hợp tự lộ nhịp chung, dù mỗi con trông vô hại. Đây là lõi của antiRea - thứ tôi và đội của mình cook ra sau hàng trăm vòng thí nghiệm đo được.',
+  m1Desc: 'Soi từng request thì bot lẻ luôn lọt. Tôi đo cả bầy theo thời gian - bầy phối hợp tự lộ nhịp chung, dù mỗi con trông vô hại.',
   m2Name: 'Đồng hồ đo theo danh tính',
-  m2Desc: 'Mọi danh tính có một ngân sách dữ liệu. Trong ngân sách thì cứ lấy, vượt là bị ghi sổ và nhận 429. Không chặn bừa theo linh cảm: đo trước, tính sau - và người dùng thật không bao giờ bị đụng tới.',
+  m2Desc: 'Mỗi danh tính có một ngân sách dữ liệu: trong ngân sách cứ lấy, vượt là bị ghi sổ và nhận 429. Người dùng thật không bao giờ bị đụng tới.',
   m3Name: 'Chứng minh đầu - cuối',
-  m3Desc: 'Không có chuyện "có vẻ là lỗ hổng". Một vấn đề chỉ được gọi tên khi đã khai thác được thật, từ đầu tới cuối, bằng chứng chụp thật. Còn lại, tất cả chỉ là gia cố. Chuẩn này tôi áp cho mọi ca nhận vào.',
+  m3Desc: 'Chỉ gọi là lỗ hổng khi đã khai thác được thật, từ đầu tới cuối, bằng chứng chụp thật. Còn lại, tất cả chỉ là gia cố.',
+  cName: 'Có hệ thống cần giữ?',
+  cDesc: 'Tôi nhận rà soát bảo mật và dựng lớp chống cào dữ liệu cho web app / SaaS. Kể tôi nghe hệ thống của bạn - tôi nói thẳng làm được gì, mất bao lâu.',
+  cCta: 'BẮT ĐẦU TRAO ĐỔI ->',
+  aName: 'Danny Phan - Hà Nội',
+  aDesc: 'Kỹ sư bảo mật, indie builder. Ban ngày giữ hệ thống cho công ty, ban đêm cook antiRea và nuôi cái deck này cùng một con mèo tên Neo.',
+  aCta: 'GẶP OPERATOR ->',
   bSite: 'WEBSITE ĐÃ GIÚP', bProb: 'VẤN ĐỀ', bMeth: 'PHƯƠNG THỨC', bStat: 'TRẠNG THÁI',
   r1Site: 'Khách sạn quốc tế - Hà Nội', r1Prob: 'Chứng chỉ TLS hết hạn ngay mùa cao điểm', r1Stat: 'Đã cảnh báo trước hạn',
   r2Site: 'Chuỗi nha khoa - TP.HCM', r2Prob: 'CORS phản chiếu mọi origin, kèm credentials', r2Stat: 'Xác minh 2 vòng - báo riêng',
@@ -805,11 +829,17 @@ en: {
   methTitle: 'Methods<br><span class="acid">home-cooked</span>',
   methNote: 'HIGH LEVEL ONLY.<br>THE PROCESS STAYS PRIVATE.<br>THE RESULTS ARE PUBLIC.',
   m1Name: 'Watch the herd, not the individual',
-  m1Desc: 'Everyone inspects single requests, so lone bots slip through. I measure the whole herd over time: a coordinated herd gives itself away by its shared rhythm, even when each member looks harmless. That is the core of antiRea - cooked by me and my crew over hundreds of measured lab rounds.',
+  m1Desc: 'Inspect single requests and lone bots slip through. I measure the whole herd over time - a coordinated herd betrays its shared rhythm, even when each member looks harmless.',
   m2Name: 'A budget for every identity',
-  m2Desc: 'Every identity gets a data budget. Inside the budget, take what you need; cross it and you are logged and served a 429. No gut-feel blocking: measure first, charge later - and real users are never touched.',
+  m2Desc: 'Every identity gets a data budget: take what you need inside it, cross it and you are logged and served a 429. Real users are never touched.',
   m3Name: 'Prove it, end to end',
-  m3Desc: 'There is no "looks like a vulnerability". An issue earns its name only when it has been exploited for real, end to end, with real screenshot evidence. Everything else is just hardening. I hold every case I take to this standard.',
+  m3Desc: 'A problem earns the name vulnerability only when it has been exploited for real, end to end, with real screenshot evidence. Everything else is just hardening.',
+  cName: 'Got a system worth keeping?',
+  cDesc: 'I take on security reviews and build anti-scraping layers for web apps and SaaS. Tell me about your system - I will say plainly what I can do and how long it takes.',
+  cCta: 'START A CONVERSATION ->',
+  aName: 'Danny Phan - Hanoi',
+  aDesc: 'Security engineer, indie builder. Days keeping company systems safe, nights cooking antiRea and running this deck with a cat named Neo.',
+  aCta: 'MEET THE OPERATOR ->',
   bSite: 'WEBSITES HELPED', bProb: 'THE PROBLEM', bMeth: 'METHOD', bStat: 'STATUS',
   r1Site: 'International hotel - Hanoi', r1Prob: 'TLS certificate expiring right before peak season', r1Stat: 'Flagged before the deadline',
   r2Site: 'Dental chain - Ho Chi Minh City', r2Prob: 'CORS reflecting every origin, with credentials', r2Stat: 'Verified twice - reported privately',
@@ -968,7 +998,10 @@ fxSize();
 /* ---------- pointer / parallax state ---------- */
 var px = .5, py = .5, tx = .5, ty = .5, scrollY = window.scrollY || 0;
 if (finePointer) window.addEventListener('pointermove', function(e){ document.body.classList.add('cur-on'); tx = e.clientX / window.innerWidth; ty = e.clientY / window.innerHeight; }, { passive: true });
-window.addEventListener('scroll', function(){ scrollY = window.scrollY || 0; }, { passive: true });
+var hdrEl = document.querySelector('header');
+function hdrState(){ if (hdrEl) hdrEl.classList.toggle('scrolled', (window.scrollY || 0) > 30); }
+window.addEventListener('scroll', function(){ scrollY = window.scrollY || 0; hdrState(); }, { passive: true });
+hdrState();
 var heroFrame = $('#heroFrame'), skyEl = $('.sky'), bandImg = $('#bandImg'), dannyWrap = $('#dannyWrap'), lotusWrap = $('#lotusWrap'), catWrap = $('#catWrap');
 var heroVisible = true, bandVisible = false;
 new IntersectionObserver(function(en){ heroVisible = en[0].isIntersecting; }, { threshold: 0 }).observe($('#hero'));
@@ -1460,31 +1493,7 @@ setTimeout(directorTick, 5000);
 (window.innerWidth <= 900 ? ['assets/p-danny-think.webp','assets/p-danny-lean.webp','assets/p-cat-groom.webp','assets/p-cat-sleep.webp'] : ['assets/danny-think.webp','assets/danny-lean.webp','assets/cat-groom.webp','assets/cat-sleep.webp']).forEach(function(s){ var im = new Image(); im.src = s; });
 if (window.DECK) { window.DECK.act = function(name){ if (poseEls[name]) { setPose(name); return 'danny:' + name; } if (catEls[name]) { setCatPose(name); return 'cat:' + name; } return 'unknown'; }; window.DECK.pose = function(){ return dannyState + '/' + catState; }; window.DECK.say = typeSay; window.DECK.i18n = function(){ return I18N[LANG]; }; }
 
-/* ---------- methods carousel: auto-scrolls, rests under your cursor ---------- */
-(function(){
-  var track = $('#methTrack'); if (!track) return;
-  var origCount = track.children.length;
-  for (var ci = 0; ci < origCount; ci++) { var cl = track.children[ci].cloneNode(true); cl.setAttribute('aria-hidden', 'true'); cl.classList.remove('reveal'); track.appendChild(cl); }
-  var half = 0, paused = false, resumeAt = 0;
-  function measure(){ half = track.scrollWidth / 2; }
-  setTimeout(measure, 600);
-  window.addEventListener('resize', measure);
-  track.addEventListener('pointerenter', function(){ paused = true; });
-  track.addEventListener('pointerleave', function(){ paused = false; });
-  track.addEventListener('pointerdown', function(){ resumeAt = Date.now() + 4000; });
-  track.addEventListener('wheel', function(){ resumeAt = Date.now() + 4000; }, { passive: true });
-  function step(){
-    if (motionOn && !paused && Date.now() > resumeAt && half > track.clientWidth && !document.hidden) {
-      track.scrollLeft += .55;
-      if (track.scrollLeft >= half) track.scrollLeft -= half;
-    }
-    requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-  var prev = $('#methPrev'), next = $('#methNext');
-  if (prev) prev.addEventListener('click', function(){ resumeAt = Date.now() + 4000; track.scrollBy({ left: -370, behavior: 'smooth' }); });
-  if (next) next.addEventListener('click', function(){ resumeAt = Date.now() + 4000; track.scrollBy({ left: 370, behavior: 'smooth' }); });
-})();
+/* ---------- methods: static grid, no carousel (Danny 10/11: clones read as duplicates) ---------- */
 
 /* ---------- heatmap: shipping rhythm, seeded so it looks the same for everyone ---------- */
 function renderHeat(){
@@ -1613,7 +1622,71 @@ try {
     function blob(rx, rz) { const m = new THREE.Mesh(new THREE.PlaneGeometry(rx, rz), new THREE.MeshBasicMaterial({ map: blobTex, transparent: true, depthWrite: false })); m.rotation.x = -Math.PI / 2; scene.add(m); return m; }
 
     const loader = new GLTFLoader();
-    const load = (p) => new Promise((res, rej) => loader.load(p, res, undefined, rej));
+    /* Texture self-heal (M7.5 white-render bug): three r160's GLTFLoader
+       swallows image load failures (.catch -> null), so on some browsers a
+       model arrives with every color map silently dropped and renders as a
+       white statue. The heal rebuilds any declared-but-missing texture
+       straight from the GLB bytes (Blob -> createImageBitmap, no object
+       URLs) and re-assigns the slot. On healthy loads it changes nothing. */
+    async function healDroppedTextures(gltf, ab) {
+      const dv = new DataView(ab);
+      const jsonLen = dv.getUint32(12, true);
+      const json = JSON.parse(new TextDecoder().decode(new Uint8Array(ab, 20, jsonLen)));
+      const binStart = 20 + jsonLen + 8;
+      const built = [];
+      for (let ti = 0; ti < (json.textures || []).length; ti++) {
+        const t = json.textures[ti];
+        const img = json.images[t.source];
+        if (!img || img.bufferView === undefined) continue;
+        const bv = json.bufferViews[img.bufferView];
+        const bytes = new Uint8Array(ab, binStart + (bv.byteOffset || 0), bv.byteLength);
+        const bmp = await createImageBitmap(new Blob([bytes], { type: img.mimeType || 'image/png' }), { premultiplyAlpha: 'none' });
+        const tex = new THREE.Texture(bmp);
+        tex.flipY = false;
+        tex.needsUpdate = true;
+        const s = (json.samplers && json.samplers[t.sampler]) || {};
+        tex.magFilter = s.magFilter !== undefined ? s.magFilter : THREE.LinearFilter;
+        tex.minFilter = s.minFilter !== undefined ? s.minFilter : THREE.LinearMipmapLinearFilter;
+        tex.wrapS = s.wrapS !== undefined ? s.wrapS : THREE.RepeatWrapping;
+        tex.wrapT = s.wrapT !== undefined ? s.wrapT : THREE.RepeatWrapping;
+        built[ti] = tex;
+      }
+      const applyInfo = (mat, prop, info, isColor) => {
+        if (!info || mat[prop]) return;
+        let tex = built[info.index];
+        if (!tex) return;
+        tex = tex.clone();
+        tex.needsUpdate = true;
+        tex.colorSpace = isColor ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+        const tr = info.extensions && info.extensions.KHR_texture_transform;
+        if (tr) {
+          if (tr.offset) tex.offset.set(tr.offset[0], tr.offset[1]);
+          if (tr.repeat) tex.repeat.set(tr.repeat[0], tr.repeat[1]);
+          if (tr.rotation) tex.rotation = tr.rotation;
+          if (tr.texCoord !== undefined) tex.channel = tr.texCoord;
+        } else if (info.texCoord) tex.channel = info.texCoord;
+        mat[prop] = tex;
+      };
+      gltf.parser.associations.forEach((assoc, mat) => {
+        if (!assoc || assoc.materials === undefined) return;
+        const def = json.materials[assoc.materials];
+        if (!def) return;
+        const pbr = def.pbrMetallicRoughness || {};
+        applyInfo(mat, 'map', pbr.baseColorTexture, true);
+        applyInfo(mat, 'roughnessMap', pbr.roughnessTexture, false);
+        applyInfo(mat, 'metalnessMap', pbr.metallicTexture, false);
+        applyInfo(mat, 'normalMap', def.normalTexture, false);
+        applyInfo(mat, 'emissiveMap', def.emissiveTexture, true);
+        applyInfo(mat, 'aoMap', def.occlusionTexture, false);
+        mat.needsUpdate = true;
+      });
+    }
+    const load = async (p) => {
+      const ab = await (await fetch(p)).arrayBuffer();
+      const g = await new Promise((res, rej) => loader.parse(ab.slice(0), '', res, rej));
+      try { await healDroppedTextures(g, ab); } catch (e) { /* heal is best-effort */ }
+      return g;
+    };
 
     /* ---------- the room ---------- */
     const roomG = await load('assets/room-lab.glb');
@@ -1635,8 +1708,60 @@ try {
     const dMats = [];
     dannyG.scene.traverse(o => { if (o.isMesh) { (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { if (m && dMats.indexOf(m) < 0) dMats.push(m); }); } });
 
+    /* ---------- guitar prop (M7.5) ----------
+       The room guitar is six loose meshes leaning on a stand. For the
+       guitar chain the director hides those and shows a cloned prop
+       parented to Danny, so the instrument is actually in his hands.
+       Parent choice, from FK-sampling the Guitar clip in the GLB: the
+       right hand strums and wanders roughly +-0.06 m around the belly,
+       so a hand-parented guitar would jitter with every strum; the left
+       (fretting) hand is steadier but sits at the neck end, the worst
+       pivot of all. Both hands hold their places relative to the chest,
+       so the prop is parented to the Spine2 bone and posed from the
+       clip's own numbers at t = 1.8 s: body centre at the Spine2 origin
+       plus (-0.05, -0.35, +0.18) in root space, neck toward the fretting
+       hand (direction (0.88, 0.48, 0.07), tilted up about 29 deg),
+       sound-hole face pointing out (+Z). GUITAR_PROP.pos and .quat are
+       those root-space targets converted into Spine2 bone space. The
+       prop group's origin is the guitar body centre (bbox of gBodyLow
+       and gBodyUp in room space); inside the group the model keeps its
+       room axes - neck along +Y, face toward -Z. */
+    const GUITAR_PROP = {
+      parent: 'Spine2',
+      pos: [-0.026, -0.314, 0.241],
+      quat: [0.4793, 0.8744, -0.0543, 0.0523]
+    };
+    const GUITAR_PARTS = ['gBodyLow', 'gBodyUp', 'gHole', 'gNeck', 'gHead', 'gBridge'];
+    const roomGuitar = GUITAR_PARTS.map(n => roomG.scene.getObjectByName(n)).filter(Boolean);
+    let guitarProp = null;
+    {
+      const spine = dBones['mixamorigSpine2'] || Object.keys(dBones).map(k => dBones[k]).find(b => /Spine2$/.test(b.name));
+      if (spine && roomGuitar.length === GUITAR_PARTS.length) {
+        const inner = new THREE.Group();
+        roomGuitar.forEach(m => inner.add(m.clone()));
+        const bb = new THREE.Box3();
+        ['gBodyLow', 'gBodyUp'].forEach(n => { const c = inner.getObjectByName(n); if (c) bb.expandByObject(c); });
+        const ctr = bb.getCenter(new THREE.Vector3());
+        inner.position.copy(ctr).multiplyScalar(-1);
+        guitarProp = new THREE.Group();
+        guitarProp.add(inner);
+        guitarProp.position.fromArray(GUITAR_PROP.pos);
+        guitarProp.quaternion.fromArray(GUITAR_PROP.quat);
+        guitarProp.visible = false;
+        spine.add(guitarProp);
+      }
+    }
+    let gtrRoomShown = true;
+    function guitarPropOn() { if (!guitarProp) return; roomGuitar.forEach(m => { m.visible = false; }); gtrRoomShown = false; guitarProp.visible = true; }
+    function guitarPropOff() { if (!guitarProp) return; guitarProp.visible = false; roomGuitar.forEach(m => { m.visible = true; }); gtrRoomShown = true; }
+
     /* ---------- Neo (optional: room + Danny still go live without her) ---------- */
     let neoRoot = null, nMixer = null; const nAct = {};
+    /* New trot GLB (28f @ 24fps): authored ground speed 0.407 units/s x inner
+       scale 0.2274 = 0.0925 m/s at 1x. Played at 2x so she trots briskly;
+       root translation must match exactly or her feet skate. */
+    const NEO_WALK_TS = 2;
+    const NEO_WALK_SPEED = 0.0925 * NEO_WALK_TS;
     try {
       const neoG = await load('assets/neo-hero.glb');
       neoRoot = new THREE.Group(); scene.add(neoRoot);
@@ -1648,8 +1773,8 @@ try {
     const nShadow = neoRoot ? blob(0.55, 0.55) : null;
 
     /* ---------- clip registry: one line per interaction ---------- */
-    const CLIPMAP = { typing: 'Typing', idle: 'SittingIdle', think: 'Thinking', lean: 'LeanBack', sleep: 'Sleeping', guitar: 'Guitar', frustrated: 'Frustrated', walk: 'Walking', stand: 'StandUp', sit: 'SitDown', pet: 'Petting' };
-    const ONCE = { LeanBack: 1, Sleeping: 1, Guitar: 1, Frustrated: 1, Petting: 1, StandUp: 1, SitDown: 1 };
+    const CLIPMAP = { typing: 'Typing', idle: 'SittingIdle', think: 'Thinking', lean: 'LeanBack', sleep: 'Sleeping', guitar: 'Guitar', frustrated: 'Frustrated', walk: 'Walking', stand: 'StandUp', sit: 'SitDown', pet: 'Petting', yawn: 'Yawn', stretch: 'ArmStretch', wave: 'Waving', thumbs: 'ThumbsUp', happy: 'HappyIdle', clap: 'Clapping', laugh: 'Laughing', sitclap: 'SittingClap', drink: 'SittingDrink' };
+    const ONCE = { LeanBack: 1, Sleeping: 1, Guitar: 1, Frustrated: 1, Petting: 1, StandUp: 1, SitDown: 1, Yawn: 1, ArmStretch: 1, Waving: 1, ThumbsUp: 1, Clapping: 1, Laughing: 1, SittingClap: 1, SittingDrink: 1 };
     const dHas = (k) => !!dAct[CLIPMAP[k]];
     const dDur = (k) => { const a = dAct[CLIPMAP[k]]; return a ? a.getClip().duration : 0; };
     let dCur = null;
@@ -1670,13 +1795,24 @@ try {
     function nPlay(name, fade) {
       const a = nAct[name]; if (!a || a === nCur) return;
       for (const k in nAct) { const o = nAct[k]; if (o !== a && o !== nCur && o.enabled) { o.stop(); o.enabled = false; o.weight = 0; } }
-      a.enabled = true; a.weight = 1; a.reset(); a.setLoop(THREE.LoopRepeat, Infinity); a.clampWhenFinished = false;
+      a.enabled = true; a.weight = 1; a.reset(); a.timeScale = name === 'Walk' ? NEO_WALK_TS : 1; a.setLoop(THREE.LoopRepeat, Infinity); a.clampWhenFinished = false;
       a.fadeIn(fade == null ? 0.3 : fade); a.play();
       if (nCur) nCur.fadeOut(fade == null ? 0.3 : fade);
       nCur = a;
     }
 
     function dPlayLoop(key) { const a = dPlay(key); if (a) { a.setLoop(THREE.LoopRepeat, Infinity); a.clampWhenFinished = false; } return a; }
+    /* variation player: like dPlay but with an explicit play length -
+       either a fixed segment in seconds (for cutting into a long clip)
+       or a whole number of loops (for clips too short to read in one
+       pass). Returns how long the caller should wait before moving on. */
+    function dPlayVar(key, opt) {
+      const a = dPlay(key); if (!a) return 0;
+      const o = opt || {};
+      a.setLoop(THREE.LoopRepeat, Infinity); a.clampWhenFinished = false;
+      if (o.seg) return o.seg;
+      return Math.max(0.3, dDur(key) * (o.loops || 1) - 0.12);
+    }
     /* Walking carries real root motion (~1.39 m per 1.067 s loop). WALK_BASE
        is the Hips offset at loop start in root space, precomputed from the
        clip's position track, so the frame loop can subtract the in-clip
@@ -1710,6 +1846,41 @@ try {
        feet +X, bone-sampled), so yaw pi/2 lays it along the bed's long axis
        (three Z) with the head toward the pillow and his face to the room. */
     const BED_POSE = { pos: new THREE.Vector3(-3.01, 0.45, 1.74), yaw: Math.PI / 2 };
+    /* ---------- chair anchor calibration (measured from the GLBs) ----------
+       chairSeat top in room-lab.glb = 0.515 (bbox max Y; seat centre XZ
+       (-0.85, -0.88) matches the desk anchor). Typing rides his hips at
+       0.469 in clip space, i.e. 0.529 world on the 0.06 desk root - just
+       over the seat top, correct. SitDown already ends there too (last
+       frame hips 0.467, delta 0.002), so it needs no help. StandUp is
+       the odd one: the Mixamo clip opens as a floor-sit (frame-0 hips
+       Y = 0.098), so uncorrected he sinks and rises from the floor.
+       SEAT_Y_OFF lifts the desk root while StandUp is the current clip
+       so frame 0 starts exactly at the seated hips height, then decays
+       to 0 across the clip's rise (hips reach the standing 0.835 at
+       about t = 3.8 s) so he lands at natural standing height. Typing
+       and every other anchor keep their existing Y. */
+    const SEAT_Y_OFF = 0.371; /* Typing hips 0.469 - StandUp frame-0 hips 0.098 */
+    const SEAT_RISE_T0 = 0.9, SEAT_RISE_SPAN = 2.9;
+    /* SitDown has the matching horizontal drift: its hips Z (root space,
+       FK-sampled from the GLB) travels from +0.088 at frame 0 down to
+       -0.308 at the settle, while Typing holds +0.106 - uncorrected, the
+       crossfade into Typing glides him about 0.41 m toward the room.
+       While SitDown carries weight at the desk, the frame loop counters
+       the drift by offsetting the root Z with -(sitZ(t) - SEAT_TYPING_Z)
+       scaled by the clip's effective weight, so his world hips Z stays
+       on the Typing anchor through the whole sit and through the blend
+       out; weight 0 gives exactly no offset. Keys below are clip seconds
+       vs root-space hips Z, sampled every tenth of the 2.267 s clip. */
+    const SEAT_TYPING_Z = 0.106; /* Typing hips Z, root space (samples 0.104-0.107) */
+    const SEAT_SIT_KEYS = [[0, 0.088], [0.23, 0.087], [0.45, 0.066], [0.68, 0.027], [0.91, -0.063], [1.02, -0.120], [1.13, -0.174], [1.36, -0.268], [1.47, -0.297], [1.59, -0.305], [1.81, -0.308], [2.27, -0.308]];
+    function seatSitZ(t) {
+      const K = SEAT_SIT_KEYS;
+      if (t <= K[0][0]) return K[0][1];
+      for (let i = 1; i < K.length; i++) {
+        if (t <= K[i][0]) { const f = (t - K[i - 1][0]) / (K[i][0] - K[i - 1][0]); return K[i - 1][1] + (K[i][1] - K[i - 1][1]) * f; }
+      }
+      return K[K.length - 1][1];
+    }
     /* furniture footprints (three XZ) that walking paths must not cross */
     const BLOCK = [
       { x0: -2.30, x1: 0.90, z0: -1.98, z1: -0.93 },  /* desk */
@@ -1740,7 +1911,7 @@ try {
     dannyRoot.position.copy(ANCHORS.desk.pos); dannyRoot.rotation.y = ANCHORS.desk.yaw;
 
     /* ---------- director v2 ---------- */
-    const D = { mode: 'typing', busy: false, holdT: 0, next: null, travel: null, at: 'desk', standing: false, standK: 0, seated: true, onBed: false, compWalk: false, fadeK: 1, fadeTgt: 1 };
+    const D = { mode: 'typing', busy: false, holdT: 0, next: null, travel: null, at: 'desk', standing: false, standK: 0, seated: true, onBed: false, compWalk: false, fadeK: 1, fadeTgt: 1, idleT: 18, idleArm: false, seatOff: 0, seatZOff: 0 };
     const STANDKEY = { think: 1, lean: 1 }; /* standing clips: ease out of the desk corner while they play */
     const STAND_OFF = { x: 0.20, z: 0.50 };
     const walkAnchor = ANCHORS.desk.pos.clone(); /* logical floor position; the rendered root adds the walk-cycle compensation on top */
@@ -1840,10 +2011,10 @@ try {
       return [];
     }
     function returnSteps() {
-      return [sTravel(ANCHORS.desk, 'desk'), sOnce('sit', 1.2), (next) => { D.seated = true; dPlay('typing'); next(); }];
+      return [(next) => { guitarPropOff(); next(); }, sTravel(ANCHORS.desk, 'desk'), sOnce('sit', 1.2), (next) => { D.seated = true; dPlay('typing'); next(); }];
     }
     function toDesk(user) {
-      if (Q.active || D.travel || D.onBed || D.at !== 'desk') { abortToDesk(user); return; }
+      if (Q.active || D.travel || D.onBed || D.at !== 'desk' || !D.seated) { abortToDesk(user); return; }
       cancelTimers(); D.busy = false; D.mode = 'typing'; D.standing = false;
       dannyRoot.rotation.y = ANCHORS.desk.yaw;
       dPlay('typing');
@@ -1865,19 +2036,64 @@ try {
       if (keyName === 'lean') sayText(pickDannyLine());
       after(keyName === 'lean' ? 4.4 : 3.6, () => toDesk(false));
     }
+    /* ---------- lively idle: seated variations at the desk ----------
+       While Danny is settled in the typing loop, one seated variation
+       is inserted every 14-26 s (scene time): a rotation over
+       SittingIdle, Thinking, a ~4 s cut of SittingClap and a ~6 s cut
+       of the 15 s SittingDrink. It runs as a beat (busy, mode 'beat'),
+       so the desk click cancels it and chains never overlap it; the
+       frame loop only counts the timer down in the pure typing state
+       and re-arms it after any busy spell. All crossfades are the
+       standard 0.35 s dPlay fades. */
+    const SEATED_VARS = [
+      { k: 'idle', seg: 4.4 }, { k: 'think', seg: 3.6 },
+      { k: 'sitclap', seg: 4.0 }, { k: 'drink', seg: 6.0 }
+    ];
+    function deskVariation() {
+      const pool = SEATED_VARS.filter(v => dHas(v.k));
+      if (!pool.length) return;
+      const v = pool[Math.floor(Math.random() * pool.length)];
+      D.busy = true; D.mode = 'beat'; D.standing = !!STANDKEY[v.k];
+      dPlayVar(v.k, { seg: v.seg });
+      after(v.seg, () => toDesk(false));
+    }
+    /* standing variations for the random routine: full one-shot clips,
+       short clips looped so they read (wave x2, happy x2-3, clap x2)
+       and a 5 s cut of the 9.8 s Laughing */
+    const STAND_VARS = [
+      { k: 'yawn' }, { k: 'stretch' }, { k: 'wave', loops: 2 }, { k: 'thumbs' },
+      { k: 'happy', loops: 2 }, { k: 'clap', loops: 2 }, { k: 'laugh', seg: 5 }
+    ];
     function startRoutine() {
       if (D.busy && D.mode !== 'beat') return;
       cancelTimers();
       if (D.at !== 'desk') { toDesk(false); return; }
       D.busy = true; D.mode = 'routine';
-      const acts = ['think', 'idle', 'lean'].sort(() => Math.random() - 0.5);
-      let i = 0;
-      const stepFn = () => {
-        if (i >= acts.length) { toDesk(false); return; }
-        const k = acts[i++]; D.standing = !!STANDKEY[k]; dPlay(k);
-        if (k === 'lean') sayText(pickDannyLine());
-        after(k === 'lean' ? 4.2 : 3.4 + Math.random() * 1.2, stepFn);
-      };
+      const seq = [];
+      const seatedPool = ['think', 'idle', 'lean'].filter(k => dHas(k)).sort(() => Math.random() - 0.5);
+      const standPool = STAND_VARS.filter(v => dHas(v.k)).sort(() => Math.random() - 0.5);
+      const doStand = standPool.length > 0 && dHas('stand') && dHas('sit') && Math.random() < 0.55;
+      if (doStand) {
+        seq.push((next) => { const a = dPlay('stand'); if (a) a.timeScale = 1.4; after(Math.max(0.25, dDur('stand') / 1.4 - 0.12), () => { D.seated = false; next(); }); });
+        const nVar = 1 + (Math.random() < 0.6 ? 1 : 0);
+        for (let j = 0; j < nVar && j < standPool.length; j++) {
+          const v = standPool[j];
+          seq.push((next) => {
+            D.standing = true;
+            const wait = dPlayVar(v.k, { seg: v.seg, loops: v.k === 'happy' ? 2 + (Math.random() < 0.5 ? 1 : 0) : v.loops });
+            if (v.k === 'laugh' || v.k === 'wave') sayText(pickDannyLine());
+            after(Math.max(0.6, wait), next);
+          });
+        }
+        seq.push((next) => { D.standing = false; after(0.45, next); });
+        seq.push((next) => { const a = dPlay('sit'); if (a) a.timeScale = 1.2; after(Math.max(0.25, dDur('sit') / 1.2 - 0.12), () => { D.seated = true; next(); }); });
+      } else {
+        seatedPool.slice(0, 2 + (Math.random() < 0.5 ? 1 : 0)).forEach(k => {
+          seq.push((next) => { D.standing = !!STANDKEY[k]; dPlay(k); if (k === 'lean') sayText(pickDannyLine()); after(k === 'lean' ? 4.2 : 3.4 + Math.random() * 1.2, next); });
+        });
+      }
+      let si = 0;
+      const stepFn = () => { if (si >= seq.length) { toDesk(false); return; } seq[si++](stepFn); };
       stepFn();
     }
     const REACT = {
@@ -1925,7 +2141,8 @@ try {
       return [
         ...departSteps(),
         sTravel(ANCHORS.guitar, 'guitar'),
-        (next) => { sayKey('sayGuitar'); dPlayLoop('guitar'); after(8, next); },
+        (next) => { guitarPropOn(); sayKey('sayGuitar'); dPlayLoop('guitar'); after(8, next); },
+        (next) => { guitarPropOff(); next(); },
         ...returnSteps()
       ];
     }
@@ -2005,7 +2222,7 @@ try {
           if (d < 0.15) { N.mode = 'walk'; nPlay('Walk'); }
           return;
         }
-        const sp = Math.min(0.55, 0.16 + dist * 0.55);
+        const sp = NEO_WALK_SPEED;
         if (dist < 0.05) {
           neoRoot.position.set(tp[0], tp[1], tp[2]);
           neoArrive(); return;
@@ -2115,7 +2332,7 @@ try {
       routine: startRoutine, react, toDesk
     };
     window.__room = {
-      state: () => ({ mode: D.mode, busy: D.busy, at: D.at, seated: D.seated, onBed: D.onBed, fade: Math.round(D.fadeK * 100) / 100, neo: neoRoot ? N.mode : 'none', dannyPos: dannyRoot.position.toArray().map(v => Math.round(v * 100) / 100), neoPos: neoRoot ? neoRoot.position.toArray().map(v => Math.round(v * 100) / 100) : null, dannyClips: Object.keys(dAct), neoClips: Object.keys(nAct) }),
+      state: () => ({ mode: D.mode, busy: D.busy, at: D.at, seated: D.seated, onBed: D.onBed, fade: Math.round(D.fadeK * 100) / 100, neo: neoRoot ? N.mode : 'none', dannyPos: dannyRoot.position.toArray().map(v => Math.round(v * 100) / 100), neoPos: neoRoot ? neoRoot.position.toArray().map(v => Math.round(v * 100) / 100) : null, dannyClips: Object.keys(dAct), neoClips: Object.keys(nAct), gtrProp: !!(guitarProp && guitarProp.visible), gtrRoom: gtrRoomShown, seatOff: Math.round(D.seatOff * 1000) / 1000, seatZOff: Math.round(D.seatZOff * 1000) / 1000, idleT: Math.round(D.idleT * 10) / 10 }),
       danny: (k) => dPlay(k),
       neo: (n) => nPlay(n),
       react: (id) => react(id),
@@ -2124,6 +2341,7 @@ try {
       neoPlace: (i) => { if (neoRoot) { N.i = i; N.target = null; N.mode = 'idle'; N.t = 30; N.pauseT = 0; neoRoot.position.set(NW[i].p[0], NW[i].p[1], NW[i].p[2]); nPlay('Idle'); } },
       neoStep: (sec) => { let n = Math.round(sec / 0.05); while (n-- > 0) neoUpdate(0.05); if (nMixer) nMixer.setTime(nMixer.time + sec); renderer.render(scene, camera); },
       setDannyY: (v) => { dannyRoot.position.y = v; renderer.render(scene, camera); },
+      pokeIdle: () => { D.idleT = 0; },
       project: (what) => {
         const o = what === 'neo' ? neoRoot : dannyRoot; if (!o) return null;
         const v = o.position.clone(); if (what === 'danny') v.y += 0.9; else v.y += 0.25;
@@ -2178,16 +2396,50 @@ try {
           D.holdT -= dt;
           if (D.holdT <= 0) { const f = D.next; D.next = null; f(); }
         }
+        /* lively desk idle: the variation timer counts down only in the
+           pure typing state and re-arms to a fresh 14-26 s after any
+           busy spell (chain, routine, beat) has ended */
+        const idleOK = !D.busy && D.mode === 'typing' && D.at === 'desk' && D.seated && !D.travel && !D.onBed;
+        if (D.busy) D.idleArm = true;
+        else if (idleOK && D.idleArm) { D.idleArm = false; D.idleT = 14 + Math.random() * 12; }
+        if (idleOK) { D.idleT -= dt; if (D.idleT <= 0) { D.idleT = 14 + Math.random() * 12; deskVariation(); } }
+        /* chair calibration: while StandUp is the current clip, lift the
+           root so the clip's floor-sit opening starts at seat height;
+           the lift decays to zero as the clip itself rises */
+        const standAct = dAct['StandUp'];
+        let seatTgt = 0;
+        if (standAct && dCur === standAct) { const f = Math.min(1, Math.max(0, (standAct.time - SEAT_RISE_T0) / SEAT_RISE_SPAN)); seatTgt = SEAT_Y_OFF * (1 - f); }
+        D.seatOff += (seatTgt - D.seatOff) * Math.min(1, dt / 0.10);
+        if (seatTgt === 0 && D.seatOff < 0.001) D.seatOff = 0;
         /* standing desk beats ease Danny a step out into the room (and back
            for Typing) so he never looks parked inside the desk corner */
         D.standK += ((D.standing && D.at === 'desk' && !D.travel ? 1 : 0) - D.standK) * Math.min(1, dt / 0.35);
         if (D.at === 'desk' && !D.travel) {
           dannyRoot.position.x = ANCHORS.desk.pos.x + STAND_OFF.x * D.standK;
-          dannyRoot.position.z = ANCHORS.desk.pos.z + STAND_OFF.z * D.standK;
+          dannyRoot.position.z = ANCHORS.desk.pos.z + STAND_OFF.z * D.standK + D.seatZOff;
+          dannyRoot.position.y = ANCHORS.desk.pos.y + D.seatOff;
         }
         if (!D.travel && !D.onBed && !D.compWalk) walkAnchor.copy(dannyRoot.position);
         dMixer.update(dt);
         applyWalkComp();
+        /* horizontal twin of the seat lift: while SitDown carries weight,
+           counter its hips-Z drift so the world hips stay on the Typing
+           anchor. It is computed AFTER the mixer update, from the clip
+           time and effective weight this frame actually renders with -
+           sampling them before the update lags a frame behind the pose.
+           The target is a pure function of those two values, so it is
+           assigned, not lerped: the weight scaling keeps the crossfade
+           into Typing exact, and at weight ~0 the offset is exactly 0.
+           It runs after applyWalkComp and stays out of its way: while a
+           walk is being compensated (D.compWalk) the walk pin owns the
+           root; the comp lands from the very frame the walk releases,
+           and travel or the bed pose never coincide with a weighted
+           SitDown at the desk. */
+        const sitAct = dAct['SitDown'];
+        let seatZOff = 0;
+        if (sitAct && sitAct.enabled) { const w = sitAct.getEffectiveWeight(); if (w > 0.001) seatZOff = -(seatSitZ(sitAct.time) - SEAT_TYPING_Z) * w; }
+        D.seatZOff = seatZOff;
+        if (D.at === 'desk' && !D.travel && !D.compWalk) dannyRoot.position.z = ANCHORS.desk.pos.z + STAND_OFF.z * D.standK + D.seatZOff;
         if (D.fadeK !== D.fadeTgt) {
           const dir = Math.sign(D.fadeTgt - D.fadeK);
           D.fadeK = Math.max(0, Math.min(1, D.fadeK + dir * dt / 0.22));
