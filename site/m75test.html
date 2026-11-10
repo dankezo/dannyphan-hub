@@ -1,4 +1,4 @@
-<!doctype html><meta charset="utf-8"><title>m75 bisect</title>
+<!doctype html><meta charset="utf-8"><title>m75 bisect v2</title>
 <style>html,body{margin:0;background:#0b0e11;height:100%}canvas{display:block;width:100vw;height:100vh}#tag{position:fixed;left:8px;top:8px;color:#a3e635;font:14px monospace;z-index:9}</style>
 <div id="tag">loading</div>
 <script type="importmap">{"imports":{"three":"./assets/vendor/three.module.js","three/addons/":"./assets/vendor/addons/"}}</script>
@@ -8,10 +8,12 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 const q = new URLSearchParams(location.search);
 const mode = q.get('mode') || 'plain';
 const what = q.get('what') || 'hero';
+const v = q.get('v') || 'std';
 const tag = document.getElementById('tag');
 async function main() {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: mode === 'full' });
   if (!renderer.capabilities.isWebGL2) { tag.textContent = 'NO WEBGL2'; return; }
+  if (v === 'outlinear') renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
   renderer.setSize(innerWidth, innerHeight);
   document.body.appendChild(renderer.domElement);
@@ -36,6 +38,22 @@ async function main() {
   const file = what === 'room' ? 'assets/room-lab.glb' : (what === 'neo' ? 'assets/neo-hero.glb' : 'assets/danny-hero-high.glb');
   const g = await new Promise((res, rej) => loader.load(file, res, undefined, rej));
   scene.add(g.scene);
+  /* ---- v2 variants: pin down where the color goes wrong ---- */
+  const mats = new Set();
+  g.scene.traverse(o => { if (o.isMesh) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => mats.add(m)); });
+  let probeImg = null;
+  for (const m of mats) { if (m.map && m.map.image) { probeImg = m.map.image; break; } }
+  if (v === 'norgb') {
+    mats.forEach(m => { if (m.map) { m.map.colorSpace = THREE.NoColorSpace; m.map.needsUpdate = true; } });
+  }
+  if (v === 'basic' || v === 'basiclin') {
+    const swap = (m) => {
+      if (!m.map) return new THREE.MeshBasicMaterial({ color: m.color ? m.color.clone() : 0x888888 });
+      if (v === 'basiclin') { m.map.colorSpace = THREE.NoColorSpace; m.map.needsUpdate = true; }
+      return new THREE.MeshBasicMaterial({ map: m.map });
+    };
+    g.scene.traverse(o => { if (o.isMesh) o.material = Array.isArray(o.material) ? o.material.map(swap) : swap(o.material); });
+  }
   let mixer = null;
   if (g.animations && g.animations.length) {
     mixer = new THREE.AnimationMixer(g.scene);
@@ -45,7 +63,16 @@ async function main() {
   if (what === 'room') { camera.position.set(3.4, 2.3, 4.4); camera.lookAt(-0.8, 0.85, -0.7); }
   if (what === 'neo') { g.scene.scale.setScalar(2.2); camera.position.set(0.8, 0.7, 1.6); camera.lookAt(0, 0.35, 0); }
   renderer.render(scene, camera);
-  tag.textContent = 'mode=' + mode + ' what=' + what + ' RENDERED';
+  /* probe strip: the decoded diffuse image drawn as a plain 2D canvas, bottom-left */
+  if (probeImg) {
+    try {
+      const c = document.createElement('canvas'); c.width = 200; c.height = 200;
+      c.style.cssText = 'position:fixed;left:8px;bottom:8px;width:200px;height:200px;border:2px solid #a3e635;z-index:9';
+      c.getContext('2d').drawImage(probeImg, 0, 0, 200, 200);
+      document.body.appendChild(c);
+    } catch (e) { /* probe is best-effort */ }
+  }
+  tag.textContent = 'mode=' + mode + ' what=' + what + ' v=' + v + ' RENDERED';
   window.__done = true;
 }
 main().catch(e => { tag.textContent = 'ERROR: ' + e.message; });
