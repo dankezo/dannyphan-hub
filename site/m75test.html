@@ -1,82 +1,92 @@
-<!doctype html><meta charset="utf-8"><title>m75 diag v3</title>
+<!doctype html><meta charset="utf-8"><title>m75 diag v4 A/B decode paths</title>
 <style>html,body{margin:0;background:#0b0e11;height:100%}canvas{display:block;width:100vw;height:100vh}#tag{position:fixed;left:8px;top:8px;color:#a3e635;font:14px monospace;z-index:9}#diag{position:fixed;left:8px;top:34px;color:#e8f1ff;background:rgba(0,0,0,.72);font:12px/1.55 monospace;z-index:9;padding:8px 10px;white-space:pre-wrap;max-width:92vw}</style>
 <div id="tag">loading</div><pre id="diag"></pre>
 <script type="importmap">{"imports":{"three":"./assets/vendor/three.module.js","three/addons/":"./assets/vendor/addons/"}}</script>
 <script type="module">
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-const q = new URLSearchParams(location.search);
-const what = q.get('what') || 'hero';
 const tag = document.getElementById('tag');
 const diag = document.getElementById('diag');
 const lines = [];
 const say = (s) => { lines.push(s); diag.textContent = lines.join('\n'); };
+function countMaps(scene) {
+  const mats = new Set();
+  scene.traverse(o => { if (o.isMesh) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => mats.add(m)); });
+  let withMap = 0; mats.forEach(m => { if (m.map) withMap++; });
+  return withMap + '/' + mats.size;
+}
+function parseGLB(loader, buf) {
+  return new Promise((res, rej) => loader.parse(buf, '', res, rej));
+}
 async function main() {
+  say('UA=' + navigator.userAgent);
+  const ab = await (await fetch('assets/danny-hero-high.glb')).arrayBuffer();
+  say('GLB_BYTES=' + ab.byteLength);
+  /* extract images[0] as a Blob, straight from the GLB chunks */
+  const dv = new DataView(ab);
+  const jsonLen = dv.getUint32(12, true);
+  const gltf = JSON.parse(new TextDecoder().decode(new Uint8Array(ab, 20, jsonLen)));
+  const binStart = 20 + jsonLen + 8;
+  const img0 = gltf.images[0];
+  const bv = gltf.bufferViews[img0.bufferView];
+  const blob = new Blob([new Uint8Array(ab, binStart + (bv.byteOffset || 0), bv.byteLength)], { type: img0.mimeType || 'image/jpeg' });
+  say('IMG0=' + (img0.mimeType || '?') + ' ' + bv.byteLength + 'B');
+  /* T1: createImageBitmap, the exact call three's ImageBitmapLoader makes */
+  try {
+    const bmp = await createImageBitmap(blob, { premultiplyAlpha: 'none' });
+    say('CIB=OK ' + bmp.width + 'x' + bmp.height);
+    bmp.close && bmp.close();
+  } catch (e) { say('CIB=ERR ' + e.name + ': ' + e.message); }
+  /* T2: plain <img> decode of the same blob */
+  try {
+    const url = URL.createObjectURL(blob);
+    const im = new Image();
+    await new Promise((res, rej) => { im.onload = res; im.onerror = () => rej(new Error('img error event')); im.src = url; });
+    say('IMG=OK ' + im.naturalWidth + 'x' + im.naturalHeight);
+    URL.revokeObjectURL(url);
+  } catch (e) { say('IMG=ERR ' + e.name + ': ' + e.message); }
+  /* T3: normal parse (ImageBitmapLoader path) */
+  const loaderA = new GLTFLoader();
+  const gA = await parseGLB(loaderA, ab.slice(0));
+  say('A_WITHMAP=' + countMaps(gA.scene));
+  /* T4: parse with createImageBitmap hidden (forces the <img> TextureLoader path) */
+  const origCIB = window.createImageBitmap;
+  window.createImageBitmap = undefined;
+  let gB = null, bErr = '';
+  try { gB = await parseGLB(new GLTFLoader(), ab.slice(0)); }
+  catch (e) { bErr = e.message; }
+  window.createImageBitmap = origCIB;
+  if (gB) say('B_WITHMAP=' + countMaps(gB.scene)); else say('B_WITHMAP=ERR ' + bErr);
+  /* render whichever parse we want to judge: B if it has maps, else A */
+  const pick = (gB && countMaps(gB.scene).split('/')[0] !== '0') ? gB : gA;
+  say('RENDERING=' + (pick === gB ? 'B' : 'A'));
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
   renderer.setSize(innerWidth, innerHeight);
   document.body.appendChild(renderer.domElement);
-  const gl = renderer.getContext();
-  say('WEBGL2=' + renderer.capabilities.isWebGL2);
-  try {
-    const ext = gl.getExtension('WEBGL_debug_renderer_info');
-    say('GPU=' + (ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)));
-    say('VENDOR=' + (ext ? gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR)));
-  } catch (e) { say('GPU=ERR ' + e.message); }
-  say('MAXTEX=' + gl.getParameter(gl.MAX_TEXTURE_SIZE));
-  const scene = new THREE.Scene();
+  const scene = pick.scene;
   const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.1, 80);
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x222222, 0.9));
-  const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(2, 3, 4); scene.add(key);
+  const sceneRoot = new THREE.Scene();
+  sceneRoot.add(scene);
+  sceneRoot.add(new THREE.HemisphereLight(0xffffff, 0x222222, 0.9));
+  const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(2, 3, 4); sceneRoot.add(key);
   camera.position.set(1.6, 1.3, 2.6); camera.lookAt(0, 0.8, 0);
-  const loader = new GLTFLoader();
-  const file = what === 'room' ? 'assets/room-lab.glb' : (what === 'neo' ? 'assets/neo-hero.glb' : 'assets/danny-hero-high.glb');
-  const g = await new Promise((res, rej) => loader.load(file, res, undefined, rej));
-  scene.add(g.scene);
-  const mats = [];
-  g.scene.traverse(o => { if (o.isMesh) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { if (!mats.includes(m)) mats.push(m); }); });
-  say('MATS=' + mats.length + ' WITHMAP=' + mats.filter(m => m.map).length);
-  mats.slice(0, 8).forEach((m, i) => {
-    if (!m.map) { say('M' + i + ' ' + (m.name || '?') + ' MAP=NONE color=' + (m.color ? m.color.getHexString() : '?')); return; }
-    const img = m.map.image;
-    say('M' + i + ' ' + (m.name || '?') + ' MAP=YES img=' + (img ? (img.constructor ? img.constructor.name : typeof img) : 'NULL') + ' ' + (img ? (img.width || img.naturalWidth || '?') + 'x' + (img.height || img.naturalHeight || '?') : '') + ' cs=' + m.map.colorSpace);
-  });
-  /* sample the first map image through a plain 2D canvas and report real pixels */
-  const first = mats.find(m => m.map && m.map.image);
-  if (first) {
-    try {
-      const c = document.createElement('canvas'); c.width = 64; c.height = 64;
-      const cx = c.getContext('2d', { willReadFrequently: true });
-      cx.drawImage(first.map.image, 0, 0, 64, 64);
-      const d = cx.getImageData(0, 0, 64, 64).data;
-      let r = 0, gg = 0, b = 0, n = 0;
-      for (let i = 0; i < d.length; i += 16) { r += d[i]; gg += d[i + 1]; b += d[i + 2]; n++; }
-      say('TEX2D_MEAN=' + Math.round(r / n) + ',' + Math.round(gg / n) + ',' + Math.round(b / n));
-      say('TEX2D_CENTER=' + d[(32 * 64 + 32) * 4] + ',' + d[(32 * 64 + 32) * 4 + 1] + ',' + d[(32 * 64 + 32) * 4 + 2]);
-    } catch (e) { say('TEX2D=ERR ' + e.name + ': ' + e.message); }
-  } else say('TEX2D=NO IMAGE ON ANY MATERIAL');
-  let mixer = null;
-  if (g.animations && g.animations.length) {
-    mixer = new THREE.AnimationMixer(g.scene);
-    const clip = g.animations.find(c => c.name === 'Typing') || g.animations[0];
+  if (pick.animations && pick.animations.length) {
+    const mixer = new THREE.AnimationMixer(scene);
+    const clip = pick.animations.find(c => c.name === 'Typing') || pick.animations[0];
     const a = mixer.clipAction(clip); a.play(); mixer.setTime(1.2);
   }
-  if (what === 'neo') { g.scene.scale.setScalar(2.2); camera.position.set(0.8, 0.7, 1.6); camera.lookAt(0, 0.35, 0); }
-  if (what === 'room') { camera.position.set(3.4, 2.3, 4.4); camera.lookAt(-0.8, 0.85, -0.7); }
-  renderer.render(scene, camera);
-  say('GLERR_AFTER_RENDER=' + gl.getError());
-  /* read back the rendered frame center in the same task */
+  renderer.render(sceneRoot, camera);
   try {
     const rc = document.createElement('canvas'); rc.width = renderer.domElement.width; rc.height = renderer.domElement.height;
     const rx = rc.getContext('2d', { willReadFrequently: true });
     rx.drawImage(renderer.domElement, 0, 0);
     const px = rx.getImageData(Math.floor(rc.width / 2), Math.floor(rc.height / 2), 1, 1).data;
     say('FRAME_CENTER=' + px[0] + ',' + px[1] + ',' + px[2]);
-    const px2 = rx.getImageData(Math.floor(rc.width * 0.5), Math.floor(rc.height * 0.35), 1, 1).data;
-    say('FRAME_UPPER=' + px2[0] + ',' + px2[1] + ',' + px2[2]);
   } catch (e) { say('FRAME=ERR ' + e.name + ': ' + e.message); }
-  tag.textContent = 'diag v3 what=' + what + ' RENDERED';
+  say('CIB_AFTER=' + (typeof createImageBitmap));
+  tag.textContent = 'diag v4 RENDERED';
   window.__done = true;
 }
-main().catch(e => { tag.textContent = 'ERROR: ' + e.message; say('LOAD=ERR ' + e.message); });
+main().catch(e => { tag.textContent = 'ERROR: ' + e.message; say('FATAL=ERR ' + e.name + ': ' + e.message); });
 </script>
