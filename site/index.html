@@ -187,6 +187,8 @@ h1.mega .acid{color:var(--acid);text-shadow:0 0 34px rgba(163,230,53,.35)}
 .hero-meta .n{font-size:clamp(22px,2.4vw,32px);font-weight:800}
 .hero-meta .n em{font-style:normal;color:var(--acid)}
 .hero-meta .l{font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--mut);margin-top:5px}
+.hero-meta .n span.on{color:var(--acid)}
+.hero-meta .n span.off{color:#8a94a0}
 .scrollcue{position:absolute;right:clamp(16px,4vw,44px);bottom:110px;z-index:6;font-family:var(--mono);font-size:10px;letter-spacing:.3em;color:var(--mut);writing-mode:vertical-rl;display:flex;align-items:center;gap:10px}
 .scrollcue::after{content:"";width:1px;height:52px;background:linear-gradient(var(--acid),transparent);animation:cue 1.8s var(--ease) infinite}
 @keyframes cue{0%{transform:scaleY(0);transform-origin:top}55%{transform:scaleY(1);transform-origin:top}56%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
@@ -274,6 +276,14 @@ section[id],footer[id]{scroll-margin-top:86px}
 .mviz .tg i:nth-child(2){animation-delay:.9s}.mviz .tg i:nth-child(3){animation-delay:1.8s}
 @keyframes ringGrow{from{width:10px;height:10px;opacity:1}to{width:110px;height:110px;opacity:0}}
 .mviz .tg b{position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px;border-radius:50%;background:var(--acid);box-shadow:0 0 12px var(--acid)}
+/* CUSUM accumulator viz: animated chart (the descriptive GIF, pure SVG+CSS) */
+.mviz.cusum svg{position:absolute;inset:0;width:100%;height:100%}
+.mviz.cusum .thr{stroke:rgba(245,241,230,.38);stroke-width:1;stroke-dasharray:5 5}
+.mviz.cusum .cpath{fill:none;stroke:var(--acid);stroke-width:2.5;stroke-linejoin:round;stroke-dasharray:100;stroke-dashoffset:100;animation:cdraw 6.5s linear infinite}
+@keyframes cdraw{0%{stroke-dashoffset:100}68%{stroke-dashoffset:0}100%{stroke-dashoffset:0}}
+.mviz.cusum .cdot{fill:var(--acid);opacity:0;animation:cdotA 6.5s linear infinite}
+@keyframes cdotA{0%,60%{opacity:0}68%,100%{opacity:1}}
+.mviz.cusum .cform{position:absolute;left:12px;top:10px;font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--paper);background:rgba(7,9,12,.72);border:1px solid var(--line2);padding:5px 9px}
 .meth .mname{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--acid)}
 .meth h3{font-size:21px;font-weight:800;margin:8px 0 8px}
 .meth p{color:var(--mut);line-height:1.65;font-size:14.5px}
@@ -282,6 +292,21 @@ section[id],footer[id]{scroll-margin-top:86px}
 .brow.bhead{border-top:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--mut)}
 .brow .bst{color:var(--acid);font-size:13px}
 .bfoot{padding:12px 20px;border-top:1px solid var(--line2);font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--mut);line-height:1.8}
+/* advisory dashboard + auto-scrolling board (Danny 11/11) */
+.bdash{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line2)}
+.bdash .dstat{padding:16px 20px 14px;border-right:1px solid var(--line2)}
+.bdash .dstat:last-child{border-right:none}
+.bdash .dn{font-size:clamp(24px,2.6vw,34px);font-weight:900;line-height:1;color:var(--paper)}
+.bdash .dl{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;color:var(--mut);margin-top:7px;line-height:1.7}
+.bscroll{height:252px;overflow:hidden;position:relative}
+.bscroll::after{content:"";position:absolute;left:0;right:0;bottom:0;height:46px;background:linear-gradient(180deg,rgba(10,13,16,0),rgba(10,13,16,.92));pointer-events:none;z-index:2}
+.btrack{animation:bscroll 48s linear infinite}
+.board:hover .btrack{animation-play-state:paused}
+@keyframes bscroll{to{transform:translateY(-50%)}}
+.brow.hl{background:linear-gradient(90deg,rgba(163,230,53,.09),transparent 58%);box-shadow:inset 3px 0 0 var(--acid)}
+.crit{display:inline-block;font-family:var(--mono);font-size:8.5px;letter-spacing:.14em;color:#0A0D10;background:var(--acid);padding:2px 6px;margin-right:8px;vertical-align:2px}
+@media(max-width:900px){.bdash{grid-template-columns:1fr 1fr}.bdash .dstat{border-bottom:1px solid var(--line2)}}
+@media(max-width:560px){.bscroll{height:308px}}
 @media(max-width:900px){.brow{grid-template-columns:1fr 1fr}.brow.bhead{display:none}}
 
 /* ---------- marquee ---------- */
@@ -387,6 +412,10 @@ section.blk{position:relative;padding:clamp(70px,10vh,120px) clamp(16px,4vw,44px
 .pjdetail .pactions a.ghosty{background:transparent;color:var(--paper);border-color:var(--line2)}
 .pjback{display:none;margin-top:14px}
 #modules.detail .pjback{display:inline-block}
+/* detail view keeps the exact height of the 4-card grid (Danny 11/11):
+   JS measures .mods, pins .pjwrap, cards stretch to fill */
+#modules.detail.fixedh .pjlist{height:100%}
+#modules.detail.fixedh .pjcard{flex:1 1 0;height:auto;min-height:92px}
 @media(max-width:860px){.pjwrap{grid-template-columns:1fr}.pjdetail .vidwrap{min-height:230px;flex:none;height:230px}}
 
 /* panorama band */
@@ -535,10 +564,10 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
         </div>
       </div>
       <div class="hero-meta">
-        <div><div class="n"><span data-count="817">0</span></div><div class="l">TEST CASES - ANTIREA SUITE</div></div>
-        <div><div class="n"><span data-count="8">0</span> <em data-i18n="wordKinds">loại</em></div><div class="l" data-i18n="meta2">SIGNAL KINDS ĐANG CHẠY</div></div>
-        <div><div class="n"><span data-count="150">0</span><em>/24h</em></div><div class="l" data-i18n="meta3">RECORD BUDGET MỖI DANH TÍNH</div></div>
-        <div><div class="n"><span data-count="4">0</span></div><div class="l" data-i18n="meta4">FLAGSHIP MODULES TRÊN DECK</div></div>
+        <div><div class="n"><span data-count="4">0</span></div><div class="l" data-i18n="meta1">PROJECT ĐANG LIVE</div></div>
+        <div><div class="n"><span data-count="30">0</span></div><div class="l" data-i18n="meta2">WEBSITE ĐÃ CỐ VẤN BẢO MẬT</div></div>
+        <div><div class="n"><span id="hmStatus">- - -</span></div><div class="l" data-i18n="meta3">TRẠNG THÁI TRỰC DECK</div></div>
+        <div><div class="n"><span id="hmHours">0H 00M</span></div><div class="l" data-i18n="meta4">THỜI GIAN ONLINE HÔM NAY</div></div>
       </div>
     </div>
     <div class="scrollcue" aria-hidden="true">SCROLL</div>
@@ -671,7 +700,7 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
         <div class="mviz"><div class="rings"><i></i><i></i><i></i></div><div class="sweep"></div><div class="blip"></div></div>
         <div class="mname">THE HERD LENS</div>
         <h3 data-i18n="m1Name">Nhìn cả bầy, không soi từng con</h3>
-        <p data-i18n="m1Desc">Đo theo cohort trên cửa sổ thời gian trượt: tương quan nhịp request, độ phủ dataset, herd-phase và CUSUM. Một identity lẻ luôn trông vô hại - bầy phối hợp không giấu được chữ ký thống kê chung.</p>
+        <p data-i18n="m1Desc">Đo theo cohort trên cửa sổ thời gian trượt: tương quan nhịp request, độ phủ dataset và herd-phase - độ đồng pha của cả bầy. Một identity lẻ luôn trông vô hại - bầy phối hợp không giấu được chữ ký thống kê chung.</p>
       </div>
       <div class="meth reveal">
         <div class="mviz"><div class="gauge"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div></div>
@@ -680,19 +709,41 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
         <p data-i18n="m2Desc">Metering theo identity: mỗi danh tính mang một record budget trượt 24h (mặc định 150 bản ghi). Vượt trần thì ghi sổ bằng chứng và trả 429 - người dùng thật không bao giờ chạm trần.</p>
       </div>
       <div class="meth reveal">
-        <div class="mviz"><div class="tg"><i></i><i></i><i></i><b></b></div></div>
-        <div class="mname">PROVE IT, END TO END</div>
-        <h3 data-i18n="m3Name">Chứng minh đầu - cuối</h3>
-        <p data-i18n="m3Desc">Một finding chỉ được gọi là lỗ hổng khi có PoC khai thác đầu-cuối: đọc hoặc ghi được dữ liệu có quyền bảo vệ, bằng chứng là ảnh chụp thật từ phiên test. Thiếu PoC thì chỉ là hardening, không báo cáo.</p>
+        <div class="mviz cusum"><svg viewBox="0 0 300 132" preserveAspectRatio="none" aria-hidden="true"><line class="thr" x1="0" y1="38" x2="300" y2="38"></line><path class="cpath" pathLength="100" d="M0,98 L28,93 L52,99 L78,91 L104,96 L128,87 L152,79 L178,65 L202,51 L226,37 L248,23 L272,11 L300,3"></path><circle class="cdot" cx="226" cy="37" r="4.5"></circle></svg><div class="cform">S_t = max(0, S_{t-1} + (x_t - k))</div></div>
+        <div class="mname">THE ACCUMULATOR - CUSUM</div>
+        <h3 data-i18n="m3Name">Lệch nhỏ cộng dồn, mưu lớn lộ hình</h3>
+        <p data-i18n="m3Desc">CUSUM - thuật toán phát hiện điểm đổi chiều của Page (1954): mỗi request cộng một điểm lệch vào một biến tích lũy. Nhiễu ngẫu nhiên tự triệt tiêu, lên rồi xuống; lệch có chủ đích chỉ đi một chiều nên tích lũy tăng đều cho tới khi chạm ngưỡng báo động. Một request lẻ không bao giờ đủ sức - cả một chiến dịch cào dữ liệu thì không giấu nổi.</p>
       </div>
     </div>
     <div class="board reveal">
+      <div class="bdash">
+        <div class="dstat"><div class="dn"><span data-count="560">0</span></div><div class="dl" data-i18n="dScan">SITE ĐÃ QUÉT SÂU</div></div>
+        <div class="dstat"><div class="dn"><span data-count="30">0</span></div><div class="dl" data-i18n="dAdv">CẢNH BÁO BẢO MẬT ĐÃ GỬI RIÊNG</div></div>
+        <div class="dstat"><div class="dn"><span data-count="4">0</span></div><div class="dl" data-i18n="dBounty">BOUNTY PR ĐANG MỞ</div></div>
+        <div class="dstat"><div class="dn"><span data-count="3">0</span></div><div class="dl" data-i18n="dWarn">CẢNH BÁO SUPPLY-CHAIN ĐÃ ĐĂNG CÔNG KHAI</div></div>
+      </div>
       <div class="brow bhead"><span data-i18n="bSite">WEBSITE ĐÃ GIÚP</span><span data-i18n="bProb">VẤN ĐỀ</span><span data-i18n="bMeth">METHODS</span><span data-i18n="bStat">TRẠNG THÁI</span></div>
-      <div class="brow"><span data-i18n="r1Site">Khách sạn quốc tế - Hà Nội</span><span data-i18n="r1Prob">Chứng chỉ TLS hết hạn ngay mùa cao điểm</span><span>THE HERD LENS</span><span class="bst" data-i18n="r1Stat">Đã cảnh báo trước hạn</span></div>
-      <div class="brow"><span data-i18n="r2Site">Chuỗi nha khoa - TP.HCM</span><span data-i18n="r2Prob">CORS phản chiếu mọi origin, kèm credentials</span><span>PROVE IT, END TO END</span><span class="bst" data-i18n="r2Stat">Xác minh 2 vòng - báo riêng</span></div>
-      <div class="brow"><span data-i18n="r3Site">Website thương mại điện tử</span><span data-i18n="r3Prob">Vẫn bật TLS 1.0 / 1.1 lỗi thời</span><span>THE HERD LENS</span><span class="bst" data-i18n="r3Stat">Đã gửi khuyến nghị gia cố</span></div>
-      <div class="brow"><span data-i18n="r4Site">Khách sạn - Đà Nẵng</span><span data-i18n="r4Prob">Luồng đặt phòng cần rà soát bảo mật</span><span>THE METER</span><span class="bst" data-i18n="r4Stat">Đã báo riêng, kèm bằng chứng</span></div>
-      <div class="bfoot" data-i18n="bFoot">Hiển thị 4 ca tiêu biểu. Tên khách hàng và hồ sơ đầy đủ giữ riêng - đó cũng là một phần của cách làm việc.</div>
+      <div class="bscroll"><div class="btrack">
+        <div class="brow hl"><span data-i18n="r1Site">Website dịch vụ nhà - Hà Nội</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r1Prob">Tên miền bị chiếm: toàn bộ khách truy cập bị chuyển hướng 301 sang sòng bạc trực tuyến</span></span><span>DEEP AUDIT</span><span class="bst" data-i18n="r1Stat">Đã gửi cảnh báo + bằng chứng</span></div>
+        <div class="brow hl"><span data-i18n="r2Site">Công ty vận tải - Việt Nam</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r2Prob">Trang phpinfo phơi toàn bộ cấu hình server; chứng chỉ TLS hết hạn hơn 1 năm</span></span><span>DEEP AUDIT</span><span class="bst" data-i18n="r2Stat">Đã gửi cảnh báo kèm ảnh chụp</span></div>
+        <div class="brow hl"><span data-i18n="r3Site">Khách sạn - Đà Nẵng</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r3Prob">Nội dung casino bị cài ẩn vào website, chủ site không hề hay biết</span></span><span>THE HERD LENS</span><span class="bst" data-i18n="r3Stat">Đã báo riêng, kèm bằng chứng</span></div>
+        <div class="brow hl"><span data-i18n="r4Site">Mã nguồn mở - Tari Universe</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r4Prob">Loader tải và chạy code từ xa giấu trong 3 PR đối thủ - tấn công chuỗi cung ứng</span></span><span>BOUNTY</span><span class="bst" data-i18n="r4Stat">Đã cảnh báo công khai trên 3 PR</span></div>
+        <div class="brow"><span data-i18n="r5Site">Mã nguồn mở - Tari Universe</span><span data-i18n="r5Prob">4 PR sửa lỗi production: xung đột cổng MCP, treo clipboard trên Flatpak/Wayland, trạng thái PIN, lịch đào tự khởi động lại</span><span>BOUNTY</span><span class="bst" data-i18n="r5Stat">Đang mở - chờ review</span></div>
+        <div class="brow"><span data-i18n="r6Site">Khách sạn quốc tế - Hà Nội</span><span data-i18n="r6Prob">Chứng chỉ TLS hết hạn ngay mùa cao điểm</span><span>THE HERD LENS</span><span class="bst" data-i18n="r6Stat">Đã cảnh báo trước hạn</span></div>
+        <div class="brow"><span data-i18n="r7Site">Chuỗi nha khoa - TP.HCM</span><span data-i18n="r7Prob">CORS phản chiếu mọi origin, kèm credentials</span><span>THE ACCUMULATOR</span><span class="bst" data-i18n="r7Stat">Đã xác minh 2 vòng</span></div>
+        <div class="brow"><span data-i18n="r8Site">Website thương mại điện tử</span><span data-i18n="r8Prob">Vẫn bật TLS 1.0 / 1.1 lỗi thời</span><span>THE HERD LENS</span><span class="bst" data-i18n="r8Stat">Đã gửi khuyến nghị gia cố</span></div>
+        <div class="brow"><span data-i18n="r9Site">Khách sạn - Đà Nẵng</span><span data-i18n="r9Prob">Luồng đặt phòng cần rà soát bảo mật</span><span>THE METER</span><span class="bst" data-i18n="r9Stat">Đã báo riêng, kèm bằng chứng</span></div>
+        <div class="brow hl" aria-hidden="true"><span data-i18n="r1Site">Website dịch vụ nhà - Hà Nội</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r1Prob">Tên miền bị chiếm: toàn bộ khách truy cập bị chuyển hướng 301 sang sòng bạc trực tuyến</span></span><span>DEEP AUDIT</span><span class="bst" data-i18n="r1Stat">Đã gửi cảnh báo + bằng chứng</span></div>
+        <div class="brow hl" aria-hidden="true"><span data-i18n="r2Site">Công ty vận tải - Việt Nam</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r2Prob">Trang phpinfo phơi toàn bộ cấu hình server; chứng chỉ TLS hết hạn hơn 1 năm</span></span><span>DEEP AUDIT</span><span class="bst" data-i18n="r2Stat">Đã gửi cảnh báo kèm ảnh chụp</span></div>
+        <div class="brow hl" aria-hidden="true"><span data-i18n="r3Site">Khách sạn - Đà Nẵng</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r3Prob">Nội dung casino bị cài ẩn vào website, chủ site không hề hay biết</span></span><span>THE HERD LENS</span><span class="bst" data-i18n="r3Stat">Đã báo riêng, kèm bằng chứng</span></div>
+        <div class="brow hl" aria-hidden="true"><span data-i18n="r4Site">Mã nguồn mở - Tari Universe</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r4Prob">Loader tải và chạy code từ xa giấu trong 3 PR đối thủ - tấn công chuỗi cung ứng</span></span><span>BOUNTY</span><span class="bst" data-i18n="r4Stat">Đã cảnh báo công khai trên 3 PR</span></div>
+        <div class="brow" aria-hidden="true"><span data-i18n="r5Site">Mã nguồn mở - Tari Universe</span><span data-i18n="r5Prob">4 PR sửa lỗi production: xung đột cổng MCP, treo clipboard trên Flatpak/Wayland, trạng thái PIN, lịch đào tự khởi động lại</span><span>BOUNTY</span><span class="bst" data-i18n="r5Stat">Đang mở - chờ review</span></div>
+        <div class="brow" aria-hidden="true"><span data-i18n="r6Site">Khách sạn quốc tế - Hà Nội</span><span data-i18n="r6Prob">Chứng chỉ TLS hết hạn ngay mùa cao điểm</span><span>THE HERD LENS</span><span class="bst" data-i18n="r6Stat">Đã cảnh báo trước hạn</span></div>
+        <div class="brow" aria-hidden="true"><span data-i18n="r7Site">Chuỗi nha khoa - TP.HCM</span><span data-i18n="r7Prob">CORS phản chiếu mọi origin, kèm credentials</span><span>THE ACCUMULATOR</span><span class="bst" data-i18n="r7Stat">Đã xác minh 2 vòng</span></div>
+        <div class="brow" aria-hidden="true"><span data-i18n="r8Site">Website thương mại điện tử</span><span data-i18n="r8Prob">Vẫn bật TLS 1.0 / 1.1 lỗi thời</span><span>THE HERD LENS</span><span class="bst" data-i18n="r8Stat">Đã gửi khuyến nghị gia cố</span></div>
+        <div class="brow" aria-hidden="true"><span data-i18n="r9Site">Khách sạn - Đà Nẵng</span><span data-i18n="r9Prob">Luồng đặt phòng cần rà soát bảo mật</span><span>THE METER</span><span class="bst" data-i18n="r9Stat">Đã báo riêng, kèm bằng chứng</span></div>
+      </div></div>
+      <div class="bfoot" data-i18n="bFoot">Bảng tự cuộn - di chuột để tạm dừng. Tên miền và hồ sơ đầy đủ giữ riêng: bảo vệ khách cũng là một phần của việc cố vấn.</div>
     </div>
   </section>
 
@@ -717,8 +768,8 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
       </div>
       <div class="reveal">
         <h2>Danny Phan <span class="acid">- Hanoi</span></h2>
-        <p data-i18n="opP1">Ban ngày tôi làm <b>bảo mật vận hành</b> trên hệ thống thật. Thời gian còn lại là để xây: thư viện chống cào dữ liệu, công cụ tra cứu dược, wiki song ngữ, pipeline tin tự động. Chuẩn không đổi: <b>làm kỹ, kiểm chứng bằng số, chưa ngon là chưa ship</b>.</p>
-        <p data-i18n="opP2">Deck này nhận việc một lần và bounty: tự động hóa, xử lý dữ liệu, web và bảo mật, media và thiết kế. Muốn biết tôi gỡ được tới đâu, cứ đưa bài toán. Hoặc hỏi Neo trước cũng được - nó trực deck 24/7.</p>
+        <p data-i18n="opP1">Chào mọi người, mình là Danny - đến từ thành phố có món phở ngon nhất trái đất (<a href="#contact">change my mind</a>). Công nghệ mở giờ nhiều vô kể, còn ý tưởng trong cái đầu hay overthinking này thì mọc lên không ngừng. Nói không ngoa: gần như không gì là không thể - chỉ có sức khỏe là có hạn. T.T</p>
+        <p data-i18n="opP2">Hy vọng qua cái page màu mè này, mọi người hiểu thêm về mình và xem qua các dự án mình đang xây - thú vị lắm đấy. Đừng ngại liên hệ để cùng nhau làm gì đó: mình cực kỳ thích bàn về cách hiện thực hóa những điều tưởng như không thể. Cheers!</p>
         <div class="caps">
           <div class="cap"><div class="t">01 // AUTOMATION</div><div class="d" data-i18n="cap1D">Python, API, crawler, tool và bot tự động hóa quy trình.</div></div>
           <div class="cap"><div class="t">02 // DATA</div><div class="d" data-i18n="cap2D">Excel, SQL, PowerBI, làm sạch và phân tích dữ liệu lớn.</div></div>
@@ -786,7 +837,7 @@ vi: {
   hstat: 'HÀ NỘI, VN - <b>ĐANG TRỰC TUYẾN</b>',
   ctaModules: 'XEM CÁC MODULE', ctaCat: 'HỎI NEO - MÈO AI',
   slogan: 'Trai Indie nhà nghèo', ctaContact: 'CONTACT', ctaAbout: 'ABOUT ME',
-  wordKinds: 'loại', meta2: 'SIGNAL KINDS ĐANG CHẠY', meta3: 'RECORD BUDGET MỖI DANH TÍNH', meta4: 'FLAGSHIP MODULES TRÊN DECK',
+  meta1: 'PROJECT ĐANG LIVE', meta2: 'WEBSITE ĐÃ CỐ VẤN BẢO MẬT', meta3: 'TRẠNG THÁI TRỰC DECK', meta4: 'THỜI GIAN ONLINE HÔM NAY',
   opsBeat: 'HEARTBEAT - GIẢ LẬP NHỊP SINH HỌC', opsTok: 'TOKEN BURN - HÔM NAY (AI CREW)', opsCrew: 'AI CREW - GHẾ ĐANG TRỰC',
   tokRateL: 'TỐC ĐỘ', tokPeakL: 'ĐỈNH HÔM NAY', crewArgon: 'MEDIA / MODEL / RED TEAM', crewNeo: 'MÈO TRỰC DECK',
   heatTitle: 'NHỊP SHIP HÀNG - 26 TUẦN GẦN NHẤT', heatStreakL: 'TUẦN ĐANG CHÁY', heatTotalL: 'NGÀY CÓ PUSH',
@@ -800,20 +851,26 @@ vi: {
   pjPage: 'MỞ PAGE ->', pjBack: '<- TẤT CẢ MODULE',
   methTitle: 'Methods',
   m1Name: 'Nhìn cả bầy, không soi từng con',
-  m1Desc: 'Đo theo cohort trên cửa sổ thời gian trượt: tương quan nhịp request, độ phủ dataset, herd-phase và CUSUM. Một identity lẻ luôn trông vô hại - bầy phối hợp không giấu được chữ ký thống kê chung.',
+  m1Desc: 'Đo theo cohort trên cửa sổ thời gian trượt: tương quan nhịp request, độ phủ dataset và herd-phase - độ đồng pha của cả bầy. Một identity lẻ luôn trông vô hại - bầy phối hợp không giấu được chữ ký thống kê chung.',
   m2Name: 'Đồng hồ đo theo danh tính',
   m2Desc: 'Metering theo identity: mỗi danh tính mang một record budget trượt 24h (mặc định 150 bản ghi). Vượt trần thì ghi sổ bằng chứng và trả 429 - người dùng thật không bao giờ chạm trần.',
-  m3Name: 'Chứng minh đầu - cuối',
-  m3Desc: 'Một finding chỉ được gọi là lỗ hổng khi có PoC khai thác đầu-cuối: đọc hoặc ghi được dữ liệu có quyền bảo vệ, bằng chứng là ảnh chụp thật từ phiên test. Thiếu PoC thì chỉ là hardening, không báo cáo.',
+  m3Name: 'Lệch nhỏ cộng dồn, mưu lớn lộ hình',
+  m3Desc: 'CUSUM - thuật toán phát hiện điểm đổi chiều của Page (1954): mỗi request cộng một điểm lệch vào một biến tích lũy. Nhiễu ngẫu nhiên tự triệt tiêu, lên rồi xuống; lệch có chủ đích chỉ đi một chiều nên tích lũy tăng đều cho tới khi chạm ngưỡng báo động. Một request lẻ không bao giờ đủ sức - cả một chiến dịch cào dữ liệu thì không giấu nổi.',
   bSite: 'WEBSITE ĐÃ GIÚP', bProb: 'VẤN ĐỀ', bMeth: 'METHODS', bStat: 'TRẠNG THÁI',
-  r1Site: 'Khách sạn quốc tế - Hà Nội', r1Prob: 'Chứng chỉ TLS hết hạn ngay mùa cao điểm', r1Stat: 'Đã cảnh báo trước hạn',
-  r2Site: 'Chuỗi nha khoa - TP.HCM', r2Prob: 'CORS phản chiếu mọi origin, kèm credentials', r2Stat: 'Xác minh 2 vòng - báo riêng',
-  r3Site: 'Website thương mại điện tử', r3Prob: 'Vẫn bật TLS 1.0 / 1.1 lỗi thời', r3Stat: 'Đã gửi khuyến nghị gia cố',
-  r4Site: 'Khách sạn - Đà Nẵng', r4Prob: 'Luồng đặt phòng cần rà soát bảo mật', r4Stat: 'Đã báo riêng, kèm bằng chứng',
-  bFoot: 'Hiển thị 4 ca tiêu biểu. Tên khách hàng và hồ sơ đầy đủ giữ riêng - đó cũng là một phần của cách làm việc.',
+  dScan: 'SITE ĐÃ QUÉT SÂU', dAdv: 'CẢNH BÁO BẢO MẬT ĐÃ GỬI RIÊNG', dBounty: 'BOUNTY PR ĐANG MỞ', dWarn: 'CẢNH BÁO SUPPLY-CHAIN ĐÃ ĐĂNG CÔNG KHAI', critTag: 'NGHIÊM TRỌNG',
+  r1Site: 'Website dịch vụ nhà - Hà Nội', r1Prob: 'Tên miền bị chiếm: toàn bộ khách truy cập bị chuyển hướng 301 sang sòng bạc trực tuyến', r1Stat: 'Đã gửi cảnh báo + bằng chứng',
+  r2Site: 'Công ty vận tải - Việt Nam', r2Prob: 'Trang phpinfo phơi toàn bộ cấu hình server; chứng chỉ TLS hết hạn hơn 1 năm', r2Stat: 'Đã gửi cảnh báo kèm ảnh chụp',
+  r3Site: 'Khách sạn - Đà Nẵng', r3Prob: 'Nội dung casino bị cài ẩn vào website, chủ site không hề hay biết', r3Stat: 'Đã báo riêng, kèm bằng chứng',
+  r4Site: 'Mã nguồn mở - Tari Universe', r4Prob: 'Loader tải và chạy code từ xa giấu trong 3 PR đối thủ - tấn công chuỗi cung ứng', r4Stat: 'Đã cảnh báo công khai trên 3 PR',
+  r5Site: 'Mã nguồn mở - Tari Universe', r5Prob: '4 PR sửa lỗi production: xung đột cổng MCP, treo clipboard trên Flatpak/Wayland, trạng thái PIN, lịch đào tự khởi động lại', r5Stat: 'Đang mở - chờ review',
+  r6Site: 'Khách sạn quốc tế - Hà Nội', r6Prob: 'Chứng chỉ TLS hết hạn ngay mùa cao điểm', r6Stat: 'Đã cảnh báo trước hạn',
+  r7Site: 'Chuỗi nha khoa - TP.HCM', r7Prob: 'CORS phản chiếu mọi origin, kèm credentials', r7Stat: 'Đã xác minh 2 vòng',
+  r8Site: 'Website thương mại điện tử', r8Prob: 'Vẫn bật TLS 1.0 / 1.1 lỗi thời', r8Stat: 'Đã gửi khuyến nghị gia cố',
+  r9Site: 'Khách sạn - Đà Nẵng', r9Prob: 'Luồng đặt phòng cần rà soát bảo mật', r9Stat: 'Đã báo riêng, kèm bằng chứng',
+  bFoot: 'Bảng tự cuộn - di chuột để tạm dừng. Tên miền và hồ sơ đầy đủ giữ riêng: bảo vệ khách cũng là một phần của việc cố vấn.',
   opTitle: 'Người giữ<br><span class="acid">buồng lái</span>',
-  opP1: 'Ban ngày tôi làm <b>bảo mật vận hành</b> trên hệ thống thật. Thời gian còn lại là để xây: thư viện chống cào dữ liệu, công cụ tra cứu dược, wiki song ngữ, pipeline tin tự động. Chuẩn không đổi: <b>làm kỹ, kiểm chứng bằng số, chưa ngon là chưa ship</b>.',
-  opP2: 'Deck này nhận việc một lần và bounty: tự động hóa, xử lý dữ liệu, web và bảo mật, media và thiết kế. Muốn biết tôi gỡ được tới đâu, cứ đưa bài toán. Hoặc hỏi Neo trước cũng được - nó trực deck 24/7.',
+  opP1: 'Chào mọi người, mình là Danny - đến từ thành phố có món phở ngon nhất trái đất (<a href="#contact">change my mind</a>). Công nghệ mở giờ nhiều vô kể, còn ý tưởng trong cái đầu hay overthinking này thì mọc lên không ngừng. Nói không ngoa: gần như không gì là không thể - chỉ có sức khỏe là có hạn. T.T',
+  opP2: 'Hy vọng qua cái page màu mè này, mọi người hiểu thêm về mình và xem qua các dự án mình đang xây - thú vị lắm đấy. Đừng ngại liên hệ để cùng nhau làm gì đó: mình cực kỳ thích bàn về cách hiện thực hóa những điều tưởng như không thể. Cheers!',
   cap1D: 'Python, API, crawler, tool và bot tự động hóa quy trình.',
   cap2D: 'Excel, SQL, PowerBI, làm sạch và phân tích dữ liệu lớn.',
   cap3D: 'Thiết kế web, IAM, Azure, Jenkins, audit bảo mật thực chiến.',
@@ -839,7 +896,7 @@ en: {
   hstat: 'HANOI, VN - <b>SYSTEMS ONLINE</b>',
   ctaModules: 'VIEW MODULES', ctaCat: 'ASK NEO - AI CAT',
   slogan: 'Broke indie kid, building anyway', ctaContact: 'CONTACT', ctaAbout: 'ABOUT ME',
-  wordKinds: 'kinds', meta2: 'SIGNAL KINDS RUNNING', meta3: 'RECORD BUDGET PER IDENTITY', meta4: 'FLAGSHIP MODULES ON DECK',
+  meta1: 'PROJECTS LIVE', meta2: 'SITES ADVISED ON SECURITY', meta3: 'OPERATOR STATUS', meta4: 'ONLINE TODAY',
   opsBeat: 'HEARTBEAT - SIMULATED VITALS', opsTok: 'TOKEN BURN - TODAY (AI CREW)', opsCrew: 'AI CREW - ON DUTY',
   tokRateL: 'RATE', tokPeakL: 'PEAK TODAY', crewArgon: 'MEDIA / MODEL / RED TEAM', crewNeo: 'DECK CAT',
   heatTitle: 'SHIPPING RHYTHM - LAST 26 WEEKS', heatStreakL: 'WEEK STREAK', heatTotalL: 'ACTIVE DAYS',
@@ -853,20 +910,26 @@ en: {
   pjPage: 'OPEN PAGE ->', pjBack: '<- ALL MODULES',
   methTitle: 'Methods',
   m1Name: 'Watch the herd, not the individual',
-  m1Desc: 'Cohort-level measurement over sliding time windows: request-rhythm correlation, dataset coverage, herd-phase and CUSUM. A lone identity always looks harmless - a coordinated herd cannot hide its shared statistical signature.',
+  m1Desc: 'Cohort-level measurement over sliding time windows: request-rhythm correlation, dataset coverage and herd-phase - the phase coherence of the whole swarm. A lone identity always looks harmless - a coordinated herd cannot hide its shared statistical signature.',
   m2Name: 'A budget for every identity',
   m2Desc: 'Per-identity metering: every identity carries a sliding 24h record budget (150 records by default). Cross it and the access is logged as evidence and answered 429 - real users never reach the ceiling.',
-  m3Name: 'Prove it, end to end',
-  m3Desc: 'A finding only earns the name vulnerability with an end-to-end exploit PoC: reading or writing access-controlled data, evidenced by real captures from the test session. No PoC, no report - it is hardening.',
+  m3Name: 'Small drifts add up - big schemes surface',
+  m3Desc: 'CUSUM - the change-point detection algorithm by Page (1954): every request adds one deviation point to a running total. Random noise cancels itself out, up then down; deliberate drift only goes one way, so the total climbs steadily until it trips the alarm threshold. A single request never has the weight - a whole scraping campaign cannot hide.',
   bSite: 'WEBSITES HELPED', bProb: 'THE PROBLEM', bMeth: 'METHOD', bStat: 'STATUS',
-  r1Site: 'International hotel - Hanoi', r1Prob: 'TLS certificate expiring right before peak season', r1Stat: 'Flagged before the deadline',
-  r2Site: 'Dental chain - Ho Chi Minh City', r2Prob: 'CORS reflecting every origin, with credentials', r2Stat: 'Verified twice - reported privately',
-  r3Site: 'E-commerce website', r3Prob: 'Still running outdated TLS 1.0 / 1.1', r3Stat: 'Hardening recommendation sent',
-  r4Site: 'Hotel - Da Nang', r4Prob: 'Booking flow needed a security review', r4Stat: 'Reported privately, with evidence',
-  bFoot: 'Four representative cases shown. Client names and full files stay private - that is part of how I work.',
+  dScan: 'SITES DEEP-SCANNED', dAdv: 'SECURITY ADVISORIES SENT PRIVATELY', dBounty: 'BOUNTY PRS OPEN', dWarn: 'PUBLIC SUPPLY-CHAIN WARNINGS POSTED', critTag: 'CRITICAL',
+  r1Site: 'Home-services website - Hanoi', r1Prob: 'Domain hijacked: all visitors 301-redirected to an online casino', r1Stat: 'Advisory with evidence sent',
+  r2Site: 'Transport company - Vietnam', r2Prob: 'Public phpinfo page exposing the full server config; TLS certificate expired over a year ago', r2Stat: 'Advisory with captures sent',
+  r3Site: 'Hotel - Da Nang', r3Prob: 'Casino content secretly injected into the website; the owner had no idea', r3Stat: 'Reported privately, with evidence',
+  r4Site: 'Open source - Tari Universe', r4Prob: 'A remote-code loader hidden inside 3 rival PRs - a supply-chain attack', r4Stat: 'Public warning posted on all 3 PRs',
+  r5Site: 'Open source - Tari Universe', r5Prob: '4 PRs fixing production bugs: MCP port conflicts, Flatpak/Wayland clipboard freeze, PIN state, scheduled mining restarts', r5Stat: 'Open - awaiting review',
+  r6Site: 'International hotel - Hanoi', r6Prob: 'TLS certificate expiring right before peak season', r6Stat: 'Flagged before the deadline',
+  r7Site: 'Dental chain - Ho Chi Minh City', r7Prob: 'CORS reflecting every origin, with credentials', r7Stat: 'Verified twice',
+  r8Site: 'E-commerce website', r8Prob: 'Still running outdated TLS 1.0 / 1.1', r8Stat: 'Hardening recommendation sent',
+  r9Site: 'Hotel - Da Nang', r9Prob: 'Booking flow needed a security review', r9Stat: 'Reported privately, with evidence',
+  bFoot: 'Auto-scrolling board - hover to pause. Domains and full case files stay private: protecting the client is part of the advisory work.',
   opTitle: 'The one at<br><span class="acid">the controls</span>',
-  opP1: 'By day I run <b>security operations</b> on real systems. The rest of the time goes into building: an anti-scraping library, a pharma search tool, a bilingual wiki, an automated news pipeline. One standard, unchanged: <b>do it properly, verify with numbers - if it is not good yet, it does not ship</b>.',
-  opP2: 'This deck takes one-off work and bounties: automation, data, web and security, media and design. Want to know how far I can push it? Bring the problem. Or ask Neo first - it is on deck duty 24/7.',
+  opP1: 'Hi everyone, I am Danny - from the city with the best pho on Earth (<a href="#contact">change my mind</a>). Open tech is everywhere these days, and ideas keep sprouting nonstop in this overthinking head of mine. No exaggeration: almost nothing is impossible - only health has its limits. T.T',
+  opP2: 'I hope this loud, colorful page helps you get to know me and browse the projects I am building - they are genuinely fun. Do not be shy, reach out and let us make something together: I love talking about how to make impossible things real. Cheers!',
   cap1D: 'Python, APIs, crawlers, tools and bots that automate the process.',
   cap2D: 'Excel, SQL, PowerBI - cleaning and analyzing data at scale.',
   cap3D: 'Web design, IAM, Azure, Jenkins, hands-on security audits.',
@@ -1312,6 +1375,7 @@ function daySegs(dow){
 }
 function segAt(dow, mins){ var segs = daySegs(dow), cur = segs[0]; for (var i = 0; i < segs.length; i++) if (mins >= segs[i].from) cur = segs[i]; return cur; }
 function nextSeg(dow, mins){ var segs = daySegs(dow); for (var i = 0; i < segs.length; i++) if (segs[i].from > mins) return segs[i]; return daySegs((dow + 1) % 7)[1] || daySegs((dow + 1) % 7)[0]; }
+function onlineMinsToday(dow, mins){ var segs = daySegs(dow), tot = 0; for (var i = 0; i < segs.length; i++) { var a = segs[i].from, b = (i + 1 < segs.length) ? segs[i + 1].from : 1440; if (segs[i].on) tot += Math.max(0, Math.min(mins, b) - a); } return tot; }
 var opsEls = { dot: $('#opDot'), state: $('#opState'), clock: $('#opClock'), next: $('#opNext'), bpm: $('#bpm'), bpmState: $('#bpmState'), tok: $('#tokToday'), rate: $('#tokRate'), peak: $('#tokPeak'), bars: $('#tokBars') };
 var tokBase = 0, tokLive = 0, tokSeedDay = -1;
 function fmtTok(n){ return Math.floor(n).toLocaleString('vi-VN'); }
@@ -1352,6 +1416,9 @@ function opsTick(){
     opsEls.tok.textContent = fmtTok(tokBase + tokLive);
     opsEls.rate.textContent = '~' + seg.rate + (LANG === 'vi' ? ' tok/phút' : ' tok/min');
     window.__deckSeg = seg; window.__deckBpm = bpmNow;
+    var hmS = document.getElementById('hmStatus'), hmH = document.getElementById('hmHours');
+    if (hmS) { hmS.textContent = seg.on ? 'ONLINE' : 'OFFLINE'; hmS.className = seg.on ? 'on' : 'off'; }
+    if (hmH) { var om = onlineMinsToday(dow, mins); hmH.textContent = Math.floor(om / 60) + 'H ' + pad2(om % 60) + 'M'; }
   }
 }
 opsTick(); setInterval(opsTick, 1000);
@@ -1541,7 +1608,10 @@ var PJ = {
 var pjSection = document.getElementById('modules');
 function pjSelect(key) {
   var d = PJ[key]; if (!d || !pjSection) return;
+  var modsEl = pjSection.querySelector('.mods'), wrapEl = document.getElementById('pjWrap');
+  var modsH = (modsEl && window.innerWidth > 860) ? modsEl.offsetHeight : 0;
   pjSection.classList.add('detail');
+  if (modsH && wrapEl) { var backEl0 = document.getElementById('pjBack'); var bh0 = backEl0 ? backEl0.offsetHeight + 14 : 0; wrapEl.style.height = Math.max(300, modsH - bh0) + 'px'; pjSection.classList.add('fixedh'); }
   $$('#pjList .pjcard').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-pj') === key); });
   var dict = (window.DECK && window.DECK.i18n) ? window.DECK.i18n() : I18N[LANG];
   var desc = document.getElementById('pjDesc');
@@ -1568,7 +1638,21 @@ $$('#modules .mod').forEach(function (card, i) {
 });
 $$('#pjList .pjcard').forEach(function (c) { c.addEventListener('click', function () { pjSelect(c.getAttribute('data-pj')); }); });
 var pjBackBtn = document.getElementById('pjBack');
-if (pjBackBtn) pjBackBtn.addEventListener('click', function () { pjSection.classList.remove('detail'); var v = document.getElementById('pjVideo'); if (v) v.pause(); });
+if (pjBackBtn) pjBackBtn.addEventListener('click', function () { pjSection.classList.remove('detail'); pjSection.classList.remove('fixedh'); var w = document.getElementById('pjWrap'); if (w) w.style.height = ''; var v = document.getElementById('pjVideo'); if (v) v.pause(); });
+/* keep the pinned detail height in sync when the window is resized */
+var pjRzT = null;
+window.addEventListener('resize', function () {
+  if (!pjSection || !pjSection.classList.contains('detail')) return;
+  clearTimeout(pjRzT);
+  pjRzT = setTimeout(function () {
+    var w = document.getElementById('pjWrap'); if (!w) return;
+    if (window.innerWidth <= 860) { pjSection.classList.remove('fixedh'); w.style.height = ''; return; }
+    pjSection.classList.remove('detail');
+    var m = pjSection.querySelector('.mods'); var h = m ? m.offsetHeight : 0;
+    pjSection.classList.add('detail');
+    if (h) { var b = document.getElementById('pjBack'); var bh = b ? b.offsetHeight + 14 : 0; w.style.height = Math.max(300, h - bh) + 'px'; pjSection.classList.add('fixedh'); }
+  }, 220);
+});
 
 /* ---------- heatmap: shipping rhythm, seeded so it looks the same for everyone ---------- */
 function renderHeat(){
