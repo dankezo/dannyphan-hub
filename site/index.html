@@ -1732,7 +1732,7 @@ try {
 
   /* ---------- bilingual lines owned by the room director ---------- */
   const RL = {
-    vi: { saySleep: 'Ngủ chút đã...', sayGuitar: 'Làm một bản nhạc đã...', sayPapers: 'Bừa bộn thế này thì code sao nổi?!', sayPet: 'Neo, lại đây nào ♥', sayWork: 'Rồi, quay lại việc thôi.', sayWindow: 'Mưa Hà Nội nhìn từ trên này đẹp ghê...', sayBoard: 'Để xem lại cái plan này đã...' },
+  vi: { saySleep: 'Ngủ chút đã...', sayGuitar: 'Đến với âm nhạc! Em chỉ cần gì ạ?', sayPapers: 'Bừa bộn thế này thì code sao nổi?!', sayPet: 'Neo, lại đây nào ♥', sayWork: 'Rồi, quay lại việc thôi.', sayWindow: 'Mưa Hà Nội nhìn từ trên này đẹp ghê...', sayBoard: 'Để xem lại cái plan này đã...' },
     en: { saySleep: 'Quick nap first...', sayGuitar: 'One quick song first...', sayPapers: 'How am I supposed to code in this mess?!', sayPet: 'Come here, Neo ♥', sayWork: 'Right, back to work.', sayWindow: 'Hanoi rain looks good from up here...', sayBoard: 'Let me re-check this plan...' }
   };
   const lang = () => (window.DECK && window.DECK.lang ? window.DECK.lang() : 'vi');
@@ -1773,7 +1773,7 @@ try {
     if (matchMedia('(max-width: 900px)').matches) { deckSettle(false); return; } /* mobile keeps its painted band */
     const renderer = new THREE.WebGLRenderer({ canvas: cvEl, alpha: true, antialias: true, powerPreference: 'high-performance' });
     if (!renderer.capabilities.isWebGL2) { deckSettle(false); return; } /* gate: painted fallback stays */
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.92;
 
@@ -1783,7 +1783,7 @@ try {
     const CAM_TGT = new THREE.Vector3(-0.35, 0.85, 1.35);
     const CAM_POS = new THREE.Vector3(1.35, 2.25, 3.30);
     const camDir = CAM_POS.clone().sub(CAM_TGT);
-    const camDist = camDir.length() * 1.38; camDir.normalize();
+    const camDist = camDir.length() * 1.28; camDir.normalize();
 
     /* ---------- lights: matched to the Blender room ---------- */
     scene.add(new THREE.HemisphereLight(0x9fc8e8, 0x16210f, 0.34));
@@ -1878,6 +1878,7 @@ try {
     const STANDIN = ['catBody', 'catHead', 'catEar', 'catEar.001', 'catTail'];
     roomG.scene.traverse(o => {
       if (STANDIN.indexOf(o.name) >= 0) o.visible = false;
+      if (o.name === 'floor') { o.scale.x = 1.5; o.scale.z = 1.8; }
       if (/^wb(?:Frame|Face|Tray|Marker)$/.test(o.name)) o.position.z += 0.25;
       if (/^(?:pegFace|toolGrip|toolShaft|cableCoil|multimeter|mmScreen)(?:\.\d+)?$/.test(o.name)) o.position.z += 0.65;
       if (/^holoFrame(?:\.\d+)?$/.test(o.name)) o.visible = false;
@@ -2027,16 +2028,22 @@ try {
         for (let i = 0; i < 6; i++) { const x = (i - 2.5) * 0.008; strings.push(x, -0.17, -0.058, x * 0.6, 0.77, -0.058); }
         for (let i = 0; i < 10; i++) { const y = 0.28 + i * 0.041; strings.push(-0.034, y, -0.056, 0.034, y, -0.056); }
         const stringGeo = new THREE.BufferGeometry(); stringGeo.setAttribute('position', new THREE.Float32BufferAttribute(strings, 3));
-        instrument.add(new THREE.LineSegments(stringGeo, new THREE.LineBasicMaterial({ color: 0xe6d7bb })));
+        instrument.add(new THREE.LineSegments(stringGeo, new THREE.LineBasicMaterial({ color: 0x91765d, transparent: true, opacity: 0.7 })));
         const standGuitar = instrument.clone();
         standGuitar.position.set(-1.58, 0.43, 0.68); standGuitar.rotation.set(0.08, Math.PI, 0);
+        standGuitar.traverse(o => {
+          if (!o.material) return;
+          o.material = o.material.clone();
+          o.userData.fullOpacity = o.material.opacity;
+          o.material.transparent = true;
+        });
         roomGuitar.forEach(m => { m.visible = false; });
         roomGuitar.length = 0; roomGuitar.push(standGuitar); roomG.scene.add(standGuitar);
         guitarProp = new THREE.Group();
         guitarProp.add(instrument);
         guitarProp.position.fromArray(GUITAR_PROP.pos);
         guitarProp.quaternion.fromArray(GUITAR_PROP.quat);
-        guitarProp.translateZ(0.21);
+        guitarProp.translateZ(-0.07); guitarProp.rotateY(-0.30);
         guitarProp.visible = false;
         spine.add(guitarProp);
       }
@@ -2044,13 +2051,69 @@ try {
     let gtrRoomShown = true;
     function guitarPropOn() { if (!guitarProp) return; roomGuitar.forEach(m => { m.visible = false; }); gtrRoomShown = false; guitarProp.visible = true; }
     function guitarPropOff() { if (!guitarProp) return; guitarProp.visible = false; roomGuitar.forEach(m => { m.visible = true; }); gtrRoomShown = true; }
+    function updateStandGuitar() {
+      if (!guitarProp || !gtrRoomShown || !roomGuitar.length) return;
+      const d = Math.hypot(dannyRoot.position.x + 1.58, dannyRoot.position.z - 0.68);
+      const a = Math.max(0, Math.min(1, (d - 0.25) / 0.35));
+      roomGuitar[0].traverse(o => {
+        if (!o.material) return;
+        o.material.opacity = o.userData.fullOpacity * a;
+        o.material.depthWrite = a >= 0.99;
+      });
+    }
+
+    /* Constrain the two hands to the instrument after the clip is sampled.
+       The guitar stays in front of the torso; moving it into the body to
+       fake hand contact makes the meshes visibly intersect. */
+    function guitarHandIK(side, localTarget, pole, weight) {
+      const hand = dBones['mixamorig' + side + 'Hand'];
+      const fore = dBones['mixamorig' + side + 'ForeArm'];
+      const arm = dBones['mixamorig' + side + 'Arm'];
+      if (!hand || !fore || !arm || !guitarProp) return;
+      const target = guitarProp.localToWorld(localTarget.clone());
+      arm.updateWorldMatrix(true, true);
+      const shoulder = arm.getWorldPosition(new THREE.Vector3());
+      const elbow = fore.getWorldPosition(new THREE.Vector3());
+      const wrist = hand.getWorldPosition(new THREE.Vector3());
+      const upperLen = shoulder.distanceTo(elbow), lowerLen = elbow.distanceTo(wrist);
+      const axis = target.clone().sub(shoulder), dist = Math.min(axis.length(), upperLen + lowerLen - 0.0001);
+      if (dist < 0.0001) return;
+      axis.normalize();
+      const bend = pole.clone().applyQuaternion(guitarProp.getWorldQuaternion(new THREE.Quaternion()));
+      bend.addScaledVector(axis, -bend.dot(axis));
+      if (bend.lengthSq() < 0.000001) return;
+      bend.normalize();
+      const along = (upperLen * upperLen - lowerLen * lowerLen + dist * dist) / (2 * dist);
+      const height = Math.sqrt(Math.max(0, upperLen * upperLen - along * along));
+      const elbowTarget = shoulder.clone().addScaledVector(axis, along).addScaledVector(bend, height);
+      function aim(joint, tip, destination) {
+        joint.updateWorldMatrix(true, true);
+        const origin = joint.getWorldPosition(new THREE.Vector3());
+        const from = tip.getWorldPosition(new THREE.Vector3()).sub(origin).normalize();
+        const to = destination.clone().sub(origin).normalize();
+        if (from.lengthSq() < 0.5 || to.lengthSq() < 0.5) return;
+        const delta = new THREE.Quaternion().setFromUnitVectors(from, to);
+        const parentQ = joint.parent.getWorldQuaternion(new THREE.Quaternion());
+        const localDelta = parentQ.clone().invert().multiply(delta).multiply(parentQ);
+        const desired = localDelta.multiply(joint.quaternion);
+        joint.quaternion.slerp(desired, weight);
+      }
+      aim(arm, fore, elbowTarget);
+      aim(fore, hand, target);
+    }
+    function applyGuitarHands() {
+      if (!guitarProp || !guitarProp.visible || dCur !== dAct.Guitar) return;
+      const time = dAct.Guitar.time, weight = Math.min(1, time / 0.35);
+      guitarHandIK('Left', new THREE.Vector3(0.02, 0.34, -0.08), new THREE.Vector3(0, 1, 0), weight);
+      guitarHandIK('Right', new THREE.Vector3(0.16, -0.04 + Math.sin(time * 7) * 0.035, -0.095), new THREE.Vector3(1, 0, 0), weight);
+    }
 
     /* ---------- Neo (optional: room + Danny still go live without her) ---------- */
     let neoRoot = null, nMixer = null; const nAct = {};
     /* New trot GLB (28f @ 24fps): authored ground speed 0.407 units/s x inner
-       scale 0.2274 = 0.0925 m/s at 1x. Played at 2x so she trots briskly;
+       scale 0.2274 = 0.0925 m/s at 1x. Played at 1.3x for a calmer gait;
        root translation must match exactly or her feet skate. */
-    const NEO_WALK_TS = 2;
+    const NEO_WALK_TS = 1.3;
     const NEO_WALK_SPEED = 0.0925 * NEO_WALK_TS;
     try {
       const neoG = await load('assets/neo-hero.glb');
@@ -2059,6 +2122,29 @@ try {
       if (rootTrack) {
         const base = rootTrack.values[1];
         for (let i = 0; i < rootTrack.times.length; i++) rootTrack.values[i * 3 + 1] = base + (rootTrack.values[i * 3 + 1] - base) * 0.25;
+      }
+      /* The source trot forces its last key back to its first: several
+         joints jump 30-50 degrees in one frame. Spread that correction
+         over the final quarter-second so the loop can close smoothly. */
+      if (trot) for (const track of trot.tracks) {
+        const isQuat = track.name.endsWith('.quaternion');
+        const isPos = track.name.endsWith('.position');
+        if ((!isQuat && !isPos) || track.times.length < 3) continue;
+        const size = isQuat ? 4 : 3, values = track.values;
+        const end = track.times[track.times.length - 1];
+        const begin = Math.max(track.times[0], end - 0.25);
+        const first = Array.from(values.slice(0, size));
+        for (let i = 0; i < track.times.length; i++) {
+          if (track.times[i] <= begin) continue;
+          let k = Math.min(1, (track.times[i] - begin) / (end - begin));
+          k = k * k * (3 - 2 * k);
+          const off = i * size;
+          let sign = 1;
+          if (isQuat && first.reduce((sum, v, j) => sum + v * values[off + j], 0) < 0) sign = -1;
+          let len = 0;
+          for (let j = 0; j < size; j++) { values[off + j] = values[off + j] * (1 - k) + first[j] * sign * k; len += values[off + j] * values[off + j]; }
+          if (isQuat && len > 0) for (let j = 0; j < size; j++) values[off + j] /= Math.sqrt(len);
+        }
       }
       neoRoot = new THREE.Group(); scene.add(neoRoot);
       const inner = new THREE.Group(); inner.scale.setScalar(0.42 / 1.847); neoRoot.add(inner); inner.add(neoG.scene);
@@ -2621,7 +2707,7 @@ try {
         /* eased speed: accelerate out, decelerate into the final point */
         const distFin = fin ? dist : dist + Math.hypot(N.path[N.path.length - 1].x - pt0.x, N.path[N.path.length - 1].z - pt0.z);
         const spdTgt = fin ? Math.min(NEO_WALK_SPEED, Math.sqrt(2 * 0.30 * distFin)) : NEO_WALK_SPEED;
-        N.speed += Math.max(-1.5 * dt, Math.min(0.9 * dt, spdTgt - N.speed));
+        N.speed += Math.max(-0.45 * dt, Math.min(0.30 * dt, spdTgt - N.speed));
         const wa = nAct['Walk'];
         if (wa) wa.timeScale = NEO_WALK_TS * Math.max(0, Math.min(1.3, N.speed / NEO_WALK_SPEED));
         if (dist < 0.001) { N.path.shift(); if (fin) neoArrive(); return; }
@@ -2752,7 +2838,7 @@ try {
       camera.aspect = a;
       const dolly = a >= 1.3 ? 1 : Math.min(1.8, 1.3 / a);
       camera.position.copy(CAM_TGT).addScaledVector(camDir, camDist * dolly);
-      camera.fov = a >= 1.3 ? 51 : 60;
+      camera.fov = a >= 1.3 ? 46 : 55;
       camera.lookAt(CAM_TGT);
       camera.updateProjectionMatrix();
     }
@@ -2770,6 +2856,48 @@ try {
       routine: startRoutine, react, toDesk
     };
     window.__room = {
+      guitarPose: () => {
+        if (!guitarProp) return null;
+        dannyG.scene.updateWorldMatrix(true, true);
+        const at = n => { const b = dBones['mixamorig' + n]; return b ? guitarProp.worldToLocal(b.getWorldPosition(new THREE.Vector3())).toArray() : null; };
+        return Object.fromEntries(['Hips', 'Spine', 'Spine2', 'LeftArm', 'LeftForeArm', 'LeftHand', 'RightArm', 'RightForeArm', 'RightHand'].map(n => [n, at(n)]));
+      },
+      neoPose: () => {
+        if (!neoRoot) return null;
+        neoRoot.updateWorldMatrix(true, true);
+        const at = n => { const b = neoRoot.getObjectByName(n); return b ? b.getWorldPosition(new THREE.Vector3()).toArray() : null; };
+        return { position: neoRoot.position.toArray(), yaw: neoRoot.rotation.y, mode: N.mode, speed: N.speed,
+          paws: ['pawFL', 'pawFR', 'pawHL', 'pawHR'].map(at) };
+      },
+      guitarOverlap: (offset = 0, angle = 0) => {
+        if (!guitarProp || !guitarProp.visible) return null;
+        const savedP = guitarProp.position.clone(), savedQ = guitarProp.quaternion.clone();
+        guitarProp.translateZ(offset); guitarProp.rotateY(angle);
+        dannyG.scene.updateWorldMatrix(true, true);
+        const hits = {}; const p = new THREE.Vector3();
+        dannyG.scene.traverse(mesh => {
+          if (!mesh.isSkinnedMesh) return;
+          mesh.skeleton.update();
+          let count = 0; const byBone = {}, points = mesh.geometry.attributes.position;
+          for (let i = 0; i < points.count; i++) {
+            mesh.getVertexPosition(i, p); mesh.localToWorld(p); guitarProp.worldToLocal(p);
+            if (Math.abs(p.x) < 0.14 && p.y > -0.26 && p.y < 0.21 && p.z > -0.035 && p.z < 0.035) {
+              count++;
+              const indices = mesh.geometry.attributes.skinIndex, weights = mesh.geometry.attributes.skinWeight;
+              if (indices && weights) {
+                let k = 0; for (let j = 1; j < 4; j++) if (weights.getComponent(i, j) > weights.getComponent(i, k)) k = j;
+                const bone = mesh.skeleton.bones[indices.getComponent(i, k)];
+                const name = bone ? bone.name : 'unknown'; byBone[name] = (byBone[name] || 0) + 1;
+              }
+            }
+          }
+          hits[mesh.name] = { count, byBone };
+        });
+        const shoulder = name => { const b = dBones['mixamorig' + name + 'Arm']; return b && guitarProp.worldToLocal(b.getWorldPosition(new THREE.Vector3())).toArray(); };
+        const result = { hits, rightShoulder: shoulder('Right'), leftShoulder: shoulder('Left') };
+        guitarProp.position.copy(savedP); guitarProp.quaternion.copy(savedQ);
+        return result;
+      },
       state: () => ({ mode: D.mode, busy: D.busy, at: D.at, seated: D.seated, onBed: D.onBed, fade: Math.round(D.fadeK * 100) / 100, neo: neoRoot ? N.mode : 'none', neoClip: nCur ? nCur.getClip().name : null, dannyPos: dannyRoot.position.toArray().map(v => Math.round(v * 100) / 100), neoPos: neoRoot ? neoRoot.position.toArray().map(v => Math.round(v * 100) / 100) : null, dannyClips: Object.keys(dAct), neoClips: Object.keys(nAct), gtrProp: !!(guitarProp && guitarProp.visible), gtrRoom: gtrRoomShown, seatOff: Math.round(D.seatOff * 1000) / 1000, seatZOff: Math.round(D.seatZOff * 1000) / 1000, idleT: Math.round(D.idleT * 10) / 10 }),
       motion: () => ({ x: dannyRoot.position.x, y: dannyRoot.position.y, z: dannyRoot.position.z, yaw: dannyRoot.rotation.y, phase: D.travel ? D.travel.phase : null, at: D.at, busy: D.busy, neoX: neoRoot ? neoRoot.position.x : null, neoY: neoRoot ? neoRoot.position.y : null, neoZ: neoRoot ? neoRoot.position.z : null, neoYaw: neoRoot ? neoRoot.rotation.y : null }),
       danny: (k) => dPlay(k),
@@ -2901,6 +3029,8 @@ try {
         if (!D.travel && !D.onBed && D.at !== 'desk' && D.sinkK !== 0) dannyRoot.position.y = D.sinkBase + D.sinkK;
         if (!D.travel && !D.onBed && !D.compWalk) walkAnchor.copy(dannyRoot.position);
         dMixer.update(dt);
+        applyGuitarHands();
+        updateStandGuitar();
         D.seatZOff = 0;
         if (D.at === 'desk' && !D.travel && !D.compWalk) {
           /* The seated and standing clips share the same chair anchor. */
