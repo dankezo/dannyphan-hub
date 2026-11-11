@@ -165,7 +165,7 @@ body.overdrive .hero-art .scan i{animation-duration:1.5s}
 .chip b{color:var(--acid);font-weight:400}
 .chip.c1{top:14px;left:14px}.chip.c2{top:14px;right:14px}.chip.c3{bottom:14px;left:14px}
 .hero-copy{padding-bottom:8px}
-.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--acid);display:flex;align-items:center;gap:12px}
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--acid);display:flex;align-items:center;gap:12px;width:max-content;max-width:100%;background:rgba(5,7,10,.52);border:1px solid rgba(245,241,230,.12);padding:7px 12px 7px 10px;margin-left:-11px;backdrop-filter:blur(3px);text-shadow:0 1px 8px rgba(0,0,0,.65)}
 .kicker::before{content:"";width:34px;height:1px;background:var(--acid)}
 h1.mega{font-size:clamp(56px,8.6vw,132px);font-weight:900;line-height:.94;letter-spacing:-.015em;margin:16px 0 6px;text-transform:uppercase;transform:scale(1.055);transition:transform 1500ms var(--ease)}
 h1.mega.play{transform:scale(1)}
@@ -267,9 +267,9 @@ section[id],footer[id]{scroll-margin-top:86px}
 .mviz .sweep{position:absolute;left:50%;top:50%;width:150px;height:150px;margin:-75px 0 0 -75px;background:conic-gradient(from 0deg,rgba(163,230,53,.4),transparent 24%);border-radius:50%;animation:spin 5.5s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .mviz .blip{position:absolute;left:63%;top:34%;width:7px;height:7px;border-radius:50%;background:var(--acid);box-shadow:0 0 12px var(--acid);animation:pulse 1.8s infinite}
-.mviz .chain{position:absolute;left:12%;right:12%;top:50%;height:2px;background:rgba(163,230,53,.25)}
-.mviz .chain i{position:absolute;top:50%;width:13px;height:13px;margin-top:-7px;border-radius:50%;border:2px solid var(--acid);background:#0A0D10;animation:pulse 2.2s infinite}
-.mviz .chain i:nth-child(1){left:0}.mviz .chain i:nth-child(2){left:33%;animation-delay:.4s}.mviz .chain i:nth-child(3){left:66%;animation-delay:.8s}.mviz .chain i:nth-child(4){left:calc(100% - 13px);animation-delay:1.2s;background:var(--acid)}
+.mviz .gauge{position:absolute;left:14%;right:14%;top:50%;transform:translateY(-50%);display:flex;gap:4px}
+.mviz .gauge i{flex:1;height:26px;background:rgba(163,230,53,.10);border:1px solid rgba(163,230,53,.22)}
+.mviz .gauge i.on{background:var(--acid);border-color:var(--acid);box-shadow:0 0 9px rgba(163,230,53,.45)}
 .mviz .tg i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border:1px solid rgba(163,230,53,.55);border-radius:50%;animation:ringGrow 2.8s var(--ease) infinite}
 .mviz .tg i:nth-child(2){animation-delay:.9s}.mviz .tg i:nth-child(3){animation-delay:1.8s}
 @keyframes ringGrow{from{width:10px;height:10px;opacity:1}to{width:110px;height:110px;opacity:0}}
@@ -362,6 +362,32 @@ section.blk{position:relative;padding:clamp(70px,10vh,120px) clamp(16px,4vw,44px
 .mod .go{margin-top:22px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--paper)}
 .mod .go b{color:var(--acid);font-weight:400}
 .mod .bignum{position:absolute;right:14px;bottom:-16px;font-size:110px;font-weight:900;color:rgba(245,241,230,.05);line-height:1;pointer-events:none}
+/* projects master-detail (M7.6, Danny 10/11): click a module and all four
+   collapse to compact rows on the left; the right panel - exactly as tall
+   as the four rows - plays the project process film, description under
+   the film, outbound buttons in the same band */
+.pjwrap{display:none;grid-template-columns:minmax(290px,5fr) 7fr;gap:14px}
+#modules.detail .mods{display:none}
+#modules.detail .pjwrap{display:grid}
+.pjlist{display:flex;flex-direction:column;gap:12px}
+.pjcard{height:92px;flex:none;display:flex;align-items:center;gap:14px;text-align:left;border:1px solid var(--line2);background:rgba(12,15,19,.55);padding:14px 18px;cursor:pointer;color:inherit;font:inherit;width:100%}
+.pjcard .n{font-family:var(--mono);font-size:10px;letter-spacing:.16em;color:var(--acid)}
+.pjcard h4{font-size:20px;font-weight:800;text-transform:uppercase;margin:3px 0}
+.pjcard .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--mut)}
+.pjcard .st{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--mut);white-space:nowrap}
+.pjcard.on{border-color:var(--acid);background:linear-gradient(180deg,rgba(163,230,53,.07),rgba(12,15,19,.55))}
+.pjdetail{border:1px solid var(--line2);background:#0A0D10;display:flex;flex-direction:column;overflow:hidden}
+.pjdetail .vidwrap{position:relative;flex:1;min-height:0;background:#07090C}
+.pjdetail video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.pjdetail .vidph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--mut)}
+.pjdetail .pinfo{padding:16px 20px 18px;border-top:1px solid var(--line2)}
+.pjdetail .pinfo p{color:var(--mut);line-height:1.6;font-size:14.5px}
+.pjdetail .pactions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.pjdetail .pactions a{font-family:var(--mono);font-size:11px;letter-spacing:.14em;padding:10px 16px;border:1px solid var(--acid);color:#0A0D10;background:var(--acid);text-decoration:none}
+.pjdetail .pactions a.ghosty{background:transparent;color:var(--paper);border-color:var(--line2)}
+.pjback{display:none;margin-top:14px}
+#modules.detail .pjback{display:inline-block}
+@media(max-width:860px){.pjwrap{grid-template-columns:1fr}.pjdetail .vidwrap{min-height:230px;flex:none;height:230px}}
 
 /* panorama band */
 .band{position:relative;height:clamp(240px,42vh,420px);overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
@@ -503,8 +529,8 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
             <a class="btn ghost" href="#" id="ctaCat" data-cur="CHAT" data-i18n="ctaCat">HỎI NEO - MÈO AI</a>
           </div>
           <div class="cta-chips">
+            <a class="hchip" href="#operator" data-cur="GO" data-i18n="ctaAbout">ABOUT ME</a>
             <a class="hchip solid" href="#contact" data-cur="GO" data-i18n="ctaContact">CONTACT</a>
-            <a class="hchip" href="#contact" data-cur="GO" data-i18n="ctaCollab">COLLAB</a>
           </div>
         </div>
       </div>
@@ -578,7 +604,7 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
     </div>
     <div class="mods">
       <a class="mod reveal" href="https://antirea.dannyphan.me" target="_blank" rel="noopener" data-cur="OPEN" data-tilt>
-        <div class="mid"><span>MOD-01 // SECURITY LIBRARY</span><span class="st">v2.8.0 - LIVE</span></div>
+        <div class="mid"><span>MOD-01 // SECURITY LIBRARY</span><span class="st">v2.8.1 - LIVE</span></div>
         <h3>antiRea</h3>
         <p data-i18n="mod1Desc">Thư viện TypeScript phía server chống cào dữ liệu: đo lượng theo từng danh tính, phát hiện bầy bot phối hợp, để lại bằng chứng điều tra được. Đã publish npm, JSR và MCP Registry - 817 test, 0 dependency, đang gác cổng cho cả deck này.</p>
         <div class="tags"><i>TYPESCRIPT</i><i>ZERO-DEP</i><i>NPM + JSR</i><i>MCP</i></div>
@@ -610,6 +636,25 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
         <div class="bignum">04</div><div class="shine"></div>
       </a>
     </div>
+    <div class="pjwrap" id="pjWrap">
+      <div class="pjlist" id="pjList">
+        <button class="pjcard" data-pj="antirea" data-cur="OPEN"><div><div class="n">MOD-01 // SECURITY LIBRARY</div><h4>antiRea</h4><div class="t">TYPESCRIPT / ZERO-DEP / MCP</div></div><span class="st">v2.8.1 - LIVE</span></button>
+        <button class="pjcard" data-pj="baoan" data-cur="OPEN"><div><div class="n">MOD-02 // SEARCH SYSTEM</div><h4>BaoAnSearch</h4><div class="t">SEARCH / PHARMA DATA / TURSO</div></div><span class="st">PRODUCTION</span></button>
+        <button class="pjcard" data-pj="catopedia" data-cur="OPEN"><div><div class="n">MOD-03 // KNOWLEDGE WIKI</div><h4>Catopedia</h4><div class="t">NEXT.JS / VI-EN / CLOUDFLARE</div></div><span class="st">LIVE</span></button>
+        <button class="pjcard" data-pj="news" data-cur="OPEN"><div><div class="n">MOD-04 // AI PIPELINE</div><h4>News Translator</h4><div class="t">AI CURATION / PLAYWRIGHT</div></div><span class="st">RUNNING</span></button>
+      </div>
+      <div class="pjdetail">
+        <div class="vidwrap">
+          <video id="pjVideo" muted loop playsinline autoplay preload="auto"></video>
+          <div class="vidph" id="pjVidPh">PROCESS FILM</div>
+        </div>
+        <div class="pinfo">
+          <p id="pjDesc" data-i18n="mod1Desc"></p>
+          <div class="pactions" id="pjActions"></div>
+        </div>
+      </div>
+    </div>
+    <button class="hchip pjback" id="pjBack" data-cur="GO" data-i18n="pjBack">&lt;- ALL MODULES</button>
   </section>
 
 
@@ -618,51 +663,36 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
     <div class="sec-head reveal">
       <div>
         <div class="idx">SECTION <b>02</b> - PROPRIETARY METHODS</div>
-        <h2 data-i18n="methTitle">Phương thức<br><span class="acid">tự cook</span></h2>
+        <h2 data-i18n="methTitle">Methods</h2>
       </div>
-      <div class="idx" style="max-width:300px;line-height:2" data-i18n="methNote">CHỈ NÓI SƠ BỘ.<br>QUY TRÌNH GIỮ KÍN.<br>KẾT QUẢ THÌ CÔNG KHAI.</div>
     </div>
     <div class="meths">
       <div class="meth reveal">
         <div class="mviz"><div class="rings"><i></i><i></i><i></i></div><div class="sweep"></div><div class="blip"></div></div>
         <div class="mname">THE HERD LENS</div>
         <h3 data-i18n="m1Name">Nhìn cả bầy, không soi từng con</h3>
-        <p data-i18n="m1Desc">Soi từng request thì bot lẻ luôn lọt. Tôi đo cả bầy theo thời gian - bầy phối hợp tự lộ nhịp chung, dù mỗi con trông vô hại.</p>
+        <p data-i18n="m1Desc">Đo theo cohort trên cửa sổ thời gian trượt: tương quan nhịp request, độ phủ dataset, herd-phase và CUSUM. Một identity lẻ luôn trông vô hại - bầy phối hợp không giấu được chữ ký thống kê chung.</p>
       </div>
       <div class="meth reveal">
-        <div class="mviz"><div class="chain"><i></i><i></i><i></i><i></i></div></div>
+        <div class="mviz"><div class="gauge"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div></div>
         <div class="mname">THE METER</div>
         <h3 data-i18n="m2Name">Đồng hồ đo theo danh tính</h3>
-        <p data-i18n="m2Desc">Mỗi danh tính có một ngân sách dữ liệu: trong ngân sách cứ lấy, vượt là bị ghi sổ và nhận 429. Người dùng thật không bao giờ bị đụng tới.</p>
+        <p data-i18n="m2Desc">Metering theo identity: mỗi danh tính mang một record budget trượt 24h (mặc định 150 bản ghi). Vượt trần thì ghi sổ bằng chứng và trả 429 - người dùng thật không bao giờ chạm trần.</p>
       </div>
       <div class="meth reveal">
         <div class="mviz"><div class="tg"><i></i><i></i><i></i><b></b></div></div>
         <div class="mname">PROVE IT, END TO END</div>
         <h3 data-i18n="m3Name">Chứng minh đầu - cuối</h3>
-        <p data-i18n="m3Desc">Chỉ gọi là lỗ hổng khi đã khai thác được thật, từ đầu tới cuối, bằng chứng chụp thật. Còn lại, tất cả chỉ là gia cố.</p>
+        <p data-i18n="m3Desc">Một finding chỉ được gọi là lỗ hổng khi có PoC khai thác đầu-cuối: đọc hoặc ghi được dữ liệu có quyền bảo vệ, bằng chứng là ảnh chụp thật từ phiên test. Thiếu PoC thì chỉ là hardening, không báo cáo.</p>
       </div>
-      <a class="meth duo collab reveal" href="#contact" data-cur="GO">
-        <div class="mviz"><div class="duo-rings"><i></i><i></i><b></b></div></div>
-        <div class="mname">COLLAB</div>
-        <h3 data-i18n="cName">Có hệ thống cần giữ?</h3>
-        <p data-i18n="cDesc">Tôi nhận rà soát bảo mật và dựng lớp chống cào dữ liệu cho web app / SaaS. Kể tôi nghe hệ thống của bạn - tôi nói thẳng làm được gì, mất bao lâu.</p>
-        <span class="mcta" data-i18n="cCta">BẮT ĐẦU TRAO ĐỔI -&gt;</span>
-      </a>
-      <a class="meth duo reveal" href="#operator" data-cur="GO">
-        <div class="mviz face"><img src="assets/operator.jpg" alt="" loading="lazy"></div>
-        <div class="mname">ABOUT ME</div>
-        <h3 data-i18n="aName">Danny Phan - Hà Nội</h3>
-        <p data-i18n="aDesc">Kỹ sư bảo mật, indie builder. Ban ngày giữ hệ thống cho công ty, ban đêm cook antiRea và nuôi cái deck này cùng một con mèo tên Neo.</p>
-        <span class="mcta" data-i18n="aCta">GẶP OPERATOR -&gt;</span>
-      </a>
     </div>
     <div class="board reveal">
-      <div class="brow bhead"><span data-i18n="bSite">WEBSITE ĐÃ GIÚP</span><span data-i18n="bProb">VẤN ĐỀ</span><span data-i18n="bMeth">PHƯƠNG THỨC</span><span data-i18n="bStat">TRẠNG THÁI</span></div>
+      <div class="brow bhead"><span data-i18n="bSite">WEBSITE ĐÃ GIÚP</span><span data-i18n="bProb">VẤN ĐỀ</span><span data-i18n="bMeth">METHODS</span><span data-i18n="bStat">TRẠNG THÁI</span></div>
       <div class="brow"><span data-i18n="r1Site">Khách sạn quốc tế - Hà Nội</span><span data-i18n="r1Prob">Chứng chỉ TLS hết hạn ngay mùa cao điểm</span><span>THE HERD LENS</span><span class="bst" data-i18n="r1Stat">Đã cảnh báo trước hạn</span></div>
       <div class="brow"><span data-i18n="r2Site">Chuỗi nha khoa - TP.HCM</span><span data-i18n="r2Prob">CORS phản chiếu mọi origin, kèm credentials</span><span>PROVE IT, END TO END</span><span class="bst" data-i18n="r2Stat">Xác minh 2 vòng - báo riêng</span></div>
       <div class="brow"><span data-i18n="r3Site">Website thương mại điện tử</span><span data-i18n="r3Prob">Vẫn bật TLS 1.0 / 1.1 lỗi thời</span><span>THE HERD LENS</span><span class="bst" data-i18n="r3Stat">Đã gửi khuyến nghị gia cố</span></div>
       <div class="brow"><span data-i18n="r4Site">Khách sạn - Đà Nẵng</span><span data-i18n="r4Prob">Luồng đặt phòng cần rà soát bảo mật</span><span>THE METER</span><span class="bst" data-i18n="r4Stat">Đã báo riêng, kèm bằng chứng</span></div>
-      <div class="bfoot" data-i18n="bFoot">Hiển thị 4 ca tiêu biểu. Tên khách hàng và hồ sơ đầy đủ giữ riêng - đó cũng là một phần của phương thức.</div>
+      <div class="bfoot" data-i18n="bFoot">Hiển thị 4 ca tiêu biểu. Tên khách hàng và hồ sơ đầy đủ giữ riêng - đó cũng là một phần của cách làm việc.</div>
     </div>
   </section>
 
@@ -755,7 +785,7 @@ var I18N = {
 vi: {
   hstat: 'HÀ NỘI, VN - <b>ĐANG TRỰC TUYẾN</b>',
   ctaModules: 'XEM CÁC MODULE', ctaCat: 'HỎI NEO - MÈO AI',
-  slogan: 'Trai Indie nhà nghèo', ctaContact: 'CONTACT', ctaCollab: 'COLLAB',
+  slogan: 'Trai Indie nhà nghèo', ctaContact: 'CONTACT', ctaAbout: 'ABOUT ME',
   wordKinds: 'loại', meta2: 'SIGNAL KINDS ĐANG CHẠY', meta3: 'RECORD BUDGET MỖI DANH TÍNH', meta4: 'FLAGSHIP MODULES TRÊN DECK',
   opsBeat: 'HEARTBEAT - GIẢ LẬP NHỊP SINH HỌC', opsTok: 'TOKEN BURN - HÔM NAY (AI CREW)', opsCrew: 'AI CREW - GHẾ ĐANG TRỰC',
   tokRateL: 'TỐC ĐỘ', tokPeakL: 'ĐỈNH HÔM NAY', crewArgon: 'MEDIA / MODEL / RED TEAM', crewNeo: 'MÈO TRỰC DECK',
@@ -767,26 +797,20 @@ vi: {
   mod3Desc: 'Wiki mèo song ngữ Việt - Anh: từ điển giống mèo, chăm sóc, nhận nuôi gần bạn. Next.js trên Cloudflare, toàn bộ hạ tầng chạy với chi phí bắt buộc 0 đồng - vẫn nhanh, vẫn miễn phí cho người đọc.',
   mod4Desc: 'Đường ống tin tự chạy: AI chọn bài đáng đọc, dịch, rồi Playwright tự đăng. Không biên tập viên, không người gác - một hệ thống xuất bản vận hành một mình từ đầu tới cuối.',
   goOpen: 'MỞ MODULE <b>-></b>', goAsk: 'HỎI THÊM <b>-></b>',
-  methTitle: 'Phương thức<br><span class="acid">tự cook</span>',
-  methNote: 'CHỈ NÓI SƠ BỘ.<br>QUY TRÌNH GIỮ KÍN.<br>KẾT QUẢ THÌ CÔNG KHAI.',
+  pjPage: 'MỞ PAGE ->', pjBack: '<- TẤT CẢ MODULE',
+  methTitle: 'Methods',
   m1Name: 'Nhìn cả bầy, không soi từng con',
-  m1Desc: 'Soi từng request thì bot lẻ luôn lọt. Tôi đo cả bầy theo thời gian - bầy phối hợp tự lộ nhịp chung, dù mỗi con trông vô hại.',
+  m1Desc: 'Đo theo cohort trên cửa sổ thời gian trượt: tương quan nhịp request, độ phủ dataset, herd-phase và CUSUM. Một identity lẻ luôn trông vô hại - bầy phối hợp không giấu được chữ ký thống kê chung.',
   m2Name: 'Đồng hồ đo theo danh tính',
-  m2Desc: 'Mỗi danh tính có một ngân sách dữ liệu: trong ngân sách cứ lấy, vượt là bị ghi sổ và nhận 429. Người dùng thật không bao giờ bị đụng tới.',
+  m2Desc: 'Metering theo identity: mỗi danh tính mang một record budget trượt 24h (mặc định 150 bản ghi). Vượt trần thì ghi sổ bằng chứng và trả 429 - người dùng thật không bao giờ chạm trần.',
   m3Name: 'Chứng minh đầu - cuối',
-  m3Desc: 'Chỉ gọi là lỗ hổng khi đã khai thác được thật, từ đầu tới cuối, bằng chứng chụp thật. Còn lại, tất cả chỉ là gia cố.',
-  cName: 'Có hệ thống cần giữ?',
-  cDesc: 'Tôi nhận rà soát bảo mật và dựng lớp chống cào dữ liệu cho web app / SaaS. Kể tôi nghe hệ thống của bạn - tôi nói thẳng làm được gì, mất bao lâu.',
-  cCta: 'BẮT ĐẦU TRAO ĐỔI ->',
-  aName: 'Danny Phan - Hà Nội',
-  aDesc: 'Kỹ sư bảo mật, indie builder. Ban ngày giữ hệ thống cho công ty, ban đêm cook antiRea và nuôi cái deck này cùng một con mèo tên Neo.',
-  aCta: 'GẶP OPERATOR ->',
-  bSite: 'WEBSITE ĐÃ GIÚP', bProb: 'VẤN ĐỀ', bMeth: 'PHƯƠNG THỨC', bStat: 'TRẠNG THÁI',
+  m3Desc: 'Một finding chỉ được gọi là lỗ hổng khi có PoC khai thác đầu-cuối: đọc hoặc ghi được dữ liệu có quyền bảo vệ, bằng chứng là ảnh chụp thật từ phiên test. Thiếu PoC thì chỉ là hardening, không báo cáo.',
+  bSite: 'WEBSITE ĐÃ GIÚP', bProb: 'VẤN ĐỀ', bMeth: 'METHODS', bStat: 'TRẠNG THÁI',
   r1Site: 'Khách sạn quốc tế - Hà Nội', r1Prob: 'Chứng chỉ TLS hết hạn ngay mùa cao điểm', r1Stat: 'Đã cảnh báo trước hạn',
   r2Site: 'Chuỗi nha khoa - TP.HCM', r2Prob: 'CORS phản chiếu mọi origin, kèm credentials', r2Stat: 'Xác minh 2 vòng - báo riêng',
   r3Site: 'Website thương mại điện tử', r3Prob: 'Vẫn bật TLS 1.0 / 1.1 lỗi thời', r3Stat: 'Đã gửi khuyến nghị gia cố',
   r4Site: 'Khách sạn - Đà Nẵng', r4Prob: 'Luồng đặt phòng cần rà soát bảo mật', r4Stat: 'Đã báo riêng, kèm bằng chứng',
-  bFoot: 'Hiển thị 4 ca tiêu biểu. Tên khách hàng và hồ sơ đầy đủ giữ riêng - đó cũng là một phần của phương thức.',
+  bFoot: 'Hiển thị 4 ca tiêu biểu. Tên khách hàng và hồ sơ đầy đủ giữ riêng - đó cũng là một phần của cách làm việc.',
   opTitle: 'Người giữ<br><span class="acid">buồng lái</span>',
   opP1: 'Ban ngày tôi làm <b>bảo mật vận hành</b> trên hệ thống thật. Thời gian còn lại là để xây: thư viện chống cào dữ liệu, công cụ tra cứu dược, wiki song ngữ, pipeline tin tự động. Chuẩn không đổi: <b>làm kỹ, kiểm chứng bằng số, chưa ngon là chưa ship</b>.',
   opP2: 'Deck này nhận việc một lần và bounty: tự động hóa, xử lý dữ liệu, web và bảo mật, media và thiết kế. Muốn biết tôi gỡ được tới đâu, cứ đưa bài toán. Hoặc hỏi Neo trước cũng được - nó trực deck 24/7.',
@@ -814,7 +838,7 @@ vi: {
 en: {
   hstat: 'HANOI, VN - <b>SYSTEMS ONLINE</b>',
   ctaModules: 'VIEW MODULES', ctaCat: 'ASK NEO - AI CAT',
-  slogan: 'Broke indie kid, building anyway', ctaContact: 'CONTACT', ctaCollab: 'COLLAB',
+  slogan: 'Broke indie kid, building anyway', ctaContact: 'CONTACT', ctaAbout: 'ABOUT ME',
   wordKinds: 'kinds', meta2: 'SIGNAL KINDS RUNNING', meta3: 'RECORD BUDGET PER IDENTITY', meta4: 'FLAGSHIP MODULES ON DECK',
   opsBeat: 'HEARTBEAT - SIMULATED VITALS', opsTok: 'TOKEN BURN - TODAY (AI CREW)', opsCrew: 'AI CREW - ON DUTY',
   tokRateL: 'RATE', tokPeakL: 'PEAK TODAY', crewArgon: 'MEDIA / MODEL / RED TEAM', crewNeo: 'DECK CAT',
@@ -826,26 +850,20 @@ en: {
   mod3Desc: 'A bilingual Vietnamese - English cat wiki: breed encyclopedia, care guides, adoptions near you. Next.js on Cloudflare, the whole infrastructure runs at a mandatory cost of exactly zero - still fast, still free to read.',
   mod4Desc: 'A news pipeline that runs itself: AI picks the stories worth reading, translates them, then Playwright publishes. No editor, no gatekeeper - a publishing system operating alone, end to end.',
   goOpen: 'OPEN MODULE <b>-></b>', goAsk: 'ASK MORE <b>-></b>',
-  methTitle: 'Methods<br><span class="acid">home-cooked</span>',
-  methNote: 'HIGH LEVEL ONLY.<br>THE PROCESS STAYS PRIVATE.<br>THE RESULTS ARE PUBLIC.',
+  pjPage: 'OPEN PAGE ->', pjBack: '<- ALL MODULES',
+  methTitle: 'Methods',
   m1Name: 'Watch the herd, not the individual',
-  m1Desc: 'Inspect single requests and lone bots slip through. I measure the whole herd over time - a coordinated herd betrays its shared rhythm, even when each member looks harmless.',
+  m1Desc: 'Cohort-level measurement over sliding time windows: request-rhythm correlation, dataset coverage, herd-phase and CUSUM. A lone identity always looks harmless - a coordinated herd cannot hide its shared statistical signature.',
   m2Name: 'A budget for every identity',
-  m2Desc: 'Every identity gets a data budget: take what you need inside it, cross it and you are logged and served a 429. Real users are never touched.',
+  m2Desc: 'Per-identity metering: every identity carries a sliding 24h record budget (150 records by default). Cross it and the access is logged as evidence and answered 429 - real users never reach the ceiling.',
   m3Name: 'Prove it, end to end',
-  m3Desc: 'A problem earns the name vulnerability only when it has been exploited for real, end to end, with real screenshot evidence. Everything else is just hardening.',
-  cName: 'Got a system worth keeping?',
-  cDesc: 'I take on security reviews and build anti-scraping layers for web apps and SaaS. Tell me about your system - I will say plainly what I can do and how long it takes.',
-  cCta: 'START A CONVERSATION ->',
-  aName: 'Danny Phan - Hanoi',
-  aDesc: 'Security engineer, indie builder. Days keeping company systems safe, nights cooking antiRea and running this deck with a cat named Neo.',
-  aCta: 'MEET THE OPERATOR ->',
+  m3Desc: 'A finding only earns the name vulnerability with an end-to-end exploit PoC: reading or writing access-controlled data, evidenced by real captures from the test session. No PoC, no report - it is hardening.',
   bSite: 'WEBSITES HELPED', bProb: 'THE PROBLEM', bMeth: 'METHOD', bStat: 'STATUS',
   r1Site: 'International hotel - Hanoi', r1Prob: 'TLS certificate expiring right before peak season', r1Stat: 'Flagged before the deadline',
   r2Site: 'Dental chain - Ho Chi Minh City', r2Prob: 'CORS reflecting every origin, with credentials', r2Stat: 'Verified twice - reported privately',
   r3Site: 'E-commerce website', r3Prob: 'Still running outdated TLS 1.0 / 1.1', r3Stat: 'Hardening recommendation sent',
   r4Site: 'Hotel - Da Nang', r4Prob: 'Booking flow needed a security review', r4Stat: 'Reported privately, with evidence',
-  bFoot: 'Four representative cases shown. Client names and full files stay private - that is part of the method too.',
+  bFoot: 'Four representative cases shown. Client names and full files stay private - that is part of how I work.',
   opTitle: 'The one at<br><span class="acid">the controls</span>',
   opP1: 'By day I run <b>security operations</b> on real systems. The rest of the time goes into building: an anti-scraping library, a pharma search tool, a bilingual wiki, an automated news pipeline. One standard, unchanged: <b>do it properly, verify with numbers - if it is not good yet, it does not ship</b>.',
   opP2: 'This deck takes one-off work and bounties: automation, data, web and security, media and design. Want to know how far I can push it? Bring the problem. Or ask Neo first - it is on deck duty 24/7.',
@@ -924,15 +942,33 @@ if (!motionOn) { boot.style.display = 'none'; $$('#megaTitle .ch').forEach(funct
 else {
   var lines = I18N[LANG].boot;
   var bl = $('#bootLines'), bp = $('#bootPct'), bb = $('#bootBar'), t0 = performance.now(), DUR = 1150;
+  /* The curtain waits for the 3D room: it lifts only when the minimum
+     boot time has passed AND the deck module has settled - ready (its
+     first frame has rendered), failed, or not applicable. The bar
+     follows the timer to 90% and earns the last 10% only when the deck
+     settles, so it never sits at a fake 100% while still waiting. A 9s
+     failsafe guarantees the curtain can never trap the page. */
+  var deckSettled = false, minDone = false, finishQueued = false;
+  function showBar(p){ bp.textContent = Math.round(p * 100) + '%'; bb.style.transform = 'scaleX(' + p + ')'; }
+  function maybeFinish(){
+    if (!minDone || !deckSettled || finishQueued) return;
+    finishQueued = true; showBar(1);
+    setTimeout(finishBoot, 120);
+  }
+  function settleDeck(){ if (deckSettled) return; deckSettled = true; maybeFinish(); }
+  /* the <=900px rule mirrors the module's own mobile gate: below it the
+     module never builds the room, so there is nothing to wait for */
+  if (matchMedia('(max-width: 900px)').matches) settleDeck();
+  else if (window.__deckReady || window.__deckFailed) settleDeck();
+  else { addEventListener('deck-ready', settleDeck); addEventListener('deck-failed', settleDeck); }
   (function step(now){
     var p = Math.min(1, (now - t0) / DUR);
-    bp.textContent = Math.round(p * 100) + '%';
-    bb.style.transform = 'scaleX(' + p + ')';
+    showBar(Math.min(p, deckSettled ? 1 : 0.9));
     var n = Math.min(lines.length, Math.floor(p * (lines.length + 0.99)));
     bl.textContent = lines.slice(0, n).join('\n');
-    if (p < 1) requestAnimationFrame(step); else setTimeout(finishBoot, 120);
+    if (p < 1) requestAnimationFrame(step); else { minDone = true; maybeFinish(); }
   })(t0);
-  setTimeout(finishBoot, 2600); /* failsafe */
+  setTimeout(settleDeck, 9000); /* failsafe */
 }
 
 /* ---------- glitch on title hover ---------- */
@@ -1495,6 +1531,45 @@ if (window.DECK) { window.DECK.act = function(name){ if (poseEls[name]) { setPos
 
 /* ---------- methods: static grid, no carousel (Danny 10/11: clones read as duplicates) ---------- */
 
+/* ---------- projects master-detail (M7.6, Danny 10/11) ---------- */
+var PJ = {
+  antirea: { desc: 'mod1Desc', video: 'assets/pj-antirea.webm', links: [['page', 'https://antirea.dannyphan.me'], ['repo', 'https://github.com/dankezo/antiRea']] },
+  baoan: { desc: 'mod2Desc', video: 'assets/pj-baoan.webm', links: [] },
+  catopedia: { desc: 'mod3Desc', video: 'assets/pj-catopedia.webm', links: [['page', 'https://catopedia.space']] },
+  news: { desc: 'mod4Desc', video: 'assets/pj-news.webm', links: [['ask', '#contact']] }
+};
+var pjSection = document.getElementById('modules');
+function pjSelect(key) {
+  var d = PJ[key]; if (!d || !pjSection) return;
+  pjSection.classList.add('detail');
+  $$('#pjList .pjcard').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-pj') === key); });
+  var dict = (window.DECK && window.DECK.i18n) ? window.DECK.i18n() : I18N[LANG];
+  var desc = document.getElementById('pjDesc');
+  desc.setAttribute('data-i18n', d.desc);
+  desc.innerHTML = dict[d.desc] || '';
+  var v = document.getElementById('pjVideo'), ph = document.getElementById('pjVidPh');
+  v.style.display = ''; ph.style.display = 'none';
+  v.onerror = function () { v.style.display = 'none'; ph.style.display = 'flex'; };
+  if (v.getAttribute('src') !== d.video) { v.setAttribute('src', d.video); v.load(); }
+  var pr = v.play(); if (pr && pr.catch) pr.catch(function () {});
+  var act = document.getElementById('pjActions'); act.innerHTML = '';
+  d.links.forEach(function (L) {
+    var a = document.createElement('a');
+    a.href = L[1]; a.setAttribute('data-cur', 'GO');
+    if (L[0] === 'page') a.textContent = dict.pjPage || 'OPEN PAGE ->';
+    else if (L[0] === 'repo') { a.textContent = 'GITHUB REPO ->'; a.className = 'ghosty'; }
+    else { a.innerHTML = dict.goAsk || 'ASK MORE ->'; a.className = 'ghosty'; }
+    if (L[1].indexOf('http') === 0) { a.target = '_blank'; a.rel = 'noopener'; }
+    act.appendChild(a);
+  });
+}
+$$('#modules .mod').forEach(function (card, i) {
+  card.addEventListener('click', function (e) { e.preventDefault(); pjSelect(['antirea', 'baoan', 'catopedia', 'news'][i]); });
+});
+$$('#pjList .pjcard').forEach(function (c) { c.addEventListener('click', function () { pjSelect(c.getAttribute('data-pj')); }); });
+var pjBackBtn = document.getElementById('pjBack');
+if (pjBackBtn) pjBackBtn.addEventListener('click', function () { pjSection.classList.remove('detail'); var v = document.getElementById('pjVideo'); if (v) v.pause(); });
+
 /* ---------- heatmap: shipping rhythm, seeded so it looks the same for everyone ---------- */
 function renderHeat(){
   var g = $('#heatGrid'); if (!g || g.children.length) return;
@@ -1567,8 +1642,8 @@ try {
 
   /* ---------- bilingual lines owned by the room director ---------- */
   const RL = {
-    vi: { saySleep: 'Ngủ chút đã...', sayGuitar: 'Làm một bản nhạc đã...', sayPapers: 'Bừa bộn thế này thì code sao nổi?!', sayPet: 'Neo, lại đây nào ♥', sayWork: 'Rồi, quay lại việc thôi.' },
-    en: { saySleep: 'Quick nap first...', sayGuitar: 'One quick song first...', sayPapers: 'How am I supposed to code in this mess?!', sayPet: 'Come here, Neo ♥', sayWork: 'Right, back to work.' }
+    vi: { saySleep: 'Ngủ chút đã...', sayGuitar: 'Làm một bản nhạc đã...', sayPapers: 'Bừa bộn thế này thì code sao nổi?!', sayPet: 'Neo, lại đây nào ♥', sayWork: 'Rồi, quay lại việc thôi.', sayWindow: 'Mưa Hà Nội nhìn từ trên này đẹp ghê...' },
+    en: { saySleep: 'Quick nap first...', sayGuitar: 'One quick song first...', sayPapers: 'How am I supposed to code in this mess?!', sayPet: 'Come here, Neo ♥', sayWork: 'Right, back to work.', sayWindow: 'Hanoi rain looks good from up here...' }
   };
   const lang = () => (window.DECK && window.DECK.lang ? window.DECK.lang() : 'vi');
   const sayEl = document.getElementById('dannySay');
@@ -1585,15 +1660,29 @@ try {
     return pool.length ? pool[Math.floor(Math.random() * pool.length)] : null;
   }
 
+  /* ---------- boot-gate signal ----------
+     The page boot curtain lifts only once the room is truly ready:
+     deckSettle(true) fires after the first real frame renders; every
+     path that leaves the painted deck in charge instead (mobile gate,
+     no WebGL2, load failure) fires deckSettle(false) so the curtain
+     still opens. If this module dies before the helper exists, the
+     boot script's own failsafe opens the curtain instead. */
+  let deckSettledFlag = false;
+  function deckSettle(ok) {
+    if (deckSettledFlag) return; deckSettledFlag = true;
+    if (ok) { window.__deckReady = true; dispatchEvent(new Event('deck-ready')); }
+    else { window.__deckFailed = true; dispatchEvent(new Event('deck-failed')); }
+  }
+
   let booted = false;
-  function boot() { if (booted) return; booted = true; init().catch(() => {}); }
+  function boot() { if (booted) return; booted = true; init().catch(() => deckSettle(false)); }
   if (document.readyState === 'complete') requestAnimationFrame(() => setTimeout(boot, 60));
   else { addEventListener('load', () => requestAnimationFrame(() => setTimeout(boot, 60)), { once: true }); setTimeout(boot, 3200); }
 
   async function init() {
-    if (matchMedia('(max-width: 900px)').matches) return; /* mobile keeps its painted band */
+    if (matchMedia('(max-width: 900px)').matches) { deckSettle(false); return; } /* mobile keeps its painted band */
     const renderer = new THREE.WebGLRenderer({ canvas: cvEl, alpha: true, antialias: true, powerPreference: 'high-performance' });
-    if (!renderer.capabilities.isWebGL2) return; /* gate: painted fallback stays */
+    if (!renderer.capabilities.isWebGL2) { deckSettle(false); return; } /* gate: painted fallback stays */
     renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.92;
@@ -1601,8 +1690,8 @@ try {
     const scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0x07090c, 15, 32);
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 80);
-    const CAM_TGT = new THREE.Vector3(-0.8, 0.85, -0.7);
-    const CAM_POS = new THREE.Vector3(3.4, 2.3, 4.4);
+    const CAM_TGT = new THREE.Vector3(0.15, 0.85, 1.35);
+    const CAM_POS = new THREE.Vector3(1.85, 2.0, 3.3);
     const camDir = CAM_POS.clone().sub(CAM_TGT);
     const camDist = camDir.length(); camDir.normalize();
 
@@ -1615,7 +1704,9 @@ try {
     pt(0xffc46b, 2.2, 5.5, -0.7, 2.3, -1.45);  /* lotus lamp */
     pt(0xa3e635, 2.6, 6.5, -3.0, 1.7, 0.6);    /* acid lab glow, left wall */
     pt(0xffd9a0, 4, 6.5, 1.2, 1.5, 1.9);     /* bench lamp, foreground */
+    pt(0xffd9a0, 4.2, 6, 0.40, 2.0, 2.45);  /* desk lamp glow over the bench station (moved with the seat to the long edge 11/11) - front-top light so his face reads over the bench */
     pt(0x35d3e0, 1.8, 5.5, 2.45, 1.4, -0.85);  /* server rack cyan */
+    pt(0xffd9a0, 3, 5.5, 1.55, 1.85, 1.45);   /* practice lamp over the guitar corner - the hold spot sits in a light hole without it */
 
     /* ---------- soft blob shadows ---------- */
     const blobTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'); const g = x.createRadialGradient(64, 64, 4, 64, 64, 62); g.addColorStop(0, 'rgba(0,0,0,0.55)'); g.addColorStop(0.6, 'rgba(0,0,0,0.25)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
@@ -1813,32 +1904,71 @@ try {
       if (o.seg) return o.seg;
       return Math.max(0.3, dDur(key) * (o.loops || 1) - 0.12);
     }
-    /* Walking carries real root motion (~1.39 m per 1.067 s loop). WALK_BASE
-       is the Hips offset at loop start in root space, precomputed from the
-       clip's position track, so the frame loop can subtract the in-clip
-       travel each frame and drive the root along the path instead. */
-    let WALK_BASE = null;
+    /* Walking carries real root motion (1.419 m per 1.067 s loop, FK-
+       measured 11/11: an almost perfect linear ramp, max residual vs a
+       straight ramp 0.05 m). Compensation history: (1) against the FIXED
+       loop-start offset - the rendered root lagged walkAnchor by the full
+       stride advance and snapped back at every wrap (1.46 m teleport,
+       Danny's catch). (2) A low-pass tracking baseline - a first-order
+       filter lags a ramp by v*tau (here 1.33 m/s * 0.5 s = 0.65 m), so
+       the root still sat ~0.6 m behind and jumped at the wrap reset
+       (QA 10/11: maxJump 0.602). (3) CURRENT: the expected hips offset is
+       the clip's OWN trajectory, sampled from the Hips position track at
+       33 phases (same parent-chain transform as the old WALK_BASE), and
+       the residual against the live hips is bob/sway only - no lag, no
+       wrap jump, and the phase comes from the walk action's own clock,
+       so crossfades stay consistent. */
+    let WALK_TRAJ = null; /* [{x, z} x 33] expected Hips offset per phase, root space */
     {
       const wa = dAct[CLIPMAP.walk], hb = dBones['mixamorigHips'];
       if (wa && hb && hb.parent) {
         const tracks = wa.getClip().tracks;
         const trk = tracks.find(t => t.name === hb.name + '.position') || tracks.find(t => t.name.endsWith('.position') && t.name.indexOf('Hips') >= 0);
         if (trk) {
-          const v = new THREE.Vector3().fromArray(trk.values, 0);
           const m = new THREE.Matrix4(); const chain = []; let n = hb.parent;
           while (n && n !== dannyG.scene) { chain.unshift(n); n = n.parent; }
           chain.forEach(o => { o.updateMatrix(); m.multiply(o.matrix); });
-          WALK_BASE = v.applyMatrix4(m);
+          const dur = wa.getClip().duration, times = trk.times, vals = trk.values, last = times.length - 1;
+          const sample = (t) => {
+            if (t <= times[0]) return new THREE.Vector3().fromArray(vals, 0);
+            if (t >= times[last]) return new THREE.Vector3().fromArray(vals, last * 3);
+            let i = 0; while (i < last - 1 && times[i + 1] < t) i++;
+            const f = Math.max(0, Math.min(1, (t - times[i]) / (times[i + 1] - times[i])));
+            return new THREE.Vector3().fromArray(vals, i * 3).lerp(new THREE.Vector3().fromArray(vals, (i + 1) * 3), f);
+          };
+          WALK_TRAJ = [];
+          for (let k = 0; k <= 32; k++) { const v = sample(dur * k / 32).applyMatrix4(m); WALK_TRAJ.push({ x: v.x, z: v.z }); }
         }
       }
+    }
+    function walkExpected(ph) {
+      const f = ph * 32, i = Math.min(31, Math.floor(f)), fr = f - i;
+      const a = WALK_TRAJ[i], b = WALK_TRAJ[i + 1];
+      return { x: a.x + (b.x - a.x) * fr, z: a.z + (b.z - a.z) * fr };
     }
 
     /* ---------- anchors (room space, recovered from room_lab.py) ---------- */
     const ANCHORS = {
-      desk: { pos: new THREE.Vector3(-0.85, 0.06, -0.90), yaw: 0 }, /* faces the room, as in the approved Blender render; y calibrated by QA */
+      /* M7.6: the default work seat is the FOREGROUND BENCH station (Danny
+         10/11). Seat moved to the bench's NORTH LONG EDGE 11/11 (Danny:
+         sitting at the west short end "looks ridiculous") - chair at glTF
+         (0.62, 1.50), laptop centred 0.56 in front of him on the bench top,
+         monitors flanking behind it, so yaw 0 faces him squarely at the
+         bench (and the room/camera). Seat top is the same 0.515 as the old
+         chair, so SEAT_Y_OFF carries over. */
+      desk: { pos: new THREE.Vector3(0.62, 0.06, 1.50), yaw: 0 },
       bed: { pos: new THREE.Vector3(-2.12, 0, 1.45), yaw: -Math.PI / 2 },
-      guitar: { pos: new THREE.Vector3(-1.42, 0, 1.40), yaw: -0.22 },
-      papers: { pos: new THREE.Vector3(1.02, 0, 0.42), yaw: -2.36 }, /* beside the floor spill, facing the mess */
+      /* the guitar stand really stands at glTF (+1.42, 1.40) - the old
+         anchor had the x sign flipped, so he played in the wrong corner.
+         The Guitar clip's own facing sits -49 deg off the root; yaw 0.64
+         compensates, netting the intended -0.22 toward the room. */
+      guitar: { pos: new THREE.Vector3(1.42, 0, 1.40), yaw: 0.64 },
+      /* west of the floor spill, facing east across the whole mess; the
+         Frustrated clip rides -17 deg off the root, yaw compensates */
+      papers: { pos: new THREE.Vector3(-0.35, 0, -0.28), yaw: 1.67 },
+      /* in front of the glass, east of the desk: gaze spot for the window
+         click - yaw pi faces the pane and the city beyond */
+      window: { pos: new THREE.Vector3(1.35, 0, -1.25), yaw: Math.PI },
       center: { pos: new THREE.Vector3(-0.45, 0, 0.30), yaw: 0 } /* open-floor routing waypoint */
     };
     /* Sleeping ON the bed: mattress top measured from room-lab.glb (mattress
@@ -1847,8 +1977,8 @@ try {
        (three Z) with the head toward the pillow and his face to the room. */
     const BED_POSE = { pos: new THREE.Vector3(-3.01, 0.45, 1.74), yaw: Math.PI / 2 };
     /* ---------- chair anchor calibration (measured from the GLBs) ----------
-       chairSeat top in room-lab.glb = 0.515 (bbox max Y; seat centre XZ
-       (-0.85, -0.88) matches the desk anchor). Typing rides his hips at
+       chairSeat top in room-lab.glb = 0.515 (bbox max Y; the bench chair's
+       seat centre XZ (0.62, 1.50) matches the M7.6 desk anchor). Typing rides his hips at
        0.469 in clip space, i.e. 0.529 world on the 0.06 desk root - just
        over the seat top, correct. SitDown already ends there too (last
        frame hips 0.467, delta 0.002), so it needs no help. StandUp is
@@ -1903,17 +2033,22 @@ try {
     }
     function segBlocked(a, b) { return BLOCK.some(bb => segHits(a.x, a.z, b.x, b.z, bb, 0.22)); }
     function pathPts(from, to) {
-      const pts = [];
-      if (segBlocked(from, to)) pts.push(ANCHORS.center.pos.clone());
-      pts.push(to.clone());
-      return pts;
+      if (!segBlocked(from, to)) return [to.clone()];
+      /* route around furniture: try the room centre first, then the open
+         east lane (the window gaze spot needs it - both desk legs clip
+         the desk block's margin) */
+      const east = new THREE.Vector3(1.55, 0, -0.35);
+      for (const v of [ANCHORS.center.pos, east]) {
+        if (!segBlocked(from, v) && !segBlocked(v, to)) return [v.clone(), to.clone()];
+      }
+      return [ANCHORS.center.pos.clone(), to.clone()];
     }
     dannyRoot.position.copy(ANCHORS.desk.pos); dannyRoot.rotation.y = ANCHORS.desk.yaw;
 
     /* ---------- director v2 ---------- */
-    const D = { mode: 'typing', busy: false, holdT: 0, next: null, travel: null, at: 'desk', standing: false, standK: 0, seated: true, onBed: false, compWalk: false, fadeK: 1, fadeTgt: 1, idleT: 18, idleArm: false, seatOff: 0, seatZOff: 0 };
+    const D = { mode: 'typing', busy: false, holdT: 0, next: null, travel: null, at: 'desk', standing: false, standK: 0, seated: true, onBed: false, compWalk: false, fadeK: 1, fadeTgt: 1, idleT: 18, idleArm: false, seatOff: 0, seatZOff: 0, sinkK: 0, sinkTgt: 0, sinkBase: 0 };
     const STANDKEY = { think: 1, lean: 1 }; /* standing clips: ease out of the desk corner while they play */
-    const STAND_OFF = { x: 0.20, z: 0.50 };
+    const STAND_OFF = { x: 0.15, z: -0.50 }; /* bench: step north, out into the room */
     const walkAnchor = ANCHORS.desk.pos.clone(); /* logical floor position; the rendered root adds the walk-cycle compensation on top */
     function after(sec, fn) { D.holdT = sec; D.next = fn; }
     function yawLerp(a, b, t) { let d = (b - a) % (Math.PI * 2); if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2; return a + d * t; }
@@ -1976,11 +2111,22 @@ try {
     }
     function applyWalkComp() {
       const wa = dAct[CLIPMAP.walk];
-      if (!D.compWalk || !wa || !WALK_BASE) return;
-      const w = wa.enabled ? wa.weight : 0;
+      if (!D.compWalk || !wa || !WALK_TRAJ) return;
+      /* NB: the weight MUST be the EFFECTIVE weight. three keeps
+         action.weight at 1 through a fadeOut and only decays the
+         effective weight, so reading .weight drags the root by the
+         full residual while the live hips blend away from the walk
+         pose, then snaps it ~1.2 m when the mixer deactivates the
+         action (probe 11/11: 1.18 m at guitar arrival, 0.99 m at
+         desk return). getEffectiveWeight decays smoothly to 0, so
+         the release below moves the root by ~0.004 m. */
+      const w = wa.enabled ? wa.getEffectiveWeight() : 0;
       if (w <= 0.003) { D.compWalk = false; dannyRoot.position.x = walkAnchor.x; dannyRoot.position.z = walkAnchor.z; return; }
       const h = hipsRootSpace(); if (!h) return;
-      const dx = (h.x - WALK_BASE.x) * w, dz = (h.z - WALK_BASE.z) * w;
+      const dur = wa.getClip().duration || 1;
+      const ph = (((wa.time % dur) + dur) % dur) / dur;
+      const e = walkExpected(ph);
+      const dx = (h.x - e.x) * w, dz = (h.z - e.z) * w;
       const c = Math.cos(dannyRoot.rotation.y), sn = Math.sin(dannyRoot.rotation.y);
       dannyRoot.position.x = walkAnchor.x - (dx * c + dz * sn);
       dannyRoot.position.z = walkAnchor.z - (-dx * sn + dz * c);
@@ -2022,6 +2168,7 @@ try {
     }
     function abortToDesk(user) {
       killChain();
+      D.sinkTgt = 0; D.sinkK = 0;
       if (N.hold) { N.hold = false; N.t = 2.0; if (neoRoot) nPlay('Idle'); }
       if (D.onBed) { D.onBed = false; dShadow.visible = true; dannyRoot.position.copy(ANCHORS.bed.pos); dannyRoot.rotation.y = ANCHORS.bed.yaw; walkAnchor.copy(ANCHORS.bed.pos); }
       D.compWalk = false;
@@ -2039,15 +2186,17 @@ try {
     /* ---------- lively idle: seated variations at the desk ----------
        While Danny is settled in the typing loop, one seated variation
        is inserted every 14-26 s (scene time): a rotation over
-       SittingIdle, Thinking, a ~4 s cut of SittingClap and a ~6 s cut
-       of the 15 s SittingDrink. It runs as a beat (busy, mode 'beat'),
+       SittingIdle, Thinking and a ~4 s cut of SittingClap. (SittingDrink
+       left the rotation in M7.6: FK sampling shows the clip turns him
+       167 deg away from the desk for most of its length.) It runs as a
+       beat (busy, mode 'beat'),
        so the desk click cancels it and chains never overlap it; the
        frame loop only counts the timer down in the pure typing state
        and re-arms it after any busy spell. All crossfades are the
        standard 0.35 s dPlay fades. */
     const SEATED_VARS = [
       { k: 'idle', seg: 4.4 }, { k: 'think', seg: 3.6 },
-      { k: 'sitclap', seg: 4.0 }, { k: 'drink', seg: 6.0 }
+      { k: 'sitclap', seg: 4.0 }
     ];
     function deskVariation() {
       const pool = SEATED_VARS.filter(v => dHas(v.k));
@@ -2070,7 +2219,7 @@ try {
       if (D.at !== 'desk') { toDesk(false); return; }
       D.busy = true; D.mode = 'routine';
       const seq = [];
-      const seatedPool = ['think', 'idle', 'lean'].filter(k => dHas(k)).sort(() => Math.random() - 0.5);
+      const seatedPool = ['think', 'idle'].filter(k => dHas(k)).sort(() => Math.random() - 0.5); /* no 'lean': the LeanBack clip is a broken 0.07 s pose turned +95 deg (FK-verified) */
       const standPool = STAND_VARS.filter(v => dHas(v.k)).sort(() => Math.random() - 0.5);
       const doStand = standPool.length > 0 && dHas('stand') && dHas('sit') && Math.random() < 0.55;
       if (doStand) {
@@ -2154,6 +2303,14 @@ try {
         ...returnSteps()
       ];
     }
+    function windowChain() {
+      return [
+        ...departSteps(),
+        sTravel(ANCHORS.window, 'window'),
+        (next) => { sayKey('sayWindow'); dPlayLoop('think'); after(5.5, next); },
+        ...returnSteps()
+      ];
+    }
     function petAnchor() {
       const np = neoRoot.position;
       const from = walkAnchor;
@@ -2169,15 +2326,20 @@ try {
     function petChain() {
       const steps = [...departSteps()];
       steps.push((next) => travelTo(petAnchor(), 'neo', next));
-      steps.push((next) => { sayKey('sayPet'); dPlayLoop('pet'); after(5, next); });
-      steps.push((next) => { if (neoRoot) { N.hold = false; N.t = 2.2; nPlay('Idle'); } next(); });
+      /* Danny 10/11: crouch down to her level to pet her, and she turns
+         to face him and grooms back - a standing one-sided pat read as
+         broken. The crouch is a root sink eased by the frame loop. */
+      steps.push((next) => { sayKey('sayPet'); D.sinkBase = dannyRoot.position.y; D.sinkTgt = -0.34; if (neoRoot) { N.faceTgt = Math.atan2(dannyRoot.position.x - neoRoot.position.x, dannyRoot.position.z - neoRoot.position.z) + NEO_YAW; nPlay('Groom'); } dPlayLoop('pet'); after(5, next); });
+      steps.push((next) => { D.sinkTgt = 0; if (neoRoot) { N.hold = false; N.t = 2.2; nPlay('Idle'); } after(0.45, next); });
       return steps.concat(returnSteps());
     }
     function react(id) {
       if (id === 'work') { toDesk(true); return; }
+      if (id === 'window') { if (!D.busy && dHas('walk') && dHas('stand') && dHas('sit')) { cancelTimers(); runChain(windowChain()); } return; }
       if (!REACT[id]) return;
       if (D.busy) return; /* one routine at a time; only the desk click interrupts */
       if (!chainReady(id) || (id === 'pet' && !neoRoot)) { legacyReact(id); return; }
+      cancelTimers(); /* a stale beat timer must never fire into a chain */
       if (id === 'pet') { N.hold = true; nPlay('Groom'); }
       if (id === 'sleep') runChain(bedChain());
       else if (id === 'guitar') runChain(guitarChain());
@@ -2191,7 +2353,7 @@ try {
       { p: [-2.05, 0.10, -0.05], bed: true }, { p: [-2.05, 0, 1.25] }
     ];
     const NEO_YAW = 0; /* model forward offset, verified by QA render */
-    const N = { i: 0, mode: 'idle', t: 3.0, target: null, pauseT: 0, hold: false };
+    const N = { i: 0, mode: 'idle', t: 3.0, target: null, pauseT: 0, hold: false, faceTgt: null };
     if (neoRoot) {
       neoRoot.position.set(NW[N.i].p[0], NW[N.i].p[1], NW[N.i].p[2]);
       neoRoot.rotation.y = -0.6;
@@ -2209,6 +2371,11 @@ try {
     }
     function neoUpdate(dt) {
       if (!neoRoot) return;
+      if (N.faceTgt != null) { /* turn to face Danny when he comes to pet her */
+        neoRoot.rotation.y = yawLerp(neoRoot.rotation.y, N.faceTgt, 1 - Math.exp(-8 * dt));
+        const fd = Math.abs(((N.faceTgt - neoRoot.rotation.y) % (Math.PI * 2) + Math.PI * 3) % (Math.PI * 2) - Math.PI);
+        if (fd < 0.05) N.faceTgt = null;
+      }
       if (N.hold) return; /* Danny is with her: she stays put */
       if (N.pauseT > 0) { N.pauseT -= dt; return; }
       if (N.mode === 'turn' || N.mode === 'walk') {
@@ -2248,11 +2415,13 @@ try {
       const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
       m.position.set(x, y, z); m.userData.act = act; scene.add(m); proxies.push(m); return m;
     }
-    proxy(-0.70, 1.15, -1.72, 3.35, 1.50, 0.85, 'work');       /* desk + monitors (desk pile sits in front of this box) */
+    proxy(0.50, 1.05, 2.02, 1.60, 1.70, 1.64, 'work');        /* bench station: chair on the long edge + laptop + monitors (his seat) */
+    proxy(-0.70, 1.15, -1.72, 3.35, 1.50, 0.85, 'work');       /* back desk + monitors */
     proxy(0.12, 0.92, -1.30, 0.55, 0.30, 0.55, 'papers');      /* desk pile */
     proxy(0.45, 0.10, -0.15, 1.35, 0.22, 1.25, 'papers');      /* floor spill */
     proxy(-2.92, 0.45, 1.55, 1.25, 0.95, 2.20, 'sleep');       /* bed */
-    proxy(-1.58, 0.62, 2.12, 0.75, 1.35, 0.65, 'guitar');      /* guitar */
+    proxy(1.42, 0.62, 1.40, 0.75, 1.35, 0.65, 'guitar');       /* guitar, on its stand */
+    proxy(0.20, 1.75, -2.02, 6.60, 2.30, 0.55, 'window');      /* the glass: click to gaze out */
     const dannyProxy = new THREE.Mesh(new THREE.BoxGeometry(1.05, 1.9, 0.95), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
     dannyProxy.position.set(0, 0.8, 0); dannyProxy.userData.act = 'danny'; dannyRoot.add(dannyProxy); proxies.push(dannyProxy);
     let neoProxy = null;
@@ -2300,6 +2469,35 @@ try {
     const rainLines = new THREE.LineSegments(rainGeo, new THREE.LineBasicMaterial({ color: 0x8fd0ff, transparent: true, opacity: 0.26 }));
     rainLines.position.z = -2.62; scene.add(rainLines);
 
+    /* rain ON the glass (M7.6): streak planes just inside the three panes,
+       a canvas of droplet trails scrolling slowly downward - light rain on
+       the pane itself, distinct from the rain falling outside */
+    const glassTex = (() => {
+      const c = document.createElement('canvas'); c.width = 256; c.height = 256;
+      const x = c.getContext('2d');
+      for (let i = 0; i < 90; i++) {
+        const gx = Math.random() * 256, gy = Math.random() * 256, len = 8 + Math.random() * 30;
+        const grd = x.createLinearGradient(0, gy, 0, gy + len);
+        grd.addColorStop(0, 'rgba(180,220,255,0)');
+        grd.addColorStop(0.75, 'rgba(180,220,255,0.5)');
+        grd.addColorStop(1, 'rgba(220,240,255,0.85)');
+        x.strokeStyle = grd; x.lineWidth = 1 + Math.random();
+        x.beginPath(); x.moveTo(gx, gy); x.lineTo(gx + (Math.random() * 2 - 1), gy + len); x.stroke();
+        x.fillStyle = 'rgba(220,240,255,0.7)';
+        x.beginPath(); x.arc(gx, gy + len, 1.1, 0, 6.29); x.fill();
+      }
+      const t = new THREE.CanvasTexture(c);
+      t.wrapS = t.wrapT = THREE.RepeatWrapping;
+      return t;
+    })();
+    const glassRain = [];
+    [-2.2, 0, 2.2].forEach(cx => {
+      const tex = glassTex.clone(); tex.needsUpdate = true;
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(2.16, 2.56), new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.15, depthWrite: false }));
+      m.position.set(cx, 1.6, -2.13);
+      scene.add(m); glassRain.push(m);
+    });
+
     /* ---------- camera fit + pointer parallax ---------- */
     let nx = 0, ny = 0;
     heroEl.addEventListener('pointermove', (e) => {
@@ -2327,12 +2525,12 @@ try {
         if (D.mode === 'beat' && name === 'type') { toDesk(false); return; }
         if (D.busy) return;
         if (name === 'think') beat('think');
-        else if (name === 'lean') beat('lean');
+        else if (name === 'lean') beat('think'); /* LeanBack clip is broken (0.07 s, +95 deg) - think covers the beat */
       },
       routine: startRoutine, react, toDesk
     };
     window.__room = {
-      state: () => ({ mode: D.mode, busy: D.busy, at: D.at, seated: D.seated, onBed: D.onBed, fade: Math.round(D.fadeK * 100) / 100, neo: neoRoot ? N.mode : 'none', dannyPos: dannyRoot.position.toArray().map(v => Math.round(v * 100) / 100), neoPos: neoRoot ? neoRoot.position.toArray().map(v => Math.round(v * 100) / 100) : null, dannyClips: Object.keys(dAct), neoClips: Object.keys(nAct), gtrProp: !!(guitarProp && guitarProp.visible), gtrRoom: gtrRoomShown, seatOff: Math.round(D.seatOff * 1000) / 1000, seatZOff: Math.round(D.seatZOff * 1000) / 1000, idleT: Math.round(D.idleT * 10) / 10 }),
+      state: () => ({ mode: D.mode, busy: D.busy, at: D.at, seated: D.seated, onBed: D.onBed, fade: Math.round(D.fadeK * 100) / 100, neo: neoRoot ? N.mode : 'none', neoClip: nCur ? nCur.getClip().name : null, dannyPos: dannyRoot.position.toArray().map(v => Math.round(v * 100) / 100), neoPos: neoRoot ? neoRoot.position.toArray().map(v => Math.round(v * 100) / 100) : null, dannyClips: Object.keys(dAct), neoClips: Object.keys(nAct), gtrProp: !!(guitarProp && guitarProp.visible), gtrRoom: gtrRoomShown, seatOff: Math.round(D.seatOff * 1000) / 1000, seatZOff: Math.round(D.seatZOff * 1000) / 1000, idleT: Math.round(D.idleT * 10) / 10 }),
       danny: (k) => dPlay(k),
       neo: (n) => nPlay(n),
       react: (id) => react(id),
@@ -2384,6 +2582,7 @@ try {
     let heroOn = true;
     new IntersectionObserver(en => { heroOn = en[0].isIntersecting; }, { threshold: 0 }).observe(heroEl);
     const clock = new THREE.Clock();
+    let firstFrame = true;
     function frame() {
       requestAnimationFrame(frame);
       const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
@@ -2415,10 +2614,17 @@ try {
            for Typing) so he never looks parked inside the desk corner */
         D.standK += ((D.standing && D.at === 'desk' && !D.travel ? 1 : 0) - D.standK) * Math.min(1, dt / 0.35);
         if (D.at === 'desk' && !D.travel) {
-          dannyRoot.position.x = ANCHORS.desk.pos.x + STAND_OFF.x * D.standK;
-          dannyRoot.position.z = ANCHORS.desk.pos.z + STAND_OFF.z * D.standK + D.seatZOff;
+          /* the SitDown drift runs along his facing axis, so the counter-
+             offset is projected on the desk anchor's yaw (0 at the bench) */
+          const dfx = Math.sin(ANCHORS.desk.yaw), dfz = Math.cos(ANCHORS.desk.yaw);
+          dannyRoot.position.x = ANCHORS.desk.pos.x + STAND_OFF.x * D.standK + dfx * D.seatZOff;
+          dannyRoot.position.z = ANCHORS.desk.pos.z + STAND_OFF.z * D.standK + dfz * D.seatZOff;
           dannyRoot.position.y = ANCHORS.desk.pos.y + D.seatOff;
         }
+        /* pet crouch: ease the root down toward Neo's level while petting */
+        D.sinkK += (D.sinkTgt - D.sinkK) * Math.min(1, dt / 0.22);
+        if (D.sinkK < 0.001 && D.sinkK > -0.001 && D.sinkTgt === 0) D.sinkK = 0;
+        if (!D.travel && !D.onBed && D.at !== 'desk' && D.sinkK !== 0) dannyRoot.position.y = D.sinkBase + D.sinkK;
         if (!D.travel && !D.onBed && !D.compWalk) walkAnchor.copy(dannyRoot.position);
         dMixer.update(dt);
         applyWalkComp();
@@ -2439,7 +2645,11 @@ try {
         let seatZOff = 0;
         if (sitAct && sitAct.enabled) { const w = sitAct.getEffectiveWeight(); if (w > 0.001) seatZOff = -(seatSitZ(sitAct.time) - SEAT_TYPING_Z) * w; }
         D.seatZOff = seatZOff;
-        if (D.at === 'desk' && !D.travel && !D.compWalk) dannyRoot.position.z = ANCHORS.desk.pos.z + STAND_OFF.z * D.standK + D.seatZOff;
+        if (D.at === 'desk' && !D.travel && !D.compWalk) {
+          const dfx2 = Math.sin(ANCHORS.desk.yaw), dfz2 = Math.cos(ANCHORS.desk.yaw);
+          dannyRoot.position.x = ANCHORS.desk.pos.x + STAND_OFF.x * D.standK + dfx2 * D.seatZOff;
+          dannyRoot.position.z = ANCHORS.desk.pos.z + STAND_OFF.z * D.standK + dfz2 * D.seatZOff;
+        }
         if (D.fadeK !== D.fadeTgt) {
           const dir = Math.sign(D.fadeTgt - D.fadeK);
           D.fadeK = Math.max(0, Math.min(1, D.fadeK + dir * dt / 0.22));
@@ -2457,17 +2667,24 @@ try {
           rPos[i * 6 + 3] = d.x - 0.03; rPos[i * 6 + 4] = d.y + 0.16; rPos[i * 6 + 5] = 0;
         }
         rainGeo.attributes.position.needsUpdate = true;
+        for (const g of glassRain) g.material.map.offset.y -= dt * 0.011;
         dShadow.position.set(dannyRoot.position.x, 0.012, dannyRoot.position.z + 0.04);
         if (nShadow && neoRoot) nShadow.position.set(neoRoot.position.x, neoRoot.position.y + 0.012, neoRoot.position.z);
         camera.position.x += ((CAM_TGT.x + camDir.x * camDist * (camera.aspect >= 1.3 ? 1 : Math.min(1.8, 1.3 / camera.aspect)) + nx * 0.16) - camera.position.x) * Math.min(1, dt * 3);
         camera.lookAt(CAM_TGT.x + nx * 0.05, CAM_TGT.y - ny * 0.04, CAM_TGT.z);
       }
       renderer.render(scene, camera);
+      /* boot gate: the room counts as ready only once a real frame has
+         actually rendered (the hidden/not-intersecting early return
+         above skips the render, so this cannot fire early) */
+      if (firstFrame) { firstFrame = false; deckSettle(true); }
     }
     frame();
   }
-} catch (err) { /* room layer is an enhancement - the painted deck stands on its own */ }
+} catch (err) { window.__deckFailed = true; try { dispatchEvent(new Event('deck-failed')); } catch (e) {} /* room layer is an enhancement - the painted deck stands on its own */ }
 </script>
+
+
 <!-- Privacy-first website analytics -->
 <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
 </body>
