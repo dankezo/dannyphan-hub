@@ -158,7 +158,6 @@ body.overdrive .hero-art .scan i{animation-duration:1.5s}
 .hero-art .scan{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:2}
 .hero-art .scan i{position:absolute;left:0;right:0;height:130px;top:-140px;background:linear-gradient(rgba(163,230,53,0),rgba(163,230,53,.13),rgba(163,230,53,0));animation:scan 5.5s var(--ease) infinite}
 .hero .chip{z-index:6}
-.hero .chip.c1{top:92px;left:clamp(16px,4vw,44px)}
 .hero .chip.c2{top:92px;right:clamp(16px,4vw,44px);left:auto}
 .hero .chip.c3{right:6%;bottom:32%;left:auto;top:auto}
 .hero-inner{position:relative;z-index:5;width:min(1440px,100%);margin:0 auto;padding:clamp(120px,17vh,180px) clamp(16px,4vw,44px) 0}
@@ -174,7 +173,7 @@ body.overdrive .hero-art .scan i{animation-duration:1.5s}
 .hudframe img.key{width:100%;height:100%;object-fit:cover;aspect-ratio:16/10.4}
 .chip{position:absolute;z-index:4;font-family:var(--mono);font-size:10px;letter-spacing:.12em;padding:7px 10px;background:rgba(7,9,12,.78);border:1px solid var(--line);backdrop-filter:blur(4px)}
 .chip b{color:var(--acid);font-weight:400}
-.chip.c1{top:14px;left:14px}.chip.c2{top:14px;right:14px}.chip.c3{bottom:14px;left:14px}
+.chip.c2{top:14px;right:14px}.chip.c3{bottom:14px;left:14px}
 .hero-copy{padding-bottom:8px}
 .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--acid);display:flex;align-items:center;gap:12px;width:max-content;max-width:100%;background:rgba(5,7,10,.52);border:1px solid rgba(245,241,230,.12);padding:7px 12px 7px 10px;margin-left:-11px;backdrop-filter:blur(3px);text-shadow:0 1px 8px rgba(0,0,0,.65)}
 .kicker::before{content:"";width:34px;height:1px;background:var(--acid)}
@@ -573,7 +572,6 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
     <canvas id="fx" aria-hidden="true"></canvas>
     <canvas id="rain" aria-hidden="true"></canvas>
     <canvas id="physGL" aria-hidden="true"></canvas>
-    <div class="chip c1">CAM 01 - <b>DECK LIVE</b></div>
     <div class="chip c2">LAT 21.0285 - LON 105.8542</div>
     <div class="chip c3">CO-PILOT: <b>NEO THE CAT</b></div>
     <button id="dannyHot" type="button" data-cur="TALK" aria-label="Tương tác với Danny, người điều hành deck"></button>
@@ -1199,8 +1197,6 @@ function dannyReact(e){
   var dl = I18N[LANG].danny; typeSay(dl[(dannyClicks - 1) % dl.length]);
   setPose('think'); dannyBusy = true;
   clearTimeout(sayTimer); sayTimer = setTimeout(function(){ dannySay.classList.remove('show'); dannyBusy = false; setPose('type'); }, 5200);
-  var c1 = $('.hero .chip.c1');
-  if (c1) c1.innerHTML = 'DANNY - <b>ĐÃ BỊ CLICK x' + dannyClicks + '</b>';
   var catB = $('#catBtn');
   catB.classList.remove('excited'); void catB.offsetWidth; catB.classList.add('excited');
   setTimeout(function(){ catB.classList.remove('excited'); }, 700);
