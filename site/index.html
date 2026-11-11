@@ -213,7 +213,7 @@ h1.mega .acid{color:var(--acid);text-shadow:0 0 34px rgba(163,230,53,.35)}
   .hero.gl3d .hero-grid{grid-template-columns:55% 1fr}
   .hero.gl3d .hero-copy{padding-left:clamp(8px,1.6vw,28px)}
   .hero.gl3d #dannySay{left:36%;top:11.5%}
-  .hero.gl3d #dannyHot{left:26%;bottom:auto;top:29%;width:9%;height:34%}
+  .hero.gl3d #dannyHot{left:26%;bottom:auto;top:29%;width:9%;height:34%;pointer-events:none}
   .hero.gl3d .chip.c3{top:134px;bottom:auto;right:clamp(16px,4vw,44px)}
 }
 @media(max-width:900px){
@@ -1787,10 +1787,10 @@ try {
     const scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0x07090c, 15, 32);
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 80);
-    const CAM_TGT = new THREE.Vector3(-0.40, 0.85, 1.35);
-    const CAM_POS = new THREE.Vector3(1.30, 2.25, 3.3);
+    const CAM_TGT = new THREE.Vector3(-0.95, 0.85, 1.15);
+    const CAM_POS = new THREE.Vector3(0.75, 2.25, 3.10);
     const camDir = CAM_POS.clone().sub(CAM_TGT);
-    const camDist = camDir.length() * 1.18; camDir.normalize(); /* M7.7: pulled back a touch (Danny: the old framing zoomed in too far and cropped the bed) */
+    const camDist = camDir.length() * 1.28; camDir.normalize();
 
     /* ---------- lights: matched to the Blender room ---------- */
     scene.add(new THREE.HemisphereLight(0x9fc8e8, 0x16210f, 0.34));
@@ -1936,6 +1936,35 @@ try {
     const dannyRoot = new THREE.Group(); scene.add(dannyRoot);
     dannyRoot.add(dannyG.scene);
     dannyG.scene.traverse(o => { if (o.isMesh && o.material && 'roughness' in o.material) { o.material.roughness = 0.92; o.material.metalness = 0.0; } });
+    /* The supplied walk contains 1.419 m of forward hips translation per
+       cycle. Remove that authored displacement in the animation track so
+       the path controller alone moves the character, including at loop wrap. */
+    function hipsTrack(name) {
+      const clip = dannyG.animations.find(c => c.name === name);
+      return clip && clip.tracks.find(t => t.name.indexOf('Hips') >= 0 && t.name.endsWith('.position'));
+    }
+    const walkTrack = hipsTrack('Walking');
+    if (walkTrack && walkTrack.times.length > 1) {
+      const v = walkTrack.values, times = walkTrack.times, last = times.length - 1;
+      const duration = times[last] - times[0];
+      const dx = v[last * 3] - v[0], dy = v[last * 3 + 1] - v[1], dz = v[last * 3 + 2] - v[2];
+      for (let i = 0; i <= last; i++) {
+        const p = duration > 0 ? (times[i] - times[0]) / duration : 0;
+        v[i * 3] -= dx * p; v[i * 3 + 1] -= dy * p; v[i * 3 + 2] -= dz * p;
+      }
+    }
+    /* StandUp starts on the floor in the source clip. Move its hips into
+       chair position in clip space, then remove the offset as he rises. */
+    const standTrack = hipsTrack('StandUp');
+    if (standTrack) for (let i = 0; i < standTrack.times.length; i++) {
+      const p = Math.max(0, Math.min(1, (standTrack.times[i] - 0.9) / 2.9));
+      const smooth = p * p * (3 - 2 * p);
+      standTrack.values[i * 3 + 2] -= 0.371 * (1 - smooth);
+    }
+    /* Keep the sitting hips over the chair instead of translating the
+       whole character backwards and then sliding it forward again. */
+    const sitTrack = hipsTrack('SitDown');
+    if (sitTrack) for (let i = 0; i < sitTrack.times.length; i++) sitTrack.values[i * 3 + 1] = 0.106;
     const dMixer = new THREE.AnimationMixer(dannyG.scene);
     const dAct = {};
     dannyG.animations.forEach(c => { const a = dMixer.clipAction(c); a.stop(); a.weight = 0; a.enabled = false; dAct[c.name] = a; });
@@ -2017,6 +2046,12 @@ try {
     const NEO_WALK_SPEED = 0.0925 * NEO_WALK_TS;
     try {
       const neoG = await load('assets/neo-hero.glb');
+      const trot = neoG.animations.find(c => c.name === 'Walk');
+      const rootTrack = trot && trot.tracks.find(t => t.name === 'root.position');
+      if (rootTrack) {
+        const base = rootTrack.values[1];
+        for (let i = 0; i < rootTrack.times.length; i++) rootTrack.values[i * 3 + 1] = base + (rootTrack.values[i * 3 + 1] - base) * 0.25;
+      }
       neoRoot = new THREE.Group(); scene.add(neoRoot);
       const inner = new THREE.Group(); inner.scale.setScalar(0.42 / 1.847); neoRoot.add(inner); inner.add(neoG.scene);
       neoG.scene.traverse(o => { if (o.isMesh && o.material && 'roughness' in o.material) { o.material.metalness = 0.0; } });
@@ -2066,51 +2101,6 @@ try {
       if (o.seg) return o.seg;
       return Math.max(0.3, dDur(key) * (o.loops || 1) - 0.12);
     }
-    /* Walking carries real root motion (1.419 m per 1.067 s loop, FK-
-       measured 11/11: an almost perfect linear ramp, max residual vs a
-       straight ramp 0.05 m). Compensation history: (1) against the FIXED
-       loop-start offset - the rendered root lagged walkAnchor by the full
-       stride advance and snapped back at every wrap (1.46 m teleport,
-       Danny's catch). (2) A low-pass tracking baseline - a first-order
-       filter lags a ramp by v*tau (here 1.33 m/s * 0.5 s = 0.65 m), so
-       the root still sat ~0.6 m behind and jumped at the wrap reset
-       (QA 10/11: maxJump 0.602). (3) CURRENT: the expected hips offset is
-       the clip's OWN trajectory, sampled from the Hips position track at
-       33 phases (same parent-chain transform as the old WALK_BASE), and
-       the residual against the live hips is bob/sway only - no lag, no
-       wrap jump, and the phase comes from the walk action's own clock,
-       so crossfades stay consistent. */
-    let WALK_TRAJ = null; /* [{x, z} x 33] expected Hips offset per phase, root space */
-    {
-      const wa = dAct[CLIPMAP.walk], hb = dBones['mixamorigHips'];
-      if (wa && hb && hb.parent) {
-        const tracks = wa.getClip().tracks;
-        const trk = tracks.find(t => t.name === hb.name + '.position') || tracks.find(t => t.name.endsWith('.position') && t.name.indexOf('Hips') >= 0);
-        if (trk) {
-          const m = new THREE.Matrix4(); const chain = []; let n = hb.parent;
-          while (n && n !== dannyG.scene) { chain.unshift(n); n = n.parent; }
-          chain.forEach(o => { o.updateMatrix(); m.multiply(o.matrix); });
-          const dur = wa.getClip().duration, times = trk.times, vals = trk.values, last = times.length - 1;
-          const sample = (t) => {
-            if (t <= times[0]) return new THREE.Vector3().fromArray(vals, 0);
-            if (t >= times[last]) return new THREE.Vector3().fromArray(vals, last * 3);
-            let i = 0; while (i < last - 1 && times[i + 1] < t) i++;
-            const f = Math.max(0, Math.min(1, (t - times[i]) / (times[i + 1] - times[i])));
-            return new THREE.Vector3().fromArray(vals, i * 3).lerp(new THREE.Vector3().fromArray(vals, (i + 1) * 3), f);
-          };
-          WALK_TRAJ = [];
-          for (let k = 0; k <= 32; k++) { const v = sample(dur * k / 32).applyMatrix4(m); WALK_TRAJ.push({ x: v.x, z: v.z }); }
-        }
-      }
-    }
-    const walkSample = { x: 0, z: 0 }, hipsSample = { x: 0, z: 0 };
-    function walkExpected(ph) {
-      const f = ph * 32, i = Math.min(31, Math.floor(f)), fr = f - i;
-      const a = WALK_TRAJ[i], b = WALK_TRAJ[i + 1];
-      walkSample.x = a.x + (b.x - a.x) * fr; walkSample.z = a.z + (b.z - a.z) * fr;
-      return walkSample;
-    }
-
     /* ---------- anchors (room space, recovered from room_lab.py) ---------- */
     const ANCHORS = {
       /* M7.6: the default work seat is the FOREGROUND BENCH station (Danny
@@ -2118,10 +2108,9 @@ try {
          sitting at the west short end "looks ridiculous") - chair at glTF
          (0.62, 1.50), laptop centred 0.56 in front of him on the bench top,
          monitors flanking behind it, so yaw 0 faces him squarely at the
-         bench (and the room/camera). Seat top is the same 0.515 as the old
-         chair, so SEAT_Y_OFF carries over. */
+         bench (and the room/camera). */
       desk: { pos: new THREE.Vector3(0.62, 0.06, 1.50), yaw: 0 },
-      bed: { pos: new THREE.Vector3(-2.12, 0, 1.45), yaw: -Math.PI / 2 },
+      bed: { pos: new THREE.Vector3(-1.98, 0, 1.45), yaw: -Math.PI / 2 },
       /* M7.7: the guitar cluster moved to the FOOT of the bed (GLB
          z 2.12 -> 0.72; it used to stand at the head end, and the old
          M7.5 anchor at (+1.42, 1.40) matched no guitar at all - he
@@ -2145,41 +2134,6 @@ try {
        feet +X, bone-sampled), so yaw pi/2 lays it along the bed's long axis
        (three Z) with the head toward the pillow and his face to the room. */
     const BED_POSE = { pos: new THREE.Vector3(-3.01, 0.45, 1.74), yaw: Math.PI / 2 };
-    /* ---------- chair anchor calibration (measured from the GLBs) ----------
-       chairSeat top in room-lab.glb = 0.515 (bbox max Y; the bench chair's
-       seat centre XZ (0.62, 1.50) matches the M7.6 desk anchor). Typing rides his hips at
-       0.469 in clip space, i.e. 0.529 world on the 0.06 desk root - just
-       over the seat top, correct. SitDown already ends there too (last
-       frame hips 0.467, delta 0.002), so it needs no help. StandUp is
-       the odd one: the Mixamo clip opens as a floor-sit (frame-0 hips
-       Y = 0.098), so uncorrected he sinks and rises from the floor.
-       SEAT_Y_OFF lifts the desk root while StandUp is the current clip
-       so frame 0 starts exactly at the seated hips height, then decays
-       to 0 across the clip's rise (hips reach the standing 0.835 at
-       about t = 3.8 s) so he lands at natural standing height. Typing
-       and every other anchor keep their existing Y. */
-    const SEAT_Y_OFF = 0.371; /* Typing hips 0.469 - StandUp frame-0 hips 0.098 */
-    const SEAT_RISE_T0 = 0.9, SEAT_RISE_SPAN = 2.9;
-    /* SitDown has the matching horizontal drift: its hips Z (root space,
-       FK-sampled from the GLB) travels from +0.088 at frame 0 down to
-       -0.308 at the settle, while Typing holds +0.106 - uncorrected, the
-       crossfade into Typing glides him about 0.41 m toward the room.
-       While SitDown carries weight at the desk, the frame loop counters
-       the drift by offsetting the root Z with -(sitZ(t) - SEAT_TYPING_Z)
-       scaled by the clip's effective weight, so his world hips Z stays
-       on the Typing anchor through the whole sit and through the blend
-       out; weight 0 gives exactly no offset. Keys below are clip seconds
-       vs root-space hips Z, sampled every tenth of the 2.267 s clip. */
-    const SEAT_TYPING_Z = 0.106; /* Typing hips Z, root space (samples 0.104-0.107) */
-    const SEAT_SIT_KEYS = [[0, 0.088], [0.23, 0.087], [0.45, 0.066], [0.68, 0.027], [0.91, -0.063], [1.02, -0.120], [1.13, -0.174], [1.36, -0.268], [1.47, -0.297], [1.59, -0.305], [1.81, -0.308], [2.27, -0.308]];
-    function seatSitZ(t) {
-      const K = SEAT_SIT_KEYS;
-      if (t <= K[0][0]) return K[0][1];
-      for (let i = 1; i < K.length; i++) {
-        if (t <= K[i][0]) { const f = (t - K[i - 1][0]) / (K[i][0] - K[i - 1][0]); return K[i - 1][1] + (K[i][1] - K[i - 1][1]) * f; }
-      }
-      return K[K.length - 1][1];
-    }
     /* furniture footprints (three XZ) that walking paths must not cross */
     const BLOCK = [
       { x0: -2.30, x1: 0.90, z0: -1.98, z1: -0.93 },  /* desk */
@@ -2200,11 +2154,11 @@ try {
       else { let ta = (z0 - az) / dz, tb = (z1 - az) / dz; if (ta > tb) { const q = ta; ta = tb; tb = q; } t0 = Math.max(t0, ta); t1 = Math.min(t1, tb); if (t0 > t1) return false; }
       return true;
     }
-    function segBlocked(a, b, margin = 0.22) { return BLOCK.some(bb => segHits(a.x, a.z, b.x, b.z, bb, margin)); }
-    function pathPts(from, to, margin = 0.22) {
+    function segBlocked(a, b, margin = 0.29) { return BLOCK.some(bb => segHits(a.x, a.z, b.x, b.z, bb, margin)); }
+    function pathPts(from, to, margin = 0.29) {
       /* Visibility graph around expanded furniture corners. A failed route
          stays failed rather than silently sending Danny through a block. */
-      const bounds = { x0: -3.28, x1: 3.28, z0: -2.38, z1: 2.38 };
+      const bounds = { x0: -3.17, x1: 3.17, z0: -1.82, z1: 2.38 };
       const inside = p => p.x >= bounds.x0 && p.x <= bounds.x1 && p.z >= bounds.z0 && p.z <= bounds.z1;
       if (!inside(from) || !inside(to) || inBlock(from, margin) || inBlock(to, margin)) return null;
       if (!segBlocked(from, to, margin)) return [to.clone()];
@@ -2238,14 +2192,13 @@ try {
     /* ---------- director v2 ---------- */
     const D = { mode: 'typing', busy: false, holdT: 0, next: null, travel: null, at: 'desk', standing: false, standK: 0, seated: true, onBed: false, compWalk: false, fadeK: 1, fadeTgt: 1, idleT: 18, awayT: 30, pending: null, idleArm: false, seatOff: 0, seatZOff: 0, sinkK: 0, sinkTgt: 0, sinkBase: 0, yawTgt: null };
     const STANDKEY = { think: 1, lean: 1 }; /* standing clips: ease out of the desk corner while they play */
-    const STAND_OFF = { x: 0.15, z: -0.50 }; /* bench: step north, out into the room */
-    const walkAnchor = ANCHORS.desk.pos.clone(); /* logical floor position; the rendered root adds the walk-cycle compensation on top */
+    const walkAnchor = ANCHORS.desk.pos.clone();
     function after(sec, fn) { D.holdT = sec; D.next = fn; }
     function yawLerp(a, b, t) { let d = (b - a) % (Math.PI * 2); if (d > Math.PI) d -= Math.PI * 2; if (d < -Math.PI) d += Math.PI * 2; return a + d * t; }
     function yawStep(a, b, maxStep) { let d = (b - a + Math.PI * 3) % (Math.PI * 2) - Math.PI; return a + Math.max(-maxStep, Math.min(maxStep, d)); }
     function cancelTimers() { D.next = null; D.holdT = 0; }
 
-    /* ---------- walking: path drive + in-clip root-motion compensation ---------- */
+    /* ---------- walking: path drive with an in-place gait ---------- */
     function travelTo(anchor, keyName, done) {
       D.standing = false; D.yawTgt = null;
       const from = walkAnchor.clone();
@@ -2280,7 +2233,7 @@ try {
       if (tr.phase === 'turn') {
         dannyRoot.rotation.y = yawStep(dannyRoot.rotation.y, wantYaw, 2.7 * dt);
         if (Math.abs(yawLerp(dannyRoot.rotation.y, wantYaw, 1) - dannyRoot.rotation.y) < 0.06) {
-          tr.phase = 'walk'; D.compWalk = true; dPlay('walk');
+          tr.phase = 'walk'; dPlay('walk');
         }
         return;
       }
@@ -2309,41 +2262,6 @@ try {
       const dn = tr.done; if (dn) dn();
     }
     const _hv = new THREE.Vector3();
-    function hipsRootSpace() {
-      const hb = dBones['mixamorigHips']; if (!hb) return null;
-      hb.getWorldPosition(_hv);
-      const dx = _hv.x - dannyRoot.position.x, dz = _hv.z - dannyRoot.position.z;
-      const c = Math.cos(dannyRoot.rotation.y), sn = Math.sin(dannyRoot.rotation.y);
-      hipsSample.x = dx * c - dz * sn; hipsSample.z = dx * sn + dz * c;
-      return hipsSample;
-    }
-    const walkOffset = { x: 0, z: 0 };
-    function applyWalkComp(dt) {
-      const wa = dAct[CLIPMAP.walk];
-      if (!D.compWalk || !wa || !WALK_TRAJ) return;
-      let tx = 0, tz = 0;
-      /* A mixed pose is not a walk pose. Only sample after its fade-in,
-         bound the residual, and release it gradually when walking ends. */
-      if (dCur === wa && wa.enabled && wa.getEffectiveWeight() > 0.98) {
-        const h = hipsRootSpace();
-        if (h) {
-          const dur = wa.getClip().duration || 1;
-          const ph = (((wa.time % dur) + dur) % dur) / dur;
-          const e = walkExpected(ph), dx = h.x - e.x, dz = h.z - e.z;
-          const c = Math.cos(dannyRoot.rotation.y), sn = Math.sin(dannyRoot.rotation.y);
-          tx = dx * c + dz * sn; tz = -dx * sn + dz * c;
-          const len = Math.hypot(tx, tz);
-          if (len > 0.03) { tx *= 0.03 / len; tz *= 0.03 / len; }
-        }
-      }
-      const k = 1 - Math.exp(-8 * dt);
-      walkOffset.x += (tx - walkOffset.x) * k; walkOffset.z += (tz - walkOffset.z) * k;
-      dannyRoot.position.x = walkAnchor.x - walkOffset.x;
-      dannyRoot.position.z = walkAnchor.z - walkOffset.z;
-      if (dCur !== wa && Math.hypot(walkOffset.x, walkOffset.z) < 0.0005) {
-        walkOffset.x = walkOffset.z = 0; D.compWalk = false;
-      }
-    }
 
     /* ---------- step sequencer for the reaction chains ---------- */
     const Q = { list: [], active: false, onDone: null };
@@ -2365,7 +2283,6 @@ try {
       };
       pump();
     }
-    function killChain() { Q.list = []; Q.active = false; Q.onDone = null; cancelTimers(); D.travel = null; }
     const sTravel = (anchor, keyName) => (next) => travelTo(anchor, keyName, next);
     const sWait = (sec) => (next) => after(sec, next);
     const sSay = (k) => (next) => { sayKey(k); next(); };
@@ -2392,17 +2309,6 @@ try {
       if (user) sayKey('sayWork');
       const pending = D.pending; D.pending = null;
       if (pending && pending !== 'work') react(pending);
-    }
-    function abortToDesk(user) {
-      killChain();
-      D.sinkTgt = 0; D.sinkK = 0;
-      if (N.hold) { N.hold = false; N.t = 2.0; if (neoRoot) nPlay('Idle'); }
-      if (D.onBed) { D.onBed = false; dShadow.visible = true; dannyRoot.position.copy(ANCHORS.bed.pos); dannyRoot.rotation.y = ANCHORS.bed.yaw; walkAnchor.copy(ANCHORS.bed.pos); }
-      D.compWalk = false;
-      setFade(1);
-      const steps = returnSteps();
-      if (user) steps.push(sSay('sayWork'));
-      runChain(steps);
     }
     function beat(keyName) {
       if (D.busy) return;
@@ -2798,7 +2704,7 @@ try {
     });
 
     /* ---------- camera fit + pointer parallax ---------- */
-    let nx = 0, ny = 0, camFocusX = 0;
+    let nx = 0, ny = 0;
     heroEl.addEventListener('pointermove', (e) => {
       const r = heroEl.getBoundingClientRect();
       nx = ((e.clientX - r.left) / r.width) * 2 - 1;
@@ -2812,7 +2718,7 @@ try {
       camera.aspect = a;
       const dolly = a >= 1.3 ? 1 : Math.min(1.8, 1.3 / a);
       camera.position.copy(CAM_TGT).addScaledVector(camDir, camDist * dolly);
-      camera.fov = a >= 1.3 ? 36 : 42;
+      camera.fov = a >= 1.3 ? 46 : 54;
       camera.updateProjectionMatrix();
     }
     new ResizeObserver(fit).observe(heroEl);
@@ -2888,7 +2794,12 @@ try {
       bones: () => {
         dannyG.scene.updateWorldMatrix(true, true);
         const g = (n) => { const b = dBones[n]; if (!b) return null; const v = new THREE.Vector3(); b.getWorldPosition(v); return v.toArray().map(x => Math.round(x * 1000) / 1000); };
-        return { hips: g('mixamorigHips'), kneeL: g('mixamorigLeftLeg'), footL: g('mixamorigLeftFoot'), head: g('mixamorigHead'), handL: g('mixamorigLeftHand') };
+        return { hips: g('mixamorigHips'), kneeL: g('mixamorigLeftLeg'), kneeR: g('mixamorigRightLeg'), footL: g('mixamorigLeftFoot'), footR: g('mixamorigRightFoot'), head: g('mixamorigHead'), handL: g('mixamorigLeftHand'), handR: g('mixamorigRightHand') };
+      },
+      neoBone: () => {
+        if (!neoRoot) return null;
+        const b = neoRoot.getObjectByName('root'); if (!b) return null;
+        const v = new THREE.Vector3(); b.getWorldPosition(v); return v.toArray();
       },
       acts: () => Object.fromEntries(Object.entries(dAct).map(([k, a]) => [k, { en: a.enabled, w: Math.round(a.weight * 100) / 100, t: Math.round(a.time * 100) / 100, run: a.isRunning() }])),
       cur: () => dCur ? dCur.getClip().name : null
@@ -2947,20 +2858,7 @@ try {
           D.awayT -= dt;
           if (D.awayT <= 0) toDesk(false);
         }
-        /* chair calibration: while StandUp is the current clip, lift the
-           root so the clip's floor-sit opening starts at seat height;
-           the lift decays to zero as the clip itself rises */
-        const standAct = dAct['StandUp'];
-        let seatTgt = 0;
-        if (standAct && dCur === standAct) { const f = Math.min(1, Math.max(0, (standAct.time - SEAT_RISE_T0) / SEAT_RISE_SPAN)); seatTgt = SEAT_Y_OFF * (1 - f); }
-        D.seatOff += (seatTgt - D.seatOff) * Math.min(1, dt / 0.10);
-        if (seatTgt === 0 && D.seatOff < 0.001) D.seatOff = 0;
-        /* standing desk beats ease Danny a step out into the room (and back
-           for Typing) so he never looks parked inside the desk corner.
-           M7.7: the step-out now requires him to actually be standing -
-           seated variations (Thinking in the chair) used to slide him
-           half a metre off the seat and back, one of the visible jerks */
-        D.standK += ((D.standing && !D.seated && D.at === 'desk' && !D.travel ? 1 : 0) - D.standK) * Math.min(1, dt / 0.35);
+        D.seatOff = 0;
         if (D.at === 'desk' && !D.travel) dannyRoot.position.y = ANCHORS.desk.pos.y + D.seatOff;
         /* pet crouch: ease the root down toward Neo's level while petting */
         D.sinkK += (D.sinkTgt - D.sinkK) * Math.min(1, dt / 0.22);
@@ -2968,37 +2866,10 @@ try {
         if (!D.travel && !D.onBed && D.at !== 'desk' && D.sinkK !== 0) dannyRoot.position.y = D.sinkBase + D.sinkK;
         if (!D.travel && !D.onBed && !D.compWalk) walkAnchor.copy(dannyRoot.position);
         dMixer.update(dt);
-        applyWalkComp(dt);
-        /* horizontal twin of the seat lift: while SitDown carries weight,
-           counter its hips-Z drift so the world hips stay on the Typing
-           anchor. It is computed AFTER the mixer update, from the clip
-           time and effective weight this frame actually renders with -
-           sampling them before the update lags a frame behind the pose.
-           The target is a pure function of those two values, so it is
-           assigned, not lerped: the weight scaling keeps the crossfade
-           into Typing exact, and at weight ~0 the offset is exactly 0.
-           It runs after applyWalkComp and stays out of its way: while a
-           walk is being compensated (D.compWalk) the walk pin owns the
-           root; the comp lands from the very frame the walk releases,
-           and travel or the bed pose never coincide with a weighted
-           SitDown at the desk. */
-        const sitAct = dAct['SitDown'];
-        let seatZOff = 0;
-        if (sitAct && sitAct.enabled) { const w = sitAct.getEffectiveWeight(); if (w > 0.001) seatZOff = -(seatSitZ(sitAct.time) - SEAT_TYPING_Z) * w; }
-        D.seatZOff = seatZOff;
+        D.seatZOff = 0;
         if (D.at === 'desk' && !D.travel && !D.compWalk) {
-          /* smoothed pin (M7.7): the target is still anchor + stand-off +
-             the exact SitDown counter-drift, but the root EASES to it
-             (70 ms tau) instead of being hard-assigned every frame - the
-             hard pin teleported him the last few centimetres whenever a
-             chain handed control back, which read as a constant small
-             jerk at the seat (Danny: "cu giat giat ve do"). The seatZOff
-             term rides inside the target: it is a pure continuous
-             function of the SitDown clip, so easing the sum stays exact
-             enough (worst transient ~2 cm during the fastest drift). */
-          const dfx2 = Math.sin(ANCHORS.desk.yaw), dfz2 = Math.cos(ANCHORS.desk.yaw);
-          const ptx = ANCHORS.desk.pos.x + STAND_OFF.x * D.standK + dfx2 * D.seatZOff;
-          const ptz = ANCHORS.desk.pos.z + STAND_OFF.z * D.standK + dfz2 * D.seatZOff;
+          /* The seated and standing clips share the same chair anchor. */
+          const ptx = ANCHORS.desk.pos.x, ptz = ANCHORS.desk.pos.z;
           const pk = Math.min(1, dt / 0.07);
           dannyRoot.position.x += (ptx - dannyRoot.position.x) * pk;
           dannyRoot.position.z += (ptz - dannyRoot.position.z) * pk;
@@ -3029,7 +2900,7 @@ try {
               const bk = Math.min(1, dt * 9);
               bubPt.x += (txp - bubPt.x) * bk; bubPt.y += (typ - bubPt.y) * bk;
               const lx = Math.max(6, Math.min(heroEl.clientWidth - bubPt.width - 6, bubPt.x + 16));
-              const ly = Math.max(6, bubPt.y - bubPt.height - 10);
+              const ly = Math.max(6, bubPt.y - bubPt.height - (D.onBed ? 90 : 10));
               sayEl.style.transform = 'translate3d(' + Math.round(lx) + 'px,' + Math.round(ly) + 'px,0)';
             }
           } else if (bubPt.x !== null) { bubPt.x = null; bubPt.y = null; }
@@ -3045,10 +2916,8 @@ try {
         for (const g of glassRain) g.material.map.offset.y -= dt * 0.011;
         dShadow.position.set(dannyRoot.position.x, 0.012, dannyRoot.position.z + 0.04);
         if (nShadow && neoRoot) nShadow.position.set(neoRoot.position.x, neoRoot.position.y + 0.012, neoRoot.position.z);
-        const focusTgt = (D.travel ? D.travel.keyName === 'bed' : D.at === 'bed') ? -1.5 : 0;
-        camFocusX += (focusTgt - camFocusX) * (1 - Math.exp(-1.8 * dt));
-        camera.position.x += ((CAM_TGT.x + camFocusX + camDir.x * camDist * (camera.aspect >= 1.3 ? 1 : Math.min(1.8, 1.3 / camera.aspect)) + nx * 0.16) - camera.position.x) * Math.min(1, dt * 3);
-        camera.lookAt(CAM_TGT.x + camFocusX + nx * 0.05, CAM_TGT.y - ny * 0.04, CAM_TGT.z);
+        camera.position.x += ((CAM_TGT.x + camDir.x * camDist * (camera.aspect >= 1.3 ? 1 : Math.min(1.8, 1.3 / camera.aspect)) + nx * 0.10) - camera.position.x) * Math.min(1, dt * 3);
+        camera.lookAt(CAM_TGT.x + nx * 0.03, CAM_TGT.y - ny * 0.025, CAM_TGT.z);
       }
       renderer.render(scene, camera);
       /* boot gate: the room counts as ready only once a real frame has

@@ -51,7 +51,7 @@ for (const a of names) for (const b of names) {
     let dy = (dannyRoot.rotation.y - yaw + Math.PI * 3) % (Math.PI * 2) - Math.PI;
     maxStep = Math.max(maxStep, step); maxYawRate = Math.max(maxYawRate, Math.abs(dy) * 60 * 180 / Math.PI);
     if (firstStep === null) firstStep = step;
-    if (inBlock(dannyRoot.position, 0.22)) blockedSteps++;
+    if (inBlock(dannyRoot.position, 0.29)) blockedSteps++;
   }
   routes.push({from:a, to:b, points:pts.map(p => [p.x,p.z]), badLegs, blockedSteps, frames,
     firstStep:+firstStep.toFixed(5), maxStep:+maxStep.toFixed(5), maxYawDegPerSec:+maxYawRate.toFixed(2), completed:!D.travel});
@@ -60,8 +60,8 @@ let seed = 2811;
 function random() { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; }
 const randomPoints = [];
 while (randomPoints.length < 80) {
-  const p = new Vec3(-3.28 + random() * 6.56, 0, -2.38 + random() * 4.76);
-  if (!inBlock(p, 0.22)) randomPoints.push(p);
+  const p = new Vec3(-3.17 + random() * 6.34, 0, -1.82 + random() * 4.20);
+  if (!inBlock(p, 0.29)) randomPoints.push(p);
 }
 let randomNoRoute = 0, randomUnsafe = 0;
 for (let i = 0; i < randomPoints.length; i++) {
