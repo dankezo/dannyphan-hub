@@ -505,6 +505,37 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
 }
 .hero.gl3d #dannySay,.hero.gl3d #dannySay.show{left:0;top:0;transition:opacity 300ms var(--ease);will-change:transform}
 @media(max-width:900px){.hero-slogan{display:block;margin-top:12px;color:var(--acid);font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase}}
+.room-controls{display:none}
+@media(max-width:900px){
+  .hero{--room-height:clamp(360px,58svh,560px)}
+  .hero-art{height:var(--room-height)}
+  .hero.gl3d .hero-art{background:#101619 url('assets/hero-clean.jpg') 37% center/cover no-repeat}
+  .hero.gl3d .hero-art .key-p,.hero.gl3d .danny-wrap,.hero.gl3d .cat-wrap{visibility:hidden}
+  .hero.gl3d #physGL{inset:auto;top:0;left:0;width:100%;height:var(--room-height);opacity:1;
+    -webkit-mask-image:linear-gradient(#000 88%,transparent 100%);mask-image:linear-gradient(#000 88%,transparent 100%)}
+  .hero.gl3d #dannyHot,.hero.gl3d #catHot{display:none}
+  .hero.gl3d .room-controls{display:block;position:relative;z-index:6;padding:4px 20px 0}
+  html.no-motion .hero.gl3d .room-controls{display:none}
+  .room-controls-label{margin:0 0 10px;color:var(--mut);font:10px var(--mono);letter-spacing:.12em;text-transform:uppercase}
+  .room-controls-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  .room-controls button{min-height:44px;padding:8px 4px;background:rgba(17,22,20,.9);border:1px solid rgba(163,230,53,.22);color:var(--paper);font:11px var(--mono);letter-spacing:.03em;cursor:pointer;touch-action:manipulation}
+  .room-controls button:active,.room-controls button:focus-visible{border-color:var(--acid);color:var(--acid)}
+  .hero.gl3d .hero-inner{padding:28px 20px 0}
+  .hero.gl3d .kicker{margin-left:0;background:none;border:0;padding:0;font-size:10px}
+  .hero.gl3d .kicker::before{width:24px}
+  .hero.gl3d h1.mega{font-size:clamp(56px,15vw,96px);margin:15px 0 4px;line-height:.9}
+  .hero.gl3d .hero-slogan{margin-top:12px}
+  .hero.gl3d .hero-sub{font-size:14px;line-height:1.65;margin-top:18px;max-width:42ch}
+  .hero.gl3d .cta-row{padding-right:0;gap:10px;margin-top:22px}
+  .hero.gl3d .cta-row .btn{min-height:46px;display:inline-flex;align-items:center;justify-content:center;padding:12px 14px;font-size:10px}
+  .hero.gl3d .hero-meta{margin-top:26px}
+  .hero.gl3d .hero-meta div{padding:14px 12px 16px}
+  .hero.gl3d .hero-meta .n{font-size:23px}
+  .hero.gl3d .hero-meta .l{font-size:9px;line-height:1.5}
+  .hero.gl3d #dannySay{width:min(252px,72vw)}
+  #catBtn{width:58px;height:58px;right:14px;bottom:14px}
+  #catPanel{right:12px;bottom:84px;height:min(520px,calc(100svh - 105px))}
+}
 </style>
 </head>
 <body>
@@ -544,6 +575,17 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
       <div class="danny-wrap" id="dannyWrap"><img class="danny-layer pose on" id="poseType" src="assets/danny-cut.webp" alt="" aria-hidden="true"><img class="danny-layer pose" id="poseThink" src="assets/danny-think.webp" alt="" aria-hidden="true"><img class="danny-layer pose" id="poseLean" src="assets/danny-lean.webp" alt="" aria-hidden="true"><img class="danny-layer mpose on" data-mpose="type" src="assets/p-danny.webp" alt="" aria-hidden="true"><img class="danny-layer mpose" data-mpose="think" src="assets/p-danny-think.webp" alt="" aria-hidden="true"><img class="danny-layer mpose" data-mpose="lean" src="assets/p-danny-lean.webp" alt="" aria-hidden="true"></div>
       <div class="cat-wrap" id="catWrap"><img class="cat-layer cpose on" id="catSit" src="assets/cat-cut.webp" alt="" aria-hidden="true"><img class="cat-layer cpose" id="catGroom" src="assets/cat-groom.webp" alt="" aria-hidden="true"><img class="cat-layer cpose" id="catSleep" src="assets/cat-sleep.webp" alt="" aria-hidden="true"><img class="cat-layer mcpose on" data-mcpose="sit" src="assets/p-cat.webp" alt="" aria-hidden="true"><img class="cat-layer mcpose" data-mcpose="groom" src="assets/p-cat-groom.webp" alt="" aria-hidden="true"><img class="cat-layer mcpose" data-mcpose="sleep" src="assets/p-cat-sleep.webp" alt="" aria-hidden="true"><span class="zzz" aria-hidden="true"><i>Z</i><i>Z</i><i>Z</i></span></div>
       <div class="scan"><i></i></div>
+    </div>
+    <div class="room-controls" role="group" aria-label="Tương tác với phòng" id="roomControls">
+      <p class="room-controls-label" data-i18n="roomHint">CHẠM VÀO PHÒNG HOẶC CHỌN MỘT HOẠT ĐỘNG</p>
+      <div class="room-controls-grid">
+        <button type="button" data-room-action="work" data-i18n="roomWork">BÀN LÀM VIỆC</button>
+        <button type="button" data-room-action="guitar" data-i18n="roomGuitar">CHƠI ĐÀN</button>
+        <button type="button" data-room-action="sleep" data-i18n="roomSleep">NGHỈ NGƠI</button>
+        <button type="button" data-room-action="board" data-i18n="roomBoard">BẢNG KẾ HOẠCH</button>
+        <button type="button" data-room-action="window" data-i18n="roomWindow">CỬA SỔ</button>
+        <button type="button" data-room-action="pet" data-i18n="roomNeo">GỌI NEO</button>
+      </div>
     </div>
     <canvas id="gl" aria-hidden="true"></canvas>
     <canvas id="fx" aria-hidden="true"></canvas>
@@ -848,6 +890,7 @@ try { LANG = localStorage.getItem('deck_lang') || 'vi'; } catch (e) {}
 var I18N = {
 vi: {
   hstat: 'HÀ NỘI, VN - <b>ĐANG TRỰC TUYẾN</b>',
+  roomHint: 'CHẠM VÀO PHÒNG HOẶC CHỌN MỘT HOẠT ĐỘNG', roomWork: 'BÀN LÀM VIỆC', roomGuitar: 'CHƠI ĐÀN', roomSleep: 'NGHỈ NGƠI', roomBoard: 'BẢNG KẾ HOẠCH', roomWindow: 'CỬA SỔ', roomNeo: 'GỌI NEO',
   ctaModules: 'XEM CÁC MODULE', ctaCat: 'HỎI NEO - MÈO AI',
   slogan: 'Trai Indie nhà nghèo', ctaContact: 'CONTACT', ctaAbout: 'ABOUT ME',
   meta1: 'PROJECT ĐANG LIVE', meta2: 'WEBSITE ĐÃ CỐ VẤN BẢO MẬT', meta3: 'TRẠNG THÁI TRỰC DECK', meta4: 'THỜI GIAN ONLINE HÔM NAY',
@@ -907,6 +950,7 @@ vi: {
 },
 en: {
   hstat: 'HANOI, VN - <b>SYSTEMS ONLINE</b>',
+  roomHint: 'TAP THE ROOM OR CHOOSE AN ACTIVITY', roomWork: 'WORK DESK', roomGuitar: 'PLAY GUITAR', roomSleep: 'TAKE A NAP', roomBoard: 'PLANNING BOARD', roomWindow: 'WINDOW', roomNeo: 'CALL NEO',
   ctaModules: 'VIEW MODULES', ctaCat: 'ASK NEO - AI CAT',
   slogan: 'Broke indie kid, building anyway', ctaContact: 'CONTACT', ctaAbout: 'ABOUT ME',
   meta1: 'PROJECTS LIVE', meta2: 'SITES ADVISED ON SECURITY', meta3: 'OPERATOR STATUS', meta4: 'ONLINE TODAY',
@@ -975,10 +1019,10 @@ function applyLang(l){
   var lb = $('#langBtn'); if (lb) lb.textContent = l === 'vi' ? 'EN' : 'VI';
   var labels = l === 'vi' ? {
     dannyHot: 'Tương tác với Danny, người điều hành deck', catHot: 'Chạm vào Neo, con mèo trên bàn điều khiển',
-    catBtn: 'Mở chat với Neo, mèo AI trợ lý', catPanel: 'Chat với Neo', catClose: 'Đóng chat'
+    catBtn: 'Mở chat với Neo, mèo AI trợ lý', catPanel: 'Chat với Neo', catClose: 'Đóng chat', roomControls: 'Tương tác với phòng'
   } : {
     dannyHot: 'Interact with Danny, the deck operator', catHot: 'Interact with Neo, the deck cat',
-    catBtn: 'Open chat with Neo, the AI cat', catPanel: 'Chat with Neo', catClose: 'Close chat'
+    catBtn: 'Open chat with Neo, the AI cat', catPanel: 'Chat with Neo', catClose: 'Close chat', roomControls: 'Interact with the room'
   };
   Object.keys(labels).forEach(function(id){ var el = document.getElementById(id); if (el) el.setAttribute('aria-label', labels[id]); });
   var catImg = document.querySelector('#catBtn img'); if (catImg) catImg.alt = l === 'vi' ? 'Neo, mèo đen AI' : 'Neo, the black AI cat';
@@ -1043,10 +1087,7 @@ else {
     setTimeout(finishBoot, 120);
   }
   function settleDeck(){ if (deckSettled) return; deckSettled = true; maybeFinish(); }
-  /* the <=900px rule mirrors the module's own mobile gate: below it the
-     module never builds the room, so there is nothing to wait for */
-  if (matchMedia('(max-width: 900px)').matches) settleDeck();
-  else if (window.__deckReady || window.__deckFailed) settleDeck();
+  if (window.__deckReady || window.__deckFailed) settleDeck();
   else { addEventListener('deck-ready', settleDeck); addEventListener('deck-failed', settleDeck); }
   (function step(now){
     var p = Math.min(1, (now - t0) / DUR);
@@ -1069,7 +1110,7 @@ if (finePointer && motionOn) mega.addEventListener('mouseenter', function(){
 /* ---------- WebGL aurora underlay ---------- */
 var glCanvas = $('#gl'), glOK = false, glProg = null, glTime = null, glMouse = null;
 try {
-  var gl = glCanvas.getContext('webgl', { antialias: false, alpha: true });
+  var gl = matchMedia('(max-width: 900px)').matches ? null : glCanvas.getContext('webgl', { antialias: false, alpha: true });
   if (gl) {
     var vs = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
     var fs = [
@@ -1730,7 +1771,7 @@ window.addEventListener('resize', fxSize);
    own beats. Reactions look up clip names in a registry - clips that
    are not in the GLB yet fall back to an existing clip + speech line,
    so dropping the real Mixamo clips in later is a one-line change.
-   Desktop only, WebGL2 only, lazy-init after first paint. If anything
+   WebGL2 only, lazy-init after first paint. If anything
    fails, the painted deck simply carries on without it. */
 const heroEl = document.getElementById('hero');
 const cvEl = document.getElementById('physGL');
@@ -1764,8 +1805,8 @@ try {
   /* ---------- boot-gate signal ----------
      The page boot curtain lifts only once the room is truly ready:
      deckSettle(true) fires after the first real frame renders; every
-     path that leaves the painted deck in charge instead (mobile gate,
-     no WebGL2, load failure) fires deckSettle(false) so the curtain
+     path that leaves the painted deck in charge instead (no WebGL2 or
+     load failure) fires deckSettle(false) so the curtain
      still opens. If this module dies before the helper exists, the
      boot script's own failsafe opens the curtain instead. */
   let deckSettledFlag = false;
@@ -1781,10 +1822,18 @@ try {
   else { addEventListener('load', () => requestAnimationFrame(() => setTimeout(boot, 60)), { once: true }); setTimeout(boot, 3200); }
 
   async function init() {
-    if (matchMedia('(max-width: 900px)').matches) { deckSettle(false); return; } /* mobile keeps its painted band */
-    const renderer = new THREE.WebGLRenderer({ canvas: cvEl, alpha: true, antialias: true, powerPreference: 'high-performance' });
+    const mobileRenderer = matchMedia('(max-width: 900px)').matches;
+    const renderer = new THREE.WebGLRenderer({ canvas: cvEl, alpha: true, antialias: !mobileRenderer, powerPreference: mobileRenderer ? 'default' : 'high-performance' });
     if (!renderer.capabilities.isWebGL2) { deckSettle(false); return; } /* gate: painted fallback stays */
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 1));
+    let contextLost = false;
+    cvEl.addEventListener('webglcontextlost', () => {
+      contextLost = true; heroEl.classList.remove('gl3d'); window.__physLive = false; window.__roomDir = null;
+      cvEl.style.display = 'none';
+      const backdrop = document.getElementById('gl'); if (backdrop) backdrop.style.display = 'none';
+      const rain = document.getElementById('rain'); if (rain) rain.style.display = '';
+      deckSettle(false);
+    }, { once: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, mobileRenderer ? 0.85 : 1));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.92;
 
@@ -1829,9 +1878,21 @@ try {
       const jsonLen = dv.getUint32(12, true);
       const json = JSON.parse(new TextDecoder().decode(new Uint8Array(ab, 20, jsonLen)));
       const binStart = 20 + jsonLen + 8;
+      const missing = new Set();
+      gltf.parser.associations.forEach((assoc, mat) => {
+        if (!assoc || assoc.materials === undefined) return;
+        const def = json.materials[assoc.materials]; if (!def) return;
+        const pbr = def.pbrMetallicRoughness || {};
+        const slots = [['map', pbr.baseColorTexture], ['roughnessMap', pbr.roughnessTexture],
+          ['metalnessMap', pbr.metallicTexture], ['normalMap', def.normalTexture],
+          ['emissiveMap', def.emissiveTexture], ['aoMap', def.occlusionTexture]];
+        slots.forEach(([key, info]) => { if (info && !mat[key]) missing.add(info.index); });
+      });
+      if (!missing.size) return;
       const built = [];
-      for (let ti = 0; ti < (json.textures || []).length; ti++) {
+      for (const ti of missing) {
         const t = json.textures[ti];
+        if (!t) continue;
         const img = json.images[t.source];
         if (!img || img.bufferView === undefined) continue;
         const bv = json.bufferViews[img.bufferView];
@@ -1884,8 +1945,12 @@ try {
       return g;
     };
 
+    /* Fetch the three independent models together to reduce the initial wait. */
+    const [roomG, dannyG, neoG] = await Promise.all([
+      load('assets/room-lab.glb'), load('assets/danny-hero-high.glb'),
+      load('assets/neo-hero.glb').catch(() => null)
+    ]);
     /* ---------- the room ---------- */
-    const roomG = await load('assets/room-lab.glb');
     const STANDIN = ['catBody', 'catHead', 'catEar', 'catEar.001', 'catTail'];
     roomG.scene.traverse(o => {
       if (STANDIN.indexOf(o.name) >= 0) o.visible = false;
@@ -1961,7 +2026,6 @@ try {
     scene.add(roomG.scene);
 
     /* ---------- Danny ---------- */
-    const dannyG = await load('assets/danny-hero-high.glb');
     const dannyRoot = new THREE.Group(); scene.add(dannyRoot);
     dannyRoot.add(dannyG.scene);
     dannyG.scene.traverse(o => { if (o.isMesh && o.material && 'roughness' in o.material) { o.material.roughness = 0.92; o.material.metalness = 0.0; } });
@@ -2042,6 +2106,7 @@ try {
         instrument.add(new THREE.LineSegments(stringGeo, new THREE.LineBasicMaterial({ color: 0x91765d, transparent: true, opacity: 0.7 })));
         const standGuitar = instrument.clone();
         standGuitar.position.set(-1.58, 0.43, 0.68); standGuitar.rotation.set(0.08, Math.PI, 0);
+        standGuitar.userData.dynamicRoomObject = true;
         standGuitar.traverse(o => {
           if (!o.material) return;
           o.material = o.material.clone();
@@ -2071,6 +2136,43 @@ try {
         o.material.opacity = o.userData.fullOpacity * a;
         o.material.depthWrite = a >= 0.99;
       });
+    }
+
+    /* Static room meshes share materials but arrive as hundreds of objects.
+       Batch compatible opaque parts on small screens; keep animated and
+       transparent objects independent and retain the original scene nodes. */
+    if (mobileRenderer) {
+      try {
+        const { mergeGeometries } = await import('three/addons/utils/BufferGeometryUtils.js');
+        roomG.scene.updateWorldMatrix(true, true);
+        const inverse = roomG.scene.matrixWorld.clone().invert(), batches = new Map();
+        roomG.scene.traverse(o => {
+          if (!o.isMesh || o.isSkinnedMesh || !o.visible || !o.geometry || !o.material || Array.isArray(o.material) || o.material.transparent || o.geometry.groups.length) return;
+          let parent = o;
+          while (parent && parent !== roomG.scene) {
+            if (!parent.visible || parent.userData.dynamicRoomObject) return;
+            parent = parent.parent;
+          }
+          const g = o.geometry;
+          if (Object.keys(g.morphAttributes).length || g.drawRange.start !== 0 || Number.isFinite(g.drawRange.count)) return;
+          const attrs = Object.keys(g.attributes).sort().map(k => {
+            const a = g.attributes[k]; return [k, a.itemSize, a.normalized, a.array.constructor.name].join(':');
+          }).join('|');
+          const id = o.material.uuid + '/' + (g.index ? 'indexed/' : 'plain/') + attrs;
+          if (!batches.has(id)) batches.set(id, []);
+          batches.get(id).push(o);
+        });
+        for (const objects of batches.values()) {
+          if (objects.length < 2) continue;
+          const parts = objects.map(o => o.geometry.clone().applyMatrix4(inverse.clone().multiply(o.matrixWorld)));
+          const merged = mergeGeometries(parts);
+          parts.forEach(g => g.dispose());
+          if (!merged) continue;
+          const mesh = new THREE.Mesh(merged, objects[0].material);
+          mesh.name = 'mobileRoomBatch'; roomG.scene.add(mesh);
+          objects.forEach(o => { o.visible = false; });
+        }
+      } catch (e) { /* Keep the unbatched room if an optimization is unavailable. */ }
     }
 
     /* Constrain the two hands to the instrument after the clip is sampled.
@@ -2127,7 +2229,7 @@ try {
     const NEO_WALK_TS = 1.3;
     const NEO_WALK_SPEED = 0.0925 * NEO_WALK_TS;
     try {
-      const neoG = await load('assets/neo-hero.glb');
+      if (!neoG) throw new Error('Neo model unavailable');
       const trot = neoG.animations.find(c => c.name === 'Walk');
       const rootTrack = trot && trot.tracks.find(t => t.name === 'root.position');
       if (rootTrack) {
@@ -2163,6 +2265,7 @@ try {
       nMixer = new THREE.AnimationMixer(neoG.scene);
       neoG.animations.forEach(c => { const a = nMixer.clipAction(c); a.stop(); a.weight = 0; a.enabled = false; nAct[c.name] = a; });
     } catch (e) { neoRoot = null; }
+    if (!neoRoot) { const neoButton = document.querySelector('[data-room-action="pet"]'); if (neoButton) neoButton.hidden = true; }
     const nShadow = neoRoot ? blob(0.55, 0.55) : null;
 
     /* ---------- clip registry: one line per interaction ---------- */
@@ -2776,8 +2879,8 @@ try {
       neoProxy.position.set(0, 0.24, 0); neoProxy.userData.act = 'pet'; neoRoot.add(neoProxy); proxies.push(neoProxy);
     }
     const ray = new THREE.Raycaster(), ptr = new THREE.Vector2();
-    heroEl.addEventListener('pointerdown', (e) => {
-      if (!live || e.target.closest('button, a, input, textarea')) return;
+    function pickRoom(e) {
+      if (!live || window.__motionOn === false || e.target.closest('button, a, input, textarea')) return;
       const r = cvEl.getBoundingClientRect();
       if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
       ptr.x = ((e.clientX - r.left) / r.width) * 2 - 1;
@@ -2799,6 +2902,21 @@ try {
       const id = hit.object.userData.act;
       if (id === 'danny') startRoutine();
       else react(id);
+    }
+    let roomTouch = null;
+    heroEl.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse') { pickRoom(e); return; }
+      roomTouch = { id: e.pointerId, x: e.clientX, y: e.clientY };
+    });
+    heroEl.addEventListener('pointerup', (e) => {
+      if (!roomTouch || roomTouch.id !== e.pointerId) return;
+      const moved = Math.hypot(e.clientX - roomTouch.x, e.clientY - roomTouch.y);
+      roomTouch = null;
+      if (moved < 10) pickRoom(e);
+    });
+    heroEl.addEventListener('pointercancel', () => { roomTouch = null; });
+    document.querySelectorAll('[data-room-action]').forEach(button => {
+      button.addEventListener('click', () => { if (live) react(button.dataset.roomAction); });
     });
     const dannyHotEl = document.getElementById('dannyHot');
     if (dannyHotEl) dannyHotEl.addEventListener('click', () => { if (live) startRoutine(); });
@@ -2847,9 +2965,10 @@ try {
       renderer.setSize(w, h, false);
       const a = w / h;
       camera.aspect = a;
-      const dolly = a >= 1.3 ? 1 : Math.min(1.8, 1.3 / a);
+      const compact = matchMedia('(max-width: 900px)').matches;
+      const dolly = compact ? Math.max(1, Math.min(1.7, 1.22 / a)) : (a >= 1.3 ? 1 : Math.min(1.8, 1.3 / a));
       camera.position.copy(CAM_TGT).addScaledVector(camDir, camDist * dolly);
-      camera.fov = a >= 1.3 ? 46 : 55;
+      camera.fov = compact ? 51 : (a >= 1.3 ? 46 : 55);
       camera.lookAt(CAM_TGT);
       camera.updateProjectionMatrix();
     }
@@ -2867,6 +2986,7 @@ try {
       routine: startRoutine, react, toDesk
     };
     window.__room = {
+      renderInfo: () => ({ calls: renderer.info.render.calls, triangles: renderer.info.render.triangles, pixelRatio: renderer.getPixelRatio() }),
       guitarPose: () => {
         if (!guitarProp) return null;
         dannyG.scene.updateWorldMatrix(true, true);
@@ -2984,6 +3104,7 @@ try {
     if (pendingPose) pendingPose = null;
 
     /* ---------- go live ---------- */
+    if (contextLost) { deckSettle(false); return; }
     heroEl.classList.add('gl3d');
     window.__physLive = true;
     const rc2d = document.getElementById('rain'); if (rc2d) rc2d.style.display = 'none';
@@ -2996,13 +3117,14 @@ try {
     const bubPt = { x: null, y: null, width: 312, height: 90 }; /* smoothed speech-bubble anchor in hero space */
     if (sayEl) new ResizeObserver(() => { bubPt.width = sayEl.offsetWidth || 312; bubPt.height = sayEl.offsetHeight || 90; }).observe(sayEl);
     let heroOn = true;
-    new IntersectionObserver(en => { heroOn = en[0].isIntersecting; }, { threshold: 0 }).observe(heroEl);
+    new IntersectionObserver(en => { heroOn = en[0].isIntersecting; }, { threshold: 0 }).observe(cvEl);
     const clock = new THREE.Clock();
     let firstFrame = true;
     function frame() {
+      if (contextLost) return;
       requestAnimationFrame(frame);
       const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
-      if (!heroOn || document.hidden) return;
+      if ((!heroOn || document.hidden) && !firstFrame) return;
       const anim = window.__motionOn !== false;
       if (anim) {
         if (D.travel) {
@@ -3074,8 +3196,9 @@ try {
               if (bubPt.x === null) { bubPt.x = txp; bubPt.y = typ; }
               const bk = Math.min(1, dt * 9);
               bubPt.x += (txp - bubPt.x) * bk; bubPt.y += (typ - bubPt.y) * bk;
-              const lx = Math.max(6, Math.min(heroEl.clientWidth - bubPt.width - 6, bubPt.x + 16));
-              const ly = Math.max(6, bubPt.y - bubPt.height - (D.onBed ? 90 : 10));
+              const compact = matchMedia('(max-width: 900px)').matches;
+              const lx = compact ? 16 : Math.max(6, Math.min(heroEl.clientWidth - bubPt.width - 6, bubPt.x + 16));
+              const ly = compact ? Math.max(68, cvEl.offsetTop + cvEl.clientHeight - bubPt.height - 18) : Math.max(6, bubPt.y - bubPt.height - (D.onBed ? 90 : 10));
               sayEl.style.transform = 'translate3d(' + Math.round(lx) + 'px,' + Math.round(ly) + 'px,0)';
             }
           } else if (bubPt.x !== null) { bubPt.x = null; bubPt.y = null; }
@@ -3093,9 +3216,8 @@ try {
         if (nShadow && neoRoot) nShadow.position.set(neoRoot.position.x, neoRoot.position.y + 0.012, neoRoot.position.z);
       }
       renderer.render(scene, camera);
-      /* boot gate: the room counts as ready only once a real frame has
-         actually rendered (the hidden/not-intersecting early return
-         above skips the render, so this cannot fire early) */
+      /* The first real frame settles the boot gate, even if the user has
+         restored a scroll position below the room. Later offscreen frames pause. */
       if (firstFrame) { firstFrame = false; deckSettle(true); }
     }
     frame();
