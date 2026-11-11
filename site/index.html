@@ -1642,8 +1642,8 @@ try {
 
   /* ---------- bilingual lines owned by the room director ---------- */
   const RL = {
-    vi: { saySleep: 'Ngủ chút đã...', sayGuitar: 'Làm một bản nhạc đã...', sayPapers: 'Bừa bộn thế này thì code sao nổi?!', sayPet: 'Neo, lại đây nào ♥', sayWork: 'Rồi, quay lại việc thôi.', sayWindow: 'Mưa Hà Nội nhìn từ trên này đẹp ghê...' },
-    en: { saySleep: 'Quick nap first...', sayGuitar: 'One quick song first...', sayPapers: 'How am I supposed to code in this mess?!', sayPet: 'Come here, Neo ♥', sayWork: 'Right, back to work.', sayWindow: 'Hanoi rain looks good from up here...' }
+    vi: { saySleep: 'Ngủ chút đã...', sayGuitar: 'Làm một bản nhạc đã...', sayPapers: 'Bừa bộn thế này thì code sao nổi?!', sayPet: 'Neo, lại đây nào ♥', sayWork: 'Rồi, quay lại việc thôi.', sayWindow: 'Mưa Hà Nội nhìn từ trên này đẹp ghê...', sayBoard: 'Để xem lại cái plan này đã...' },
+    en: { saySleep: 'Quick nap first...', sayGuitar: 'One quick song first...', sayPapers: 'How am I supposed to code in this mess?!', sayPet: 'Come here, Neo ♥', sayWork: 'Right, back to work.', sayWindow: 'Hanoi rain looks good from up here...', sayBoard: 'Let me re-check this plan...' }
   };
   const lang = () => (window.DECK && window.DECK.lang ? window.DECK.lang() : 'vi');
   const sayEl = document.getElementById('dannySay');
@@ -1693,7 +1693,7 @@ try {
     const CAM_TGT = new THREE.Vector3(0.15, 0.85, 1.35);
     const CAM_POS = new THREE.Vector3(1.85, 2.0, 3.3);
     const camDir = CAM_POS.clone().sub(CAM_TGT);
-    const camDist = camDir.length(); camDir.normalize();
+    const camDist = camDir.length() * 1.18; camDir.normalize(); /* M7.7: pulled back a touch (Danny: the old framing zoomed in too far and cropped the bed) */
 
     /* ---------- lights: matched to the Blender room ---------- */
     scene.add(new THREE.HemisphereLight(0x9fc8e8, 0x16210f, 0.34));
@@ -1706,7 +1706,11 @@ try {
     pt(0xffd9a0, 4, 6.5, 1.2, 1.5, 1.9);     /* bench lamp, foreground */
     pt(0xffd9a0, 4.2, 6, 0.40, 2.0, 2.45);  /* desk lamp glow over the bench station (moved with the seat to the long edge 11/11) - front-top light so his face reads over the bench */
     pt(0x35d3e0, 1.8, 5.5, 2.45, 1.4, -0.85);  /* server rack cyan */
-    pt(0xffd9a0, 3, 5.5, 1.55, 1.85, 1.45);   /* practice lamp over the guitar corner - the hold spot sits in a light hole without it */
+    pt(0xffd9a0, 3, 5.5, -1.30, 1.85, 0.80);   /* practice lamp over the guitar spot - M7.7: the guitar moved to the foot of the bed, the lamp follows */
+    /* monitor glow (M7.7, Danny): a soft blue wash from the bench
+       screens onto his face while he works - intensity eased per frame
+       in the render loop, on only while he is seated at the bench */
+    const screenGlow = new THREE.PointLight(0x7fb4ff, 0, 1.9, 2); screenGlow.position.set(0.62, 1.30, 1.90); scene.add(screenGlow);
 
     /* ---------- soft blob shadows ---------- */
     const blobTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 128; const x = c.getContext('2d'); const g = x.createRadialGradient(64, 64, 4, 64, 64, 62); g.addColorStop(0, 'rgba(0,0,0,0.55)'); g.addColorStop(0.6, 'rgba(0,0,0,0.25)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, 128, 128); return new THREE.CanvasTexture(c); })();
@@ -1958,11 +1962,16 @@ try {
          chair, so SEAT_Y_OFF carries over. */
       desk: { pos: new THREE.Vector3(0.62, 0.06, 1.50), yaw: 0 },
       bed: { pos: new THREE.Vector3(-2.12, 0, 1.45), yaw: -Math.PI / 2 },
-      /* the guitar stand really stands at glTF (+1.42, 1.40) - the old
-         anchor had the x sign flipped, so he played in the wrong corner.
-         The Guitar clip's own facing sits -49 deg off the root; yaw 0.64
-         compensates, netting the intended -0.22 toward the room. */
-      guitar: { pos: new THREE.Vector3(1.42, 0, 1.40), yaw: 0.64 },
+      /* M7.7: the guitar cluster moved to the FOOT of the bed (GLB
+         z 2.12 -> 0.72; it used to stand at the head end, and the old
+         M7.5 anchor at (+1.42, 1.40) matched no guitar at all - he
+         played air guitar by the bench). He stands just east of the
+         stand; the Guitar clip's own facing sits -49 deg off the root,
+         so yaw 0.85 nets ~0: facing the room and the camera. */
+      guitar: { pos: new THREE.Vector3(-1.40, 0, 0.74), yaw: 0.85 },
+      /* the whiteboard on the west wall (wbFace at x -3.40, z -0.55):
+         stand 0.68 in front of it, facing -X (yaw -pi/2) */
+      board: { pos: new THREE.Vector3(-2.72, 0, -0.55), yaw: -Math.PI / 2 },
       /* west of the floor spill, facing east across the whole mess; the
          Frustrated clip rides -17 deg off the root, yaw compensates */
       papers: { pos: new THREE.Vector3(-0.35, 0, -0.28), yaw: 1.67 },
@@ -2046,7 +2055,7 @@ try {
     dannyRoot.position.copy(ANCHORS.desk.pos); dannyRoot.rotation.y = ANCHORS.desk.yaw;
 
     /* ---------- director v2 ---------- */
-    const D = { mode: 'typing', busy: false, holdT: 0, next: null, travel: null, at: 'desk', standing: false, standK: 0, seated: true, onBed: false, compWalk: false, fadeK: 1, fadeTgt: 1, idleT: 18, idleArm: false, seatOff: 0, seatZOff: 0, sinkK: 0, sinkTgt: 0, sinkBase: 0 };
+    const D = { mode: 'typing', busy: false, holdT: 0, next: null, travel: null, at: 'desk', standing: false, standK: 0, seated: true, onBed: false, compWalk: false, fadeK: 1, fadeTgt: 1, idleT: 18, idleArm: false, seatOff: 0, seatZOff: 0, sinkK: 0, sinkTgt: 0, sinkBase: 0, yawTgt: null };
     const STANDKEY = { think: 1, lean: 1 }; /* standing clips: ease out of the desk corner while they play */
     const STAND_OFF = { x: 0.15, z: -0.50 }; /* bench: step north, out into the room */
     const walkAnchor = ANCHORS.desk.pos.clone(); /* logical floor position; the rendered root adds the walk-cycle compensation on top */
@@ -2056,7 +2065,7 @@ try {
 
     /* ---------- walking: path drive + in-clip root-motion compensation ---------- */
     function travelTo(anchor, keyName, done) {
-      D.standing = false;
+      D.standing = false; D.yawTgt = null;
       const from = walkAnchor.clone();
       const to = anchor.pos.clone();
       const dist = Math.hypot(to.x - from.x, to.z - from.z);
@@ -2065,7 +2074,7 @@ try {
         D.compWalk = true;
         dPlay('walk');
       } else {
-        walkAnchor.copy(to); dannyRoot.position.copy(to); dannyRoot.rotation.y = anchor.yaw;
+        walkAnchor.copy(to); dannyRoot.position.copy(to); D.yawTgt = anchor.yaw;
         D.at = keyName; done();
       }
     }
@@ -2097,7 +2106,7 @@ try {
       D.travel = null;
       const endP = tr.pts[tr.pts.length - 1];
       tr.pos.copy(endP); walkAnchor.copy(endP); dannyRoot.position.copy(endP);
-      dannyRoot.rotation.y = tr.yawT;
+      D.yawTgt = tr.yawT; /* M7.7: ease the last degrees of facing in the frame loop - a hard yaw set here snapped his heading on every arrival */
       D.at = tr.keyName;
       const dn = tr.done; if (dn) dn();
     }
@@ -2162,7 +2171,7 @@ try {
     function toDesk(user) {
       if (Q.active || D.travel || D.onBed || D.at !== 'desk' || !D.seated) { abortToDesk(user); return; }
       cancelTimers(); D.busy = false; D.mode = 'typing'; D.standing = false;
-      dannyRoot.rotation.y = ANCHORS.desk.yaw;
+      D.yawTgt = ANCHORS.desk.yaw; /* ease back to desk facing (M7.7) instead of snapping */
       dPlay('typing');
       if (user) sayKey('sayWork');
     }
@@ -2311,6 +2320,16 @@ try {
         ...returnSteps()
       ];
     }
+    /* M7.7 (Danny): click the whiteboard - he walks over, studies it
+       with the Thinking pose, then heads back to work */
+    function boardChain() {
+      return [
+        ...departSteps(),
+        sTravel(ANCHORS.board, 'board'),
+        (next) => { sayKey('sayBoard'); dPlayLoop('think'); after(5.5, next); },
+        ...returnSteps()
+      ];
+    }
     function petAnchor() {
       const np = neoRoot.position;
       const from = walkAnchor;
@@ -2336,6 +2355,7 @@ try {
     function react(id) {
       if (id === 'work') { toDesk(true); return; }
       if (id === 'window') { if (!D.busy && dHas('walk') && dHas('stand') && dHas('sit')) { cancelTimers(); runChain(windowChain()); } return; }
+      if (id === 'board') { if (!D.busy && dHas('walk') && dHas('stand') && dHas('sit')) { cancelTimers(); runChain(boardChain()); } return; }
       if (!REACT[id]) return;
       if (D.busy) return; /* one routine at a time; only the desk click interrupts */
       if (!chainReady(id) || (id === 'pet' && !neoRoot)) { legacyReact(id); return; }
@@ -2349,11 +2369,11 @@ try {
 
     /* ---------- Neo's waypoint brain ---------- */
     const NW = [
-      { p: [0.95, 0, -0.50] }, { p: [1.75, 0, -1.55] }, { p: [-2.35, 0, -1.40] },
+      { p: [0.95, 0, -0.50] }, { p: [1.75, 0, -1.55] }, { p: [-2.50, 0, -1.15] },
       { p: [-2.05, 0.10, -0.05], bed: true }, { p: [-2.05, 0, 1.25] }
     ];
     const NEO_YAW = 0; /* model forward offset, verified by QA render */
-    const N = { i: 0, mode: 'idle', t: 3.0, target: null, pauseT: 0, hold: false, faceTgt: null };
+    const N = { i: 0, mode: 'idle', t: 3.0, target: null, pauseT: 0, hold: false, faceTgt: null, path: [], speed: 0 };
     if (neoRoot) {
       neoRoot.position.set(NW[N.i].p[0], NW[N.i].p[1], NW[N.i].p[2]);
       neoRoot.rotation.y = -0.6;
@@ -2364,10 +2384,35 @@ try {
       N.pauseT = 3.6; N.mode = 'idle'; N.t = 2.2; nPlay('Groom');
     }
     function neoArrive() {
+      N.speed = 0; N.path = [];
       const wp = NW[N.i];
       if (wp.bed && Math.random() < 0.6) { N.mode = 'sleep'; nPlay('Sleep'); N.t = 7 + Math.random() * 4; }
       else if (Math.random() < 0.35) { N.mode = 'groom'; nPlay('Groom'); N.t = 3.5; }
       else { N.mode = 'idle'; nPlay('Idle'); N.t = 2.5 + Math.random() * 2.5; }
+    }
+    /* M7.7 route planner for Neo: she used to beeline between waypoints
+       at one constant speed - straight through the back desk on the
+       north leg, with instant start/stop, which is exactly the jerky
+       "bug" walk Danny flagged. Routes now bend around the furniture
+       blocks (same BLOCK table as Danny's paths, cat-sized margin),
+       speed ramps in and out, and the Walk clip's cadence tracks the
+       eased ground speed so her feet never skate. */
+    function neoSegClear(ax, az, bx, bz) { return !BLOCK.some(bb => segHits(ax, az, bx, bz, bb, 0.05)); }
+    function neoPath(fx, fz, tx, tz) {
+      if (neoSegClear(fx, fz, tx, tz)) return [{ x: tx, z: tz }];
+      const vias = [[-0.45, 0.30], [1.55, -0.35], [-2.62, -0.80], [0.20, 0.95], [-1.20, 0.85]];
+      for (const v of vias) if (neoSegClear(fx, fz, v[0], v[1]) && neoSegClear(v[0], v[1], tx, tz)) return [{ x: v[0], z: v[1] }, { x: tx, z: tz }];
+      for (const a of vias) for (const b of vias) {
+        if (a === b) continue;
+        if (neoSegClear(fx, fz, a[0], a[1]) && neoSegClear(a[0], a[1], b[0], b[1]) && neoSegClear(b[0], b[1], tx, tz)) return [{ x: a[0], z: a[1] }, { x: b[0], z: b[1] }, { x: tx, z: tz }];
+      }
+      return [{ x: tx, z: tz }];
+    }
+    function neoStartTrip() {
+      const tp = N.target.p;
+      N.path = neoPath(neoRoot.position.x, neoRoot.position.z, tp[0], tp[2]);
+      N.speed = 0;
+      N.mode = 'turn'; nPlay('Idle');
     }
     function neoUpdate(dt) {
       if (!neoRoot) return;
@@ -2379,32 +2424,42 @@ try {
       if (N.hold) return; /* Danny is with her: she stays put */
       if (N.pauseT > 0) { N.pauseT -= dt; return; }
       if (N.mode === 'turn' || N.mode === 'walk') {
-        const tp = N.target.p;
-        const dx = tp[0] - neoRoot.position.x, dz = tp[2] - neoRoot.position.z;
+        if (!N.path.length) { neoArrive(); return; }
+        const pt0 = N.path[0], fin = N.path.length === 1;
+        const dx = pt0.x - neoRoot.position.x, dz = pt0.z - neoRoot.position.z;
         const dist = Math.hypot(dx, dz);
         const want = Math.atan2(dx, dz) + NEO_YAW;
-        neoRoot.rotation.y = yawLerp(neoRoot.rotation.y, want, 1 - Math.exp(-7 * dt));
+        neoRoot.rotation.y = yawLerp(neoRoot.rotation.y, want, 1 - Math.exp(-(N.mode === 'turn' ? 5 : 3.5) * dt));
         if (N.mode === 'turn') {
           let d = Math.abs(((want - neoRoot.rotation.y) % (Math.PI * 2) + Math.PI * 3) % (Math.PI * 2) - Math.PI);
-          if (d < 0.15) { N.mode = 'walk'; nPlay('Walk'); }
+          if (d < 0.30) { N.mode = 'walk'; nPlay('Walk'); }
           return;
         }
-        const sp = NEO_WALK_SPEED;
-        if (dist < 0.05) {
-          neoRoot.position.set(tp[0], tp[1], tp[2]);
-          neoArrive(); return;
+        /* eased speed: accelerate out, decelerate into the final point */
+        const distFin = fin ? dist : dist + Math.hypot(N.path[N.path.length - 1].x - pt0.x, N.path[N.path.length - 1].z - pt0.z);
+        const spdTgt = NEO_WALK_SPEED * (fin ? Math.min(1, Math.max(0.22, distFin / 0.30)) : 1);
+        N.speed += Math.max(-1.5 * dt, Math.min(0.9 * dt, spdTgt - N.speed));
+        const wa = nAct['Walk'];
+        if (wa) wa.timeScale = NEO_WALK_TS * Math.max(0.25, Math.min(1.3, N.speed / NEO_WALK_SPEED));
+        if (dist < 0.03 && fin) {
+          neoRoot.position.x = pt0.x; neoRoot.position.z = pt0.z;
+          N.path.shift();
+          neoRoot.position.y = N.target.p[1]; neoArrive();
+          return;
         }
-        const step = Math.min(dist, sp * dt);
+        if (dist < 0.05 && !fin) { N.path.shift(); return; } /* pass intermediate points without snapping onto them - a snap here read as a hop */
+        const step = Math.min(dist, N.speed * dt);
         neoRoot.position.x += dx / dist * step;
         neoRoot.position.z += dz / dist * step;
-        neoRoot.position.y += (tp[1] - neoRoot.position.y) * Math.min(1, dt * 5);
+        const yTgt = fin ? N.target.p[1] : neoRoot.position.y;
+        neoRoot.position.y += (yTgt - neoRoot.position.y) * Math.min(1, dt * 5);
         return;
       }
       N.t -= dt;
       if (N.t <= 0) {
         let ni = N.i;
         while (ni === N.i) ni = Math.floor(Math.random() * NW.length);
-        N.i = ni; N.target = NW[ni]; N.mode = 'turn'; nPlay('Idle');
+        N.i = ni; N.target = NW[ni]; neoStartTrip();
       }
     }
 
@@ -2415,14 +2470,24 @@ try {
       const m = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
       m.position.set(x, y, z); m.userData.act = act; scene.add(m); proxies.push(m); return m;
     }
-    proxy(0.50, 1.05, 2.02, 1.60, 1.70, 1.64, 'work');        /* bench station: chair on the long edge + laptop + monitors (his seat) */
-    proxy(-0.70, 1.15, -1.72, 3.35, 1.50, 0.85, 'work');       /* back desk + monitors */
+    /* M7.7 proxy audit (Danny: "every click says back to work"): the old
+       pair of giant 'work' boxes - the whole bench AND the whole back
+       desk - sat in front of nearly every ray into the room, so the
+       nearest-hit race resolved most clicks to 'work'. Boxes are now
+       tight to their objects, the back desk belongs to the documents
+       on it, and the pointer handler tests the character proxies
+       before any room box. */
+    proxy(0.62, 0.78, 2.28, 1.55, 1.22, 0.94, 'work');         /* bench station: bench top + laptop + monitors only - the box starts at the bench's north edge (z 1.81) and tops at 1.39, just over the monitors, so it never covers Danny himself or the rays passing over the bench */
+    proxy(-0.70, 0.92, -1.45, 3.10, 0.45, 0.95, 'papers');     /* back desk surface: the document desk (its computer is gone in M7.7) */
     proxy(0.12, 0.92, -1.30, 0.55, 0.30, 0.55, 'papers');      /* desk pile */
     proxy(0.45, 0.10, -0.15, 1.35, 0.22, 1.25, 'papers');      /* floor spill */
     proxy(-2.92, 0.45, 1.55, 1.25, 0.95, 2.20, 'sleep');       /* bed */
-    proxy(1.42, 0.62, 1.40, 0.75, 1.35, 0.65, 'guitar');       /* guitar, on its stand */
+    proxy(-1.58, 0.62, 0.72, 0.75, 1.35, 0.65, 'guitar');      /* guitar, on its stand at the foot of the bed */
+    proxy(-3.38, 1.78, -0.55, 0.40, 1.30, 1.95, 'board');      /* whiteboard on the west wall */
     proxy(0.20, 1.75, -2.02, 6.60, 2.30, 0.55, 'window');      /* the glass: click to gaze out */
-    const dannyProxy = new THREE.Mesh(new THREE.BoxGeometry(1.05, 1.9, 0.95), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
+    /* M7.7: slimmed from 1.05 x 1.9 x 0.95 - the fat box's empty corners
+       swallowed rays aimed at the desk and board behind him */
+    const dannyProxy = new THREE.Mesh(new THREE.BoxGeometry(0.72, 1.64, 0.62), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false }));
     dannyProxy.position.set(0, 0.8, 0); dannyProxy.userData.act = 'danny'; dannyRoot.add(dannyProxy); proxies.push(dannyProxy);
     let neoProxy = null;
     if (neoRoot) {
@@ -2437,9 +2502,20 @@ try {
       ptr.x = ((e.clientX - r.left) / r.width) * 2 - 1;
       ptr.y = -((e.clientY - r.top) / r.height) * 2 + 1;
       ray.setFromCamera(ptr, camera);
-      const hits = ray.intersectObjects(proxies, false);
-      if (!hits.length) return;
-      const id = hits[0].object.userData.act;
+      /* characters win when they are the first thing the ray meets, or
+         within 0.8 m behind a room box (M7.7): Danny leans over the
+         bench, so rays to his head and chest cross the bench box's top
+         airspace 0.4-0.7 m before reaching him - a plain nearest-hit
+         race made clicks on him read as 'work' (his original complaint
+         was that EVERY click did). The laptop and monitors keep a
+         1.5 m+ gap, so the grace never steals a genuine desk click. */
+      const charHits = ray.intersectObjects([dannyProxy, neoProxy].filter(Boolean), false);
+      const roomHits = ray.intersectObjects(proxies, false);
+      let hit = null;
+      if (charHits.length && (!roomHits.length || charHits[0].distance <= roomHits[0].distance + 0.8)) hit = charHits[0];
+      else if (roomHits.length) hit = roomHits[0];
+      if (!hit) return;
+      const id = hit.object.userData.act;
       if (id === 'danny') startRoutine();
       else react(id);
     });
@@ -2535,17 +2611,46 @@ try {
       neo: (n) => nPlay(n),
       react: (id) => react(id),
       routine: () => startRoutine(),
-      neoGo: (i) => { if (neoRoot) { N.i = i; N.target = NW[i]; N.mode = 'turn'; N.pauseT = 0; nPlay('Idle'); } },
-      neoPlace: (i) => { if (neoRoot) { N.i = i; N.target = null; N.mode = 'idle'; N.t = 30; N.pauseT = 0; neoRoot.position.set(NW[i].p[0], NW[i].p[1], NW[i].p[2]); nPlay('Idle'); } },
+      neoGo: (i) => { if (neoRoot) { N.i = i; N.target = NW[i]; N.pauseT = 0; neoStartTrip(); } },
+      neoPlace: (i) => { if (neoRoot) { N.i = i; N.target = null; N.mode = 'idle'; N.t = 30; N.pauseT = 0; N.path = []; N.speed = 0; neoRoot.position.set(NW[i].p[0], NW[i].p[1], NW[i].p[2]); nPlay('Idle'); } },
       neoStep: (sec) => { let n = Math.round(sec / 0.05); while (n-- > 0) neoUpdate(0.05); if (nMixer) nMixer.setTime(nMixer.time + sec); renderer.render(scene, camera); },
       setDannyY: (v) => { dannyRoot.position.y = v; renderer.render(scene, camera); },
       pokeIdle: () => { D.idleT = 0; },
       project: (what) => {
         const o = what === 'neo' ? neoRoot : dannyRoot; if (!o) return null;
-        const v = o.position.clone(); if (what === 'danny') v.y += 0.9; else v.y += 0.25;
+        const v = o.position.clone();
+        if (what === 'danny') { const hb = dBones['mixamorigHead']; if (hb) hb.getWorldPosition(v); else v.y += 0.9; }
+        else v.y += 0.25;
         v.project(camera);
         const r = cvEl.getBoundingClientRect();
         return { x: Math.round(r.left + (v.x * 0.5 + 0.5) * r.width), y: Math.round(r.top + (-v.y * 0.5 + 0.5) * r.height) };
+      },
+      pick: (wx, wy, wz) => {
+        /* QA hook: which action a click toward a world point resolves
+           to, using the exact handler logic (characters first). The
+           matrix refresh matters only under the QA render stub (real
+           renders update world matrices every frame anyway). */
+        camera.updateMatrixWorld();
+        proxies.forEach(p => p.updateWorldMatrix(true, false));
+        const dirv = new THREE.Vector3(wx, wy, wz).sub(camera.position).normalize();
+        ray.set(camera.position, dirv);
+        const charHits = ray.intersectObjects([dannyProxy, neoProxy].filter(Boolean), false);
+        const roomHits = ray.intersectObjects(proxies, false);
+        if (charHits.length && (!roomHits.length || charHits[0].distance <= roomHits[0].distance + 0.8)) return charHits[0].object.userData.act;
+        return roomHits.length ? roomHits[0].object.userData.act : null;
+      },
+      pickDbg: (wx, wy, wz) => {
+        camera.updateMatrixWorld();
+        proxies.forEach(p => p.updateWorldMatrix(true, false));
+        const dirv = new THREE.Vector3(wx, wy, wz).sub(camera.position).normalize();
+        ray.set(camera.position, dirv);
+        const ch = ray.intersectObjects([dannyProxy, neoProxy].filter(Boolean), false);
+        const rh = ray.intersectObjects(proxies, false);
+        return {
+          cam: camera.position.toArray().map(v => Math.round(v * 100) / 100),
+          char: ch.length ? { act: ch[0].object.userData.act, d: Math.round(ch[0].distance * 1000) / 1000 } : null,
+          room: rh.length ? { act: rh[0].object.userData.act, d: Math.round(rh[0].distance * 1000) / 1000 } : null
+        };
       },
       setTime: (t) => {
         /* snap to the current action alone first: mixer.setTime rewinds
@@ -2579,6 +2684,7 @@ try {
     live = true;
     window.__phys = { count: shards.length, room: true };
 
+    const bubPt = { x: null, y: null }; /* smoothed speech-bubble anchor (screen px, hero space) */
     let heroOn = true;
     new IntersectionObserver(en => { heroOn = en[0].isIntersecting; }, { threshold: 0 }).observe(heroEl);
     const clock = new THREE.Clock();
@@ -2595,6 +2701,16 @@ try {
           D.holdT -= dt;
           if (D.holdT <= 0) { const f = D.next; D.next = null; f(); }
         }
+        /* arrival facing ease (M7.7): finishTravel and friends leave a
+           yaw target instead of snapping the heading; ease it out here */
+        if (!D.travel && D.yawTgt != null) {
+          dannyRoot.rotation.y = yawLerp(dannyRoot.rotation.y, D.yawTgt, 1 - Math.exp(-9 * dt));
+          const ydd = Math.abs(((D.yawTgt - dannyRoot.rotation.y) % (Math.PI * 2) + Math.PI * 3) % (Math.PI * 2) - Math.PI);
+          if (ydd < 0.004) { dannyRoot.rotation.y = D.yawTgt; D.yawTgt = null; }
+        }
+        /* monitor glow: on while he is seated at the bench, eased */
+        const glowTgt = (D.at === 'desk' && D.seated && !D.travel) ? 1.7 : 0;
+        screenGlow.intensity += (glowTgt - screenGlow.intensity) * Math.min(1, dt * 3);
         /* lively desk idle: the variation timer counts down only in the
            pure typing state and re-arms to a fresh 14-26 s after any
            busy spell (chain, routine, beat) has ended */
@@ -2611,16 +2727,12 @@ try {
         D.seatOff += (seatTgt - D.seatOff) * Math.min(1, dt / 0.10);
         if (seatTgt === 0 && D.seatOff < 0.001) D.seatOff = 0;
         /* standing desk beats ease Danny a step out into the room (and back
-           for Typing) so he never looks parked inside the desk corner */
-        D.standK += ((D.standing && D.at === 'desk' && !D.travel ? 1 : 0) - D.standK) * Math.min(1, dt / 0.35);
-        if (D.at === 'desk' && !D.travel) {
-          /* the SitDown drift runs along his facing axis, so the counter-
-             offset is projected on the desk anchor's yaw (0 at the bench) */
-          const dfx = Math.sin(ANCHORS.desk.yaw), dfz = Math.cos(ANCHORS.desk.yaw);
-          dannyRoot.position.x = ANCHORS.desk.pos.x + STAND_OFF.x * D.standK + dfx * D.seatZOff;
-          dannyRoot.position.z = ANCHORS.desk.pos.z + STAND_OFF.z * D.standK + dfz * D.seatZOff;
-          dannyRoot.position.y = ANCHORS.desk.pos.y + D.seatOff;
-        }
+           for Typing) so he never looks parked inside the desk corner.
+           M7.7: the step-out now requires him to actually be standing -
+           seated variations (Thinking in the chair) used to slide him
+           half a metre off the seat and back, one of the visible jerks */
+        D.standK += ((D.standing && !D.seated && D.at === 'desk' && !D.travel ? 1 : 0) - D.standK) * Math.min(1, dt / 0.35);
+        if (D.at === 'desk' && !D.travel) dannyRoot.position.y = ANCHORS.desk.pos.y + D.seatOff;
         /* pet crouch: ease the root down toward Neo's level while petting */
         D.sinkK += (D.sinkTgt - D.sinkK) * Math.min(1, dt / 0.22);
         if (D.sinkK < 0.001 && D.sinkK > -0.001 && D.sinkTgt === 0) D.sinkK = 0;
@@ -2646,9 +2758,21 @@ try {
         if (sitAct && sitAct.enabled) { const w = sitAct.getEffectiveWeight(); if (w > 0.001) seatZOff = -(seatSitZ(sitAct.time) - SEAT_TYPING_Z) * w; }
         D.seatZOff = seatZOff;
         if (D.at === 'desk' && !D.travel && !D.compWalk) {
+          /* smoothed pin (M7.7): the target is still anchor + stand-off +
+             the exact SitDown counter-drift, but the root EASES to it
+             (70 ms tau) instead of being hard-assigned every frame - the
+             hard pin teleported him the last few centimetres whenever a
+             chain handed control back, which read as a constant small
+             jerk at the seat (Danny: "cu giat giat ve do"). The seatZOff
+             term rides inside the target: it is a pure continuous
+             function of the SitDown clip, so easing the sum stays exact
+             enough (worst transient ~2 cm during the fastest drift). */
           const dfx2 = Math.sin(ANCHORS.desk.yaw), dfz2 = Math.cos(ANCHORS.desk.yaw);
-          dannyRoot.position.x = ANCHORS.desk.pos.x + STAND_OFF.x * D.standK + dfx2 * D.seatZOff;
-          dannyRoot.position.z = ANCHORS.desk.pos.z + STAND_OFF.z * D.standK + dfz2 * D.seatZOff;
+          const ptx = ANCHORS.desk.pos.x + STAND_OFF.x * D.standK + dfx2 * D.seatZOff;
+          const ptz = ANCHORS.desk.pos.z + STAND_OFF.z * D.standK + dfz2 * D.seatZOff;
+          const pk = Math.min(1, dt / 0.07);
+          dannyRoot.position.x += (ptx - dannyRoot.position.x) * pk;
+          dannyRoot.position.z += (ptz - dannyRoot.position.z) * pk;
         }
         if (D.fadeK !== D.fadeTgt) {
           const dir = Math.sign(D.fadeTgt - D.fadeK);
@@ -2659,6 +2783,32 @@ try {
         if (nMixer) nMixer.update(dt);
         neoUpdate(dt);
         for (const s of shards) { s.o.rotation.y += s.rs * dt; s.o.rotation.x += s.rs * 0.6 * dt; s.o.position.y = s.hy + Math.sin(t * 0.8 + s.ph) * 0.07; }
+        /* speech bubble tracks his HEAD (M7.7, Danny): #dannySay used to
+           sit at one fixed CSS spot wherever he was in the room. While
+           it is shown, project the Head bone to screen space every
+           frame and ease the bubble to just above it, so lines land on
+           him whether he is typing, walking or lying on the bed. */
+        if (sayEl) {
+          if (sayEl.classList.contains('show')) {
+            const hb = dBones['mixamorigHead'];
+            if (hb) {
+              hb.getWorldPosition(_hv); _hv.y += 0.24;
+              _hv.project(camera);
+              const cr = cvEl.getBoundingClientRect();
+              const op = sayEl.offsetParent ? sayEl.offsetParent.getBoundingClientRect() : cr;
+              const txp = cr.left - op.left + (_hv.x * 0.5 + 0.5) * cr.width;
+              const typ = cr.top - op.top + (-_hv.y * 0.5 + 0.5) * cr.height;
+              if (bubPt.x === null) { bubPt.x = txp; bubPt.y = typ; }
+              const bk = Math.min(1, dt * 9);
+              bubPt.x += (txp - bubPt.x) * bk; bubPt.y += (typ - bubPt.y) * bk;
+              const bw = sayEl.offsetWidth || 312, bh = sayEl.offsetHeight || 90;
+              const lx = Math.max(6, Math.min(op.width - bw - 6, bubPt.x + 16));
+              const ly = Math.max(6, bubPt.y - bh - 10);
+              sayEl.style.left = Math.round(lx) + 'px';
+              sayEl.style.top = Math.round(ly) + 'px';
+            }
+          } else if (bubPt.x !== null) { bubPt.x = null; bubPt.y = null; }
+        }
         for (let i = 0; i < NR; i++) {
           const d = rDat[i];
           d.y -= d.s * dt;
