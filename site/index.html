@@ -26,7 +26,7 @@ img{display:block;max-width:100%}
 .mono{font-family:var(--mono);letter-spacing:.08em}
 
 /* ---------- grain + scanlines ---------- */
-.grain{position:fixed;inset:-40px;z-index:70;pointer-events:none;opacity:.05;background-repeat:repeat;animation:grain 900ms steps(4) infinite}
+.grain{position:fixed;inset:-40px;z-index:70;pointer-events:none;opacity:.035;background-repeat:repeat}
 @keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-14px,9px)}50%{transform:translate(11px,-13px)}75%{transform:translate(-7px,-6px)}100%{transform:translate(0,0)}}
 
 /* ---------- boot loader ---------- */
@@ -83,7 +83,7 @@ header .hstat b{color:var(--acid);font-weight:400}
 /* Danny is a REAL separated layer (cut from the original art), animated on his own:
    breathing idle, deeper parallax than the background, and a nod when clicked. */
 .lotus-wrap{position:absolute;inset:0;z-index:1;pointer-events:none;will-change:transform}
-.lotus-layer{width:100%;height:100%;object-fit:cover;object-position:36% 46%;animation:lotusGlow 7s ease-in-out infinite}
+.lotus-layer{width:100%;height:100%;object-fit:cover;object-position:36% 46%}
 @keyframes lotusGlow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15) drop-shadow(0 0 26px rgba(255,196,86,.35))}}
 .danny-wrap{position:absolute;inset:0;z-index:2;pointer-events:none;will-change:transform}
 .cat-wrap{position:absolute;inset:0;z-index:3;pointer-events:none;will-change:transform}
@@ -1192,14 +1192,7 @@ function loop(now){
   if (!motionOn || document.hidden) return;
   px += (tx - px) * .06; py += (ty - py) * .06;
   if (heroVisible) {
-    if (skyEl) skyEl.style.transform = 'translate3d(' + ((px - .5) * -14) + 'px,' + (scrollY * .10 + (py - .5) * -8) + 'px,0)';
-    if (heroFrame) heroFrame.style.transform = 'translate3d(' + ((px - .5) * -7) + 'px,' + ((py - .5) * -5 + Math.min(scrollY * .025, 16)) + 'px,0) scale(' + (1.03 + Math.min(scrollY * .00003, .025)) + ')';
-    if (lotusWrap) lotusWrap.style.transform = 'translate3d(' + ((px - .5) * -9) + 'px,' + ((py - .5) * -5 + Math.min(scrollY * .012, 8)) + 'px,0) scale(1.02)';
-    if (dannyWrap) dannyWrap.style.transform = 'translate3d(' + ((px - .5) * -25) + 'px,' + ((py - .5) * -14 + Math.min(scrollY * .03, 20)) + 'px,0) scale(1.045)';
-    if (catWrap) catWrap.style.transform = 'translate3d(' + ((px - .5) * -38) + 'px,' + ((py - .5) * -21 + Math.min(scrollY * .05, 26)) + 'px,0) scale(1.06)';
-    var hInner = $('.hero-inner');
-    if (hInner && scrollY < window.innerHeight) hInner.style.transform = 'scale(' + (1 - Math.min(scrollY / 1100, 1) * .035) + ')';
-    if (glOK) { var gl = glCanvas._gl; gl.uniform1f(glTime, now * .001); gl.uniform2f(glMouse, px, py); gl.drawArrays(gl.TRIANGLES, 0, 3); }
+    /* Keep the painted backdrop and room registered to one another. */
     /* particles */
     var w = fx.width, h = fx.height; fxCtx.clearRect(0, 0, w, h);
     stars.forEach(function(s){
@@ -1787,10 +1780,10 @@ try {
     const scene = new THREE.Scene();
     scene.fog = new THREE.Fog(0x07090c, 15, 32);
     const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 80);
-    const CAM_TGT = new THREE.Vector3(-0.95, 0.85, 1.15);
-    const CAM_POS = new THREE.Vector3(0.75, 2.25, 3.10);
+    const CAM_TGT = new THREE.Vector3(-0.35, 0.85, 1.35);
+    const CAM_POS = new THREE.Vector3(1.35, 2.25, 3.30);
     const camDir = CAM_POS.clone().sub(CAM_TGT);
-    const camDist = camDir.length() * 1.28; camDir.normalize();
+    const camDist = camDir.length() * 1.38; camDir.normalize();
 
     /* ---------- lights: matched to the Blender room ---------- */
     scene.add(new THREE.HemisphereLight(0x9fc8e8, 0x16210f, 0.34));
@@ -1883,7 +1876,12 @@ try {
     /* ---------- the room ---------- */
     const roomG = await load('assets/room-lab.glb');
     const STANDIN = ['catBody', 'catHead', 'catEar', 'catEar.001', 'catTail'];
-    roomG.scene.traverse(o => { if (STANDIN.indexOf(o.name) >= 0) o.visible = false; });
+    roomG.scene.traverse(o => {
+      if (STANDIN.indexOf(o.name) >= 0) o.visible = false;
+      if (/^wb(?:Frame|Face|Tray|Marker)$/.test(o.name)) o.position.z += 0.25;
+      if (/^(?:pegFace|toolGrip|toolShaft|cableCoil|multimeter|mmScreen)(?:\.\d+)?$/.test(o.name)) o.position.z += 0.65;
+      if (/^holoFrame(?:\.\d+)?$/.test(o.name)) o.visible = false;
+    });
     /* Small shared image textures add detail without another download or
        changing the room model. The original maps and texture repair remain intact. */
     function roomDetail(kind) {
@@ -1929,6 +1927,25 @@ try {
       if (!source) continue;
       const page = source.clone(); page.position.x -= 1.70; page.position.z += 1.10; roomG.scene.add(page);
     }
+    /* A soft quilt and cushions give the sleeping corner a finished shape. */
+    for (const name of ['blanket', 'blanketHang', 'pillow']) {
+      const part = roomG.scene.getObjectByName(name); if (part) part.visible = false;
+    }
+    const quiltGeo = new THREE.PlaneGeometry(0.94, 1.17, 20, 20);
+    const qpos = quiltGeo.attributes.position;
+    for (let i = 0; i < qpos.count; i++) {
+      const x = qpos.getX(i), y = qpos.getY(i);
+      qpos.setZ(i, 0.008 * Math.cos(y * 14) + 0.012 * Math.cos(x * 4));
+    }
+    quiltGeo.computeVertexNormals();
+    const quilt = new THREE.Mesh(quiltGeo, new THREE.MeshStandardMaterial({ color: 0x345b50, roughness: 1, side: THREE.DoubleSide }));
+    quilt.rotation.x = -Math.PI / 2; quilt.position.set(-2.90, 0.48, 1.15); roomG.scene.add(quilt);
+    const seamPoints = [];
+    for (let z = 0.66; z < 1.70; z += 0.19) seamPoints.push(-3.34, 0.501, z, -2.46, 0.501, z);
+    const seamGeo = new THREE.BufferGeometry(); seamGeo.setAttribute('position', new THREE.Float32BufferAttribute(seamPoints, 3));
+    roomG.scene.add(new THREE.LineSegments(seamGeo, new THREE.LineBasicMaterial({ color: 0x719286, transparent: true, opacity: 0.5 })));
+    const pillow = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 12), new THREE.MeshStandardMaterial({ color: 0xd2d8c9, roughness: 1 }));
+    pillow.scale.set(0.34, 0.065, 0.20); pillow.position.set(-2.92, 0.49, 2.20); roomG.scene.add(pillow);
     scene.add(roomG.scene);
 
     /* ---------- Danny ---------- */
@@ -1974,24 +1991,7 @@ try {
     const dMats = [];
     dannyG.scene.traverse(o => { if (o.isMesh) { (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { if (m && dMats.indexOf(m) < 0) dMats.push(m); }); } });
 
-    /* ---------- guitar prop (M7.5) ----------
-       The room guitar is six loose meshes leaning on a stand. For the
-       guitar chain the director hides those and shows a cloned prop
-       parented to Danny, so the instrument is actually in his hands.
-       Parent choice, from FK-sampling the Guitar clip in the GLB: the
-       right hand strums and wanders roughly +-0.06 m around the belly,
-       so a hand-parented guitar would jitter with every strum; the left
-       (fretting) hand is steadier but sits at the neck end, the worst
-       pivot of all. Both hands hold their places relative to the chest,
-       so the prop is parented to the Spine2 bone and posed from the
-       clip's own numbers at t = 1.8 s: body centre at the Spine2 origin
-       plus (-0.05, -0.35, +0.18) in root space, neck toward the fretting
-       hand (direction (0.88, 0.48, 0.07), tilted up about 29 deg),
-       sound-hole face pointing out (+Z). GUITAR_PROP.pos and .quat are
-       those root-space targets converted into Spine2 bone space. The
-       prop group's origin is the guitar body centre (bbox of gBodyLow
-       and gBodyUp in room space); inside the group the model keeps its
-       room axes - neck along +Y, face toward -Z. */
+    /* Keep the guitar attached to the chest so it stays steady during a strum. */
     const GUITAR_PROP = {
       parent: 'Spine2',
       pos: [-0.026, -0.314, 0.241],
@@ -1999,36 +1999,44 @@ try {
     };
     const GUITAR_PARTS = ['gBodyLow', 'gBodyUp', 'gHole', 'gNeck', 'gHead', 'gBridge'];
     const roomGuitar = GUITAR_PARTS.map(n => roomG.scene.getObjectByName(n)).filter(Boolean);
-    if (roomGuitar.length === GUITAR_PARTS.length) {
-      /* Fine strings and frets stay with both the stand and held copies. */
-      const lines = [];
-      for (let i = 0; i < 6; i++) {
-        const x = -1.599 + i * 0.0076;
-        lines.push(x, 0.30, 0.635, x, 1.16, 0.686);
-      }
-      for (let i = 0; i < 10; i++) {
-        const y = 0.66 + i * 0.045, z = 0.663 + i * 0.0027;
-        lines.push(-1.603, y, z, -1.557, y, z);
-      }
-      const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(lines, 3));
-      const detail = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: 0xd7c8aa }));
-      detail.name = 'gStrings'; detail.quaternion.copy(roomGuitar[0].quaternion);
-      roomG.scene.add(detail); roomGuitar.push(detail);
-    }
     let guitarProp = null;
     {
       const spine = dBones['mixamorigSpine2'] || Object.keys(dBones).map(k => dBones[k]).find(b => /Spine2$/.test(b.name));
       if (spine && roomGuitar.length >= GUITAR_PARTS.length) {
-        const inner = new THREE.Group();
-        roomGuitar.forEach(m => inner.add(m.clone()));
-        const bb = new THREE.Box3();
-        ['gBodyLow', 'gBodyUp'].forEach(n => { const c = inner.getObjectByName(n); if (c) bb.expandByObject(c); });
-        const ctr = bb.getCenter(new THREE.Vector3());
-        inner.position.copy(ctr).multiplyScalar(-1);
+        /* A single shaped soundboard replaces the old overlapping oval meshes. */
+        const instrument = new THREE.Group();
+        const outline = new THREE.Shape();
+        outline.moveTo(0, -0.29);
+        outline.bezierCurveTo(-0.22, -0.29, -0.25, -0.17, -0.20, -0.06);
+        outline.bezierCurveTo(-0.17, 0.00, -0.13, 0.02, -0.15, 0.09);
+        outline.bezierCurveTo(-0.18, 0.20, -0.10, 0.26, 0, 0.25);
+        outline.bezierCurveTo(0.10, 0.26, 0.18, 0.20, 0.15, 0.09);
+        outline.bezierCurveTo(0.13, 0.02, 0.17, 0.00, 0.20, -0.06);
+        outline.bezierCurveTo(0.25, -0.17, 0.22, -0.29, 0, -0.29);
+        const bodyGeo = new THREE.ExtrudeGeometry(outline, { depth: 0.07, bevelEnabled: true, bevelThickness: 0.008, bevelSize: 0.008, bevelSegments: 2 });
+        bodyGeo.translate(0, 0, -0.035);
+        instrument.add(new THREE.Mesh(bodyGeo, new THREE.MeshStandardMaterial({ color: 0xc0894b, roughness: 0.8 })));
+        const dark = new THREE.MeshStandardMaterial({ color: 0x392117, roughness: 0.88 });
+        function block(w, h, d, x, y, z, mat) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); instrument.add(m); }
+        block(0.068, 0.47, 0.045, 0, 0.47, 0, dark);
+        block(0.105, 0.13, 0.06, 0, 0.765, 0, dark);
+        block(0.11, 0.024, 0.012, 0, -0.17, -0.048, dark);
+        const hole = new THREE.Mesh(new THREE.CircleGeometry(0.056, 32), new THREE.MeshBasicMaterial({ color: 0x211812, side: THREE.DoubleSide }));
+        hole.position.set(0, 0.035, -0.044); instrument.add(hole);
+        const strings = [];
+        for (let i = 0; i < 6; i++) { const x = (i - 2.5) * 0.008; strings.push(x, -0.17, -0.058, x * 0.6, 0.77, -0.058); }
+        for (let i = 0; i < 10; i++) { const y = 0.28 + i * 0.041; strings.push(-0.034, y, -0.056, 0.034, y, -0.056); }
+        const stringGeo = new THREE.BufferGeometry(); stringGeo.setAttribute('position', new THREE.Float32BufferAttribute(strings, 3));
+        instrument.add(new THREE.LineSegments(stringGeo, new THREE.LineBasicMaterial({ color: 0xe6d7bb })));
+        const standGuitar = instrument.clone();
+        standGuitar.position.set(-1.58, 0.43, 0.68); standGuitar.rotation.set(0.08, Math.PI, 0);
+        roomGuitar.forEach(m => { m.visible = false; });
+        roomGuitar.length = 0; roomGuitar.push(standGuitar); roomG.scene.add(standGuitar);
         guitarProp = new THREE.Group();
-        guitarProp.add(inner);
+        guitarProp.add(instrument);
         guitarProp.position.fromArray(GUITAR_PROP.pos);
         guitarProp.quaternion.fromArray(GUITAR_PROP.quat);
+        guitarProp.translateZ(0.21);
         guitarProp.visible = false;
         spine.add(guitarProp);
       }
@@ -2089,7 +2097,7 @@ try {
       nCur = a;
     }
 
-    function dPlayLoop(key) { const a = dPlay(key); if (a) { a.setLoop(THREE.LoopRepeat, Infinity); a.clampWhenFinished = false; } return a; }
+    function dPlayLoop(key, fade) { const a = dPlay(key, fade); if (a) { a.setLoop(THREE.LoopRepeat, Infinity); a.clampWhenFinished = false; } return a; }
     /* variation player: like dPlay but with an explicit play length -
        either a fixed segment in seconds (for cutting into a long clip)
        or a whole number of loops (for clips too short to read in one
@@ -2118,9 +2126,9 @@ try {
          stand; the Guitar clip's own facing sits -49 deg off the root,
          so yaw 0.85 nets ~0: facing the room and the camera. */
       guitar: { pos: new THREE.Vector3(-1.40, 0, 0.74), yaw: 0.85 },
-      /* the whiteboard on the west wall (wbFace at x -3.40, z -0.55):
+      /* the whiteboard on the west wall (wbFace at x -3.40, z -0.30):
          stand 0.68 in front of it, facing -X (yaw -pi/2) */
-      board: { pos: new THREE.Vector3(-2.72, 0, -0.55), yaw: -Math.PI / 2 },
+      board: { pos: new THREE.Vector3(-2.72, 0, -0.30), yaw: -Math.PI / 2 },
       /* west of the floor spill, facing east across the whole mess; the
          Frustrated clip rides -17 deg off the root, yaw compensates */
       papers: { pos: new THREE.Vector3(-0.98, 0, 0.55), yaw: 1.67 },
@@ -2221,6 +2229,20 @@ try {
     }
     function travelUpdate(dt) {
       const tr = D.travel; if (!tr) return;
+      if (tr.phase === 'brake') {
+        const target = tr.pts[tr.i];
+        if (target && tr.speed > 0) {
+          const dx = target.x - tr.pos.x, dz = target.z - tr.pos.z, dist = Math.hypot(dx, dz);
+          tr.speed = Math.max(0, tr.speed - 3.2 * dt);
+          const step = Math.min(dist, tr.speed * dt);
+          if (dist > 0.00001) { tr.pos.x += dx / dist * step; tr.pos.z += dz / dist * step; }
+          walkAnchor.copy(tr.pos); dannyRoot.position.copy(tr.pos);
+          const a = dAct[CLIPMAP.walk]; if (a) a.timeScale = Math.max(0.03, tr.speed / 1.30);
+          if (step < dist - 0.00001 && tr.speed > 0) return;
+        }
+        D.travel = null; D.at = 'transit'; dPlay('happy'); after(0.2, finishSwitch);
+        return;
+      }
       if (tr.phase === 'face') {
         dannyRoot.rotation.y = yawStep(dannyRoot.rotation.y, tr.yawT, 2.7 * dt);
         if (Math.abs(yawLerp(dannyRoot.rotation.y, tr.yawT, 1) - dannyRoot.rotation.y) < 0.015) finishTravel();
@@ -2289,6 +2311,39 @@ try {
     const sOnce = (key, ts) => (next) => { const a = dPlay(key); if (a && ts) a.timeScale = ts; after(Math.max(0.25, dDur(key) / (ts || 1) - 0.12), next); };
     const sFade = (v) => (next) => { setFade(v); after(0.26, next); };
     function setFade(v) { D.fadeTgt = v; if (v < 1) dMats.forEach(m => { m.transparent = true; }); }
+    function finishSwitch() {
+      if (D.mode !== 'switch') return;
+      const id = D.pending; D.pending = null;
+      D.busy = false; D.mode = D.at === 'desk' && D.seated ? 'typing' : 'idle';
+      if (id) react(id);
+    }
+    function switchTo(id) {
+      D.pending = id;
+      if (D.mode === 'switch') return;
+      Q.list = []; Q.active = false; Q.onDone = null; cancelTimers();
+      D.busy = true; D.mode = 'switch'; D.standing = false; D.yawTgt = null;
+      guitarPropOff();
+      if (neoRoot && N.hold) { N.hold = false; N.mode = 'idle'; N.path = []; N.speed = 0; N.t = 2; nPlay('Idle'); }
+      const wasCrouched = D.sinkK < -0.02;
+      D.sinkTgt = 0;
+      if (D.onBed) {
+        D.travel = null; setFade(0);
+        after(0.26, () => {
+          D.onBed = false; D.seated = false; D.at = 'bed'; dShadow.visible = true;
+          dannyRoot.position.copy(ANCHORS.bed.pos); dannyRoot.rotation.y = ANCHORS.bed.yaw;
+          walkAnchor.copy(ANCHORS.bed.pos); dPlay('happy', 0.001); dMixer.update(0.002); setFade(1); after(0.26, finishSwitch);
+        });
+        return;
+      }
+      setFade(1);
+      if (D.travel) {
+        if (D.travel.phase === 'walk' && D.travel.i < D.travel.pts.length) { D.travel.phase = 'brake'; return; }
+        D.travel = null; D.at = 'transit'; D.seated = false;
+      }
+      if (dCur === dAct.StandUp || dCur === dAct.SitDown) D.seated = false;
+      if (!D.seated) dPlay('happy');
+      after(wasCrouched ? 0.6 : 0.22, finishSwitch);
+    }
     function departSteps() {
       if (D.at === 'desk' && D.seated) return [sOnce('stand', 1.4), (next) => { D.seated = false; next(); }];
       return [];
@@ -2422,11 +2477,10 @@ try {
         sTravel(ANCHORS.bed, 'bed'),
         sSay('saySleep'),
         sFade(0),
-        (next) => { D.compWalk = false; D.onBed = true; dShadow.visible = false; dannyRoot.position.copy(BED_POSE.pos); dannyRoot.rotation.y = BED_POSE.yaw; walkAnchor.copy(BED_POSE.pos); dPlayLoop('sleep'); setFade(1); next(); },
+        (next) => { D.compWalk = false; D.onBed = true; dShadow.visible = false; dannyRoot.position.copy(BED_POSE.pos); dannyRoot.rotation.y = BED_POSE.yaw; walkAnchor.copy(BED_POSE.pos); dPlayLoop('sleep', 0.001); dMixer.update(0.002); setFade(1); next(); },
         sWait(6.2),
         sFade(0),
-        (next) => { D.onBed = false; dShadow.visible = true; dannyRoot.position.copy(ANCHORS.bed.pos); dannyRoot.rotation.y = ANCHORS.bed.yaw; walkAnchor.copy(ANCHORS.bed.pos); setFade(1); next(); },
-        (next) => { dPlay('happy'); next(); }
+        (next) => { D.onBed = false; dShadow.visible = true; dannyRoot.position.copy(ANCHORS.bed.pos); dannyRoot.rotation.y = ANCHORS.bed.yaw; walkAnchor.copy(ANCHORS.bed.pos); dPlay('happy', 0.001); dMixer.update(0.002); setFade(1); next(); }
       ];
     }
     function guitarChain() {
@@ -2487,8 +2541,9 @@ try {
       return steps;
     }
     function react(id) {
+      if (id !== 'work' && id !== 'window' && id !== 'board' && !REACT[id]) return;
+      if (D.busy || Q.active || D.travel || D.onBed) { switchTo(id); return; }
       if (id === 'work') { toDesk(true); return; }
-      if (D.busy || Q.active || D.travel) { D.pending = id; return; }
       if (id === 'window') { if (!D.busy && dHas('walk') && dHas('stand') && dHas('sit')) { cancelTimers(); runChain(windowChain()); } return; }
       if (id === 'board') { if (!D.busy && dHas('walk') && dHas('stand') && dHas('sit')) { cancelTimers(); runChain(boardChain()); } return; }
       if (!REACT[id]) return;
@@ -2612,7 +2667,7 @@ try {
     proxy(-1.10, 0.12, 1.12, 0.85, 0.25, 0.70, 'papers');     /* visible aisle pages */
     proxy(-2.92, 0.45, 1.55, 1.25, 0.95, 2.20, 'sleep');       /* bed */
     proxy(-1.58, 0.62, 0.72, 0.75, 1.35, 0.65, 'guitar');      /* guitar, on its stand at the foot of the bed */
-    proxy(-3.38, 1.78, -0.55, 0.40, 1.30, 1.95, 'board');      /* whiteboard on the west wall */
+    proxy(-3.38, 1.78, -0.30, 0.40, 1.30, 1.95, 'board');      /* whiteboard on the west wall */
     proxy(0.20, 1.75, -2.02, 6.60, 2.30, 0.55, 'window');      /* the glass: click to gaze out */
     /* M7.7: slimmed from 1.05 x 1.9 x 0.95 - the fat box's empty corners
        swallowed rays aimed at the desk and board behind him */
@@ -2651,21 +2706,6 @@ try {
     const dannyHotEl = document.getElementById('dannyHot');
     if (dannyHotEl) dannyHotEl.addEventListener('click', () => { if (live) startRoutine(); });
 
-    /* ---------- a few hologram shards drift inside the room ---------- */
-    const shards = [];
-    {
-      const geos = [new THREE.IcosahedronGeometry(0.16, 0), new THREE.OctahedronGeometry(0.19), new THREE.TetrahedronGeometry(0.21), new THREE.BoxGeometry(0.2, 0.2, 0.2)];
-      const cols = [0xa3e635, 0x67e8f9, 0xf5f1e6, 0xa3e635];
-      const homes = [[-1.7, 2.0, -1.3], [0.7, 2.25, -2.0], [2.3, 1.75, -0.7], [-3.0, 2.3, 0.7], [1.5, 2.5, 1.0]];
-      homes.forEach((h, i) => {
-        const g = geos[i % geos.length], grp = new THREE.Group();
-        grp.add(new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: cols[i % 4], transparent: true, opacity: 0.05 })));
-        grp.add(new THREE.LineSegments(new THREE.EdgesGeometry(g), new THREE.LineBasicMaterial({ color: cols[i % 4], transparent: true, opacity: 0.8 })));
-        grp.position.set(h[0], h[1], h[2]); scene.add(grp);
-        shards.push({ o: grp, hy: h[1], ph: Math.random() * 6.28, rs: 0.3 + Math.random() * 0.5 });
-      });
-    }
-
     /* ---------- rain: outside the window only ---------- */
     const NR = 110, rPos = new Float32Array(NR * 6), rDat = [];
     for (let i = 0; i < NR; i++) rDat.push({ x: -3.5 + Math.random() * 7, y: 0.1 + Math.random() * 3.0, s: 2.0 + Math.random() * 1.4 });
@@ -2703,13 +2743,7 @@ try {
       scene.add(m); glassRain.push(m);
     });
 
-    /* ---------- camera fit + pointer parallax ---------- */
-    let nx = 0, ny = 0;
-    heroEl.addEventListener('pointermove', (e) => {
-      const r = heroEl.getBoundingClientRect();
-      nx = ((e.clientX - r.left) / r.width) * 2 - 1;
-      ny = ((e.clientY - r.top) / r.height) * 2 - 1;
-    });
+    /* ---------- fixed camera ---------- */
     function fit() {
       const w = cvEl.clientWidth, h = cvEl.clientHeight;
       if (!w || !h) return;
@@ -2718,7 +2752,8 @@ try {
       camera.aspect = a;
       const dolly = a >= 1.3 ? 1 : Math.min(1.8, 1.3 / a);
       camera.position.copy(CAM_TGT).addScaledVector(camDir, camDist * dolly);
-      camera.fov = a >= 1.3 ? 46 : 54;
+      camera.fov = a >= 1.3 ? 51 : 60;
+      camera.lookAt(CAM_TGT);
       camera.updateProjectionMatrix();
     }
     new ResizeObserver(fit).observe(heroEl);
@@ -2817,7 +2852,7 @@ try {
     dPlay('typing', 0.1);
     dMixer.update(2.2); /* land mid-clip: first visible frame is a real pose */
     live = true;
-    window.__phys = { count: shards.length, room: true };
+    window.__phys = { count: 0, room: true };
 
     const bubPt = { x: null, y: null, width: 312, height: 90 }; /* smoothed speech-bubble anchor in hero space */
     if (sayEl) new ResizeObserver(() => { bubPt.width = sayEl.offsetWidth || 312; bubPt.height = sayEl.offsetHeight || 90; }).observe(sayEl);
@@ -2882,7 +2917,6 @@ try {
         }
         if (nMixer) nMixer.update(dt);
         neoUpdate(dt);
-        for (const s of shards) { s.o.rotation.y += s.rs * dt; s.o.rotation.x += s.rs * 0.6 * dt; s.o.position.y = s.hy + Math.sin(t * 0.8 + s.ph) * 0.07; }
         /* speech bubble tracks his HEAD (M7.7, Danny): #dannySay used to
            sit at one fixed CSS spot wherever he was in the room. While
            it is shown, project the Head bone to screen space every
@@ -2916,8 +2950,6 @@ try {
         for (const g of glassRain) g.material.map.offset.y -= dt * 0.011;
         dShadow.position.set(dannyRoot.position.x, 0.012, dannyRoot.position.z + 0.04);
         if (nShadow && neoRoot) nShadow.position.set(neoRoot.position.x, neoRoot.position.y + 0.012, neoRoot.position.z);
-        camera.position.x += ((CAM_TGT.x + camDir.x * camDist * (camera.aspect >= 1.3 ? 1 : Math.min(1.8, 1.3 / camera.aspect)) + nx * 0.10) - camera.position.x) * Math.min(1, dt * 3);
-        camera.lookAt(CAM_TGT.x + nx * 0.03, CAM_TGT.y - ny * 0.025, CAM_TGT.z);
       }
       renderer.render(scene, camera);
       /* boot gate: the room counts as ready only once a real frame has
