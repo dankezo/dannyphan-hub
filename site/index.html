@@ -505,7 +505,6 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
 }
 .hero.gl3d #dannySay,.hero.gl3d #dannySay.show{left:0;top:0;transition:opacity 300ms var(--ease);will-change:transform}
 @media(max-width:900px){.hero-slogan{display:block;margin-top:12px;color:var(--acid);font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase}}
-.room-controls{display:none}
 @media(max-width:900px){
   .hero{--room-height:clamp(360px,58svh,560px)}
   .hero-art{height:var(--room-height)}
@@ -514,12 +513,6 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
   .hero.gl3d #physGL{inset:auto;top:0;left:0;width:100%;height:var(--room-height);opacity:1;
     -webkit-mask-image:linear-gradient(#000 88%,transparent 100%);mask-image:linear-gradient(#000 88%,transparent 100%)}
   .hero.gl3d #dannyHot,.hero.gl3d #catHot{display:none}
-  .hero.gl3d .room-controls{display:block;position:relative;z-index:6;padding:4px 20px 0}
-  html.no-motion .hero.gl3d .room-controls{display:none}
-  .room-controls-label{margin:0 0 10px;color:var(--mut);font:10px var(--mono);letter-spacing:.12em;text-transform:uppercase}
-  .room-controls-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
-  .room-controls button{min-height:44px;padding:8px 4px;background:rgba(17,22,20,.9);border:1px solid rgba(163,230,53,.22);color:var(--paper);font:11px var(--mono);letter-spacing:.03em;cursor:pointer;touch-action:manipulation}
-  .room-controls button:active,.room-controls button:focus-visible{border-color:var(--acid);color:var(--acid)}
   .hero.gl3d .hero-inner{padding:28px 20px 0}
   .hero.gl3d .kicker{margin-left:0;background:none;border:0;padding:0;font-size:10px}
   .hero.gl3d .kicker::before{width:24px}
@@ -575,17 +568,6 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
       <div class="danny-wrap" id="dannyWrap"><img class="danny-layer pose on" id="poseType" src="assets/danny-cut.webp" alt="" aria-hidden="true"><img class="danny-layer pose" id="poseThink" src="assets/danny-think.webp" alt="" aria-hidden="true"><img class="danny-layer pose" id="poseLean" src="assets/danny-lean.webp" alt="" aria-hidden="true"><img class="danny-layer mpose on" data-mpose="type" src="assets/p-danny.webp" alt="" aria-hidden="true"><img class="danny-layer mpose" data-mpose="think" src="assets/p-danny-think.webp" alt="" aria-hidden="true"><img class="danny-layer mpose" data-mpose="lean" src="assets/p-danny-lean.webp" alt="" aria-hidden="true"></div>
       <div class="cat-wrap" id="catWrap"><img class="cat-layer cpose on" id="catSit" src="assets/cat-cut.webp" alt="" aria-hidden="true"><img class="cat-layer cpose" id="catGroom" src="assets/cat-groom.webp" alt="" aria-hidden="true"><img class="cat-layer cpose" id="catSleep" src="assets/cat-sleep.webp" alt="" aria-hidden="true"><img class="cat-layer mcpose on" data-mcpose="sit" src="assets/p-cat.webp" alt="" aria-hidden="true"><img class="cat-layer mcpose" data-mcpose="groom" src="assets/p-cat-groom.webp" alt="" aria-hidden="true"><img class="cat-layer mcpose" data-mcpose="sleep" src="assets/p-cat-sleep.webp" alt="" aria-hidden="true"><span class="zzz" aria-hidden="true"><i>Z</i><i>Z</i><i>Z</i></span></div>
       <div class="scan"><i></i></div>
-    </div>
-    <div class="room-controls" role="group" aria-label="Tương tác với phòng" id="roomControls">
-      <p class="room-controls-label" data-i18n="roomHint">CHẠM VÀO PHÒNG HOẶC CHỌN MỘT HOẠT ĐỘNG</p>
-      <div class="room-controls-grid">
-        <button type="button" data-room-action="work" data-i18n="roomWork">BÀN LÀM VIỆC</button>
-        <button type="button" data-room-action="guitar" data-i18n="roomGuitar">CHƠI ĐÀN</button>
-        <button type="button" data-room-action="sleep" data-i18n="roomSleep">NGHỈ NGƠI</button>
-        <button type="button" data-room-action="board" data-i18n="roomBoard">BẢNG KẾ HOẠCH</button>
-        <button type="button" data-room-action="window" data-i18n="roomWindow">CỬA SỔ</button>
-        <button type="button" data-room-action="pet" data-i18n="roomNeo">GỌI NEO</button>
-      </div>
     </div>
     <canvas id="gl" aria-hidden="true"></canvas>
     <canvas id="fx" aria-hidden="true"></canvas>
@@ -890,7 +872,6 @@ try { LANG = localStorage.getItem('deck_lang') || 'vi'; } catch (e) {}
 var I18N = {
 vi: {
   hstat: 'HÀ NỘI, VN - <b>ĐANG TRỰC TUYẾN</b>',
-  roomHint: 'CHẠM VÀO PHÒNG HOẶC CHỌN MỘT HOẠT ĐỘNG', roomWork: 'BÀN LÀM VIỆC', roomGuitar: 'CHƠI ĐÀN', roomSleep: 'NGHỈ NGƠI', roomBoard: 'BẢNG KẾ HOẠCH', roomWindow: 'CỬA SỔ', roomNeo: 'GỌI NEO',
   ctaModules: 'XEM CÁC MODULE', ctaCat: 'HỎI NEO - MÈO AI',
   slogan: 'Trai Indie nhà nghèo', ctaContact: 'CONTACT', ctaAbout: 'ABOUT ME',
   meta1: 'PROJECT ĐANG LIVE', meta2: 'WEBSITE ĐÃ CỐ VẤN BẢO MẬT', meta3: 'TRẠNG THÁI TRỰC DECK', meta4: 'THỜI GIAN ONLINE HÔM NAY',
@@ -950,7 +931,6 @@ vi: {
 },
 en: {
   hstat: 'HANOI, VN - <b>SYSTEMS ONLINE</b>',
-  roomHint: 'TAP THE ROOM OR CHOOSE AN ACTIVITY', roomWork: 'WORK DESK', roomGuitar: 'PLAY GUITAR', roomSleep: 'TAKE A NAP', roomBoard: 'PLANNING BOARD', roomWindow: 'WINDOW', roomNeo: 'CALL NEO',
   ctaModules: 'VIEW MODULES', ctaCat: 'ASK NEO - AI CAT',
   slogan: 'Broke indie kid, building anyway', ctaContact: 'CONTACT', ctaAbout: 'ABOUT ME',
   meta1: 'PROJECTS LIVE', meta2: 'SITES ADVISED ON SECURITY', meta3: 'OPERATOR STATUS', meta4: 'ONLINE TODAY',
@@ -1019,10 +999,10 @@ function applyLang(l){
   var lb = $('#langBtn'); if (lb) lb.textContent = l === 'vi' ? 'EN' : 'VI';
   var labels = l === 'vi' ? {
     dannyHot: 'Tương tác với Danny, người điều hành deck', catHot: 'Chạm vào Neo, con mèo trên bàn điều khiển',
-    catBtn: 'Mở chat với Neo, mèo AI trợ lý', catPanel: 'Chat với Neo', catClose: 'Đóng chat', roomControls: 'Tương tác với phòng'
+    catBtn: 'Mở chat với Neo, mèo AI trợ lý', catPanel: 'Chat với Neo', catClose: 'Đóng chat'
   } : {
     dannyHot: 'Interact with Danny, the deck operator', catHot: 'Interact with Neo, the deck cat',
-    catBtn: 'Open chat with Neo, the AI cat', catPanel: 'Chat with Neo', catClose: 'Close chat', roomControls: 'Interact with the room'
+    catBtn: 'Open chat with Neo, the AI cat', catPanel: 'Chat with Neo', catClose: 'Close chat'
   };
   Object.keys(labels).forEach(function(id){ var el = document.getElementById(id); if (el) el.setAttribute('aria-label', labels[id]); });
   var catImg = document.querySelector('#catBtn img'); if (catImg) catImg.alt = l === 'vi' ? 'Neo, mèo đen AI' : 'Neo, the black AI cat';
@@ -1823,7 +1803,8 @@ try {
 
   async function init() {
     const mobileRenderer = matchMedia('(max-width: 900px)').matches;
-    const renderer = new THREE.WebGLRenderer({ canvas: cvEl, alpha: true, antialias: !mobileRenderer, powerPreference: mobileRenderer ? 'default' : 'high-performance' });
+    const deviceDpr = window.devicePixelRatio || 1;
+    const renderer = new THREE.WebGLRenderer({ canvas: cvEl, alpha: true, antialias: !mobileRenderer || deviceDpr < 1.5, powerPreference: mobileRenderer ? 'default' : 'high-performance' });
     if (!renderer.capabilities.isWebGL2) { deckSettle(false); return; } /* gate: painted fallback stays */
     let contextLost = false;
     cvEl.addEventListener('webglcontextlost', () => {
@@ -1833,7 +1814,8 @@ try {
       const rain = document.getElementById('rain'); if (rain) rain.style.display = '';
       deckSettle(false);
     }, { once: true });
-    renderer.setPixelRatio(Math.min(devicePixelRatio, mobileRenderer ? 0.85 : 1));
+    const mobileDprCap = navigator.deviceMemory && navigator.deviceMemory <= 4 ? 1.5 : 2;
+    renderer.setPixelRatio(Math.min(deviceDpr, mobileRenderer ? mobileDprCap : 1));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 0.92;
 
@@ -2265,7 +2247,6 @@ try {
       nMixer = new THREE.AnimationMixer(neoG.scene);
       neoG.animations.forEach(c => { const a = nMixer.clipAction(c); a.stop(); a.weight = 0; a.enabled = false; nAct[c.name] = a; });
     } catch (e) { neoRoot = null; }
-    if (!neoRoot) { const neoButton = document.querySelector('[data-room-action="pet"]'); if (neoButton) neoButton.hidden = true; }
     const nShadow = neoRoot ? blob(0.55, 0.55) : null;
 
     /* ---------- clip registry: one line per interaction ---------- */
@@ -2915,9 +2896,6 @@ try {
       if (moved < 10) pickRoom(e);
     });
     heroEl.addEventListener('pointercancel', () => { roomTouch = null; });
-    document.querySelectorAll('[data-room-action]').forEach(button => {
-      button.addEventListener('click', () => { if (live) react(button.dataset.roomAction); });
-    });
     const dannyHotEl = document.getElementById('dannyHot');
     if (dannyHotEl) dannyHotEl.addEventListener('click', () => { if (live) startRoutine(); });
 
