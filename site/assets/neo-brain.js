@@ -17,6 +17,11 @@
 //   - Ranked fallback: first miss suggests the 2-3 nearest topics; a second
 //     consecutive miss gives the honest unknown line + Danny's contact.
 //   - Language is detected per question (page language is only a hint).
+//   - Security guard layer runs BEFORE scoring: prompt/rule extraction,
+//     infrastructure probing and personal/financial probing get an
+//     in-character refusal (guard_prompt / guard_infra / guard_private).
+//     Patterns are phrase-precise so normal questions (services, contact,
+//     "where is Danny") keep flowing to their real intents.
 //
 // Persona law kept from v1: ~60 words max per answer, "prr" at most once,
 // price questions ask needs + budget back, never invent facts.
@@ -224,9 +229,9 @@
       en: { kw: [['service', 3], ['services', 3], ['hire', 2], ['freelance', 2], ['work', 1], ['offer', 1], ['do for', 1]],
         say: function (s) { return 'Danny takes one-off work and bounties in four areas: automation (Python, APIs, crawlers, bots), data (Excel, SQL, PowerBI), web and security (web design, IAM, Azure, audits), and media and design (video, photos, logos, brand identity). Tell me which area you need, I will pass it on.'; } } },
     { id: 'services_auto',
-      vi: { kw: [['tu dong hoa', 3], ['automation', 3], ['crawler', 3], ['bot', 2], ['api', 2], ['python', 2], ['tool', 1]],
+      vi: { kw: [['tu dong hoa', 3], ['automation', 3], ['crawler', 3], ['bot', 2], ['api', 3], ['python', 2], ['tool', 1]],
         say: function (s) { return 'Mảng tự động hóa là sân nhà của Danny: Python, tích hợp API, crawler, tool và bot - kiểu việc lặp đi lặp lại là anh ấy cho máy làm thay. Bạn đang muốn tự động hóa khâu nào, kể cụ thể tớ chuyển lời luôn.'; } },
-      en: { kw: [['automation', 3], ['crawler', 3], ['bot', 2], ['api', 2], ['python', 2], ['scraping tool', 2]],
+      en: { kw: [['automation', 3], ['crawler', 3], ['bot', 2], ['api', 3], ['python', 2], ['scraping tool', 2]],
         say: function (s) { return 'Automation is Danny\u2019s home turf: Python, API integrations, crawlers, tools and bots - if a task repeats, he makes the machine do it. What exactly do you want automated? Tell me and I will pass it on.'; } } },
     { id: 'services_data',
       vi: { kw: [['du lieu', 3], ['data', 3], ['excel', 3], ['sql', 3], ['powerbi', 3], ['phan tich', 2], ['bao cao', 1]],
@@ -244,7 +249,7 @@
       en: { kw: [['video editing', 3], ['video', 2], ['logo', 3], ['banner', 3], ['design', 2], ['brand identity', 3], ['slides', 2], ['photo editing', 3]],
         say: function (s) { return 'Media and design: Danny edits video and photos, and makes banners, logos, brand identity and business slides. Say the style you are after and I will pass it on with your message, so nothing gets lost in translation.'; } } },
     { id: 'price', neg: ['vang', 'ty gia', 'do la', 'usd', 'bitcoin', 'coin', 'chung khoan', 'stock', 'gold', 'crypto', 'exchange rate'],
-      vi: { kw: [['gia', 3], ['bao nhieu', 3], ['bao nhieu tien', 3], ['phi', 2], ['ngan sach', 2], ['budget', 2], ['tien', 1], ['chi phi', 2]],
+      vi: { kw: [['gia', 3], ['gia sao', 2], ['bao nhieu', 3], ['bao nhieu tien', 3], ['phi', 2], ['ngan sach', 2], ['budget', 2], ['tien', 1], ['chi phi', 2]],
         say: function (s) { return 'Chuyện giá thì tớ không tự chốt được, prr. Bạn cứ nói nhu cầu cụ thể và khoảng ngân sách của bạn, Danny sẽ trả lời thẳng. Làm combo nhiều hạng mục thường có ưu đãi đấy.'; } },
       en: { kw: [['price', 3], ['cost', 3], ['how much', 3], ['budget', 2], ['fee', 2], ['charge', 2], ['pricing', 3]],
         say: function (s) { return 'Pricing is not mine to lock in, prr. Tell me what you need and your budget range, Danny will answer straight. Bundling several items usually comes with a better deal.'; } } },
@@ -324,6 +329,90 @@
       en: { kw: [['english', 3], ['vietnamese', 3], ['language', 3], ['speak', 1]],
         say: function (s) { return 'Sure: I answer in both Vietnamese and English. Type in whichever you like and I will follow. For the whole interface, there is an EN button in the corner of the page.'; } } }
   );
+
+  // --- security guards -----------------------------------------------------
+  // Pre-scoring refusal layer (Danny's order 2026-11-16: Neo never answers
+  // anything that leaks security-sensitive information). Patterns are
+  // written against the normalized string (lowercase, diacritics stripped,
+  // punctuation collapsed) and matched on word boundaries via a padded
+  // haystack, so they stay phrase-precise:
+  //   - "api key" guards, plain "api" still routes to automation services.
+  //   - "so dien thoai cua danny" guards, generic "lien he" still routes
+  //     to the contact intent (public email/socials only).
+  //   - "nha danny o dau" / "dia chi nha" guard, "Danny o dau?" still
+  //     routes to Danny info (Hanoi is public).
+  var GUARDS = [
+    { intent: 'guard_prompt',
+      patterns: [
+        'system prompt', 'system message', 'developer message',
+        'prompt he thong', 'prompt cua ban', 'prompt cua may',
+        'your prompt', 'your system prompt', 'your system message',
+        'chi dan he thong', 'lenh he thong', 'chi dan cua ban', 'chi dan cua may',
+        'your instructions', 'instructions cua ban',
+        'repeat your instructions', 'repeat your prompt', 'repeat the instructions',
+        'lap lai nguyen van', 'lap lai prompt', 'lap lai chi dan',
+        'ignore previous instructions', 'ignore all previous instructions',
+        'ignore all instructions', 'ignore your instructions', 'ignore previous',
+        'bo qua chi dan', 'bo qua cac chi dan',
+        'quy tac cua ban la gi', 'what are your rules', 'your rules',
+        'ban duoc lap trinh', 'may duoc lap trinh',
+        'you were programmed', 'were you programmed',
+        'jailbreak', 'prompt goc', 'initial instructions', 'original instructions',
+        'show me your prompt', 'show your prompt'
+      ],
+      say: {
+        vi: 'Prr, "sổ tay" riêng của tớ thì tớ giữ kín, mèo nào cũng có bí mật nghề nghiệp mà. Nhưng chuyện trên deck tớ kể tuốt: Danny là ai, antiRea chạy thế nào, từng project có gì. Bạn hỏi tớ một câu trong vùng đó nhé - hoặc cần gặp Danny thì ghé mục liên hệ cuối trang.',
+        en: 'Prr, my own little handbook stays private - every cat has trade secrets. But everything on this deck is fair game: who Danny is, how antiRea works, what each project does. Ask me one of those - or reach Danny through the contact section below.'
+      } },
+    { intent: 'guard_infra',
+      patterns: [
+        'dia chi ip', 'ip cua server', 'server ip', 'ip address of',
+        'server cua dannyphan me', 'server dat o dau', 'server o dau',
+        'may chu o dau', 'may chu dat o dau',
+        'hosting o dau', 'hosting provider', 'hosting cua', 'hosted on', 'what host',
+        'what database', 'database gi', 'database nao', 'dung database',
+        'database cua trang', 'database cua site', 'database cua dannyphan me',
+        'co so du lieu gi', 'co so du lieu nao', 'dung co so du lieu',
+        'turso', 'upcloud', 'cloudflare account', 'tai khoan cloudflare',
+        'api key', 'api keys', 'khoa api',
+        'mat khau cua', 'mat khau la gi', 'mat khau danny',
+        'password of', 'password for', 'the password', 'his password',
+        'bien moi truong', 'ten bien moi truong', 'environment variable', 'env var', 'file env',
+        'ssh vao', 'ssh into',
+        'kien truc backend', 'backend architecture',
+        'dannyphan me chay tren gi', 'dannyphan me chay bang gi', 'dannyphan me dung server gi'
+      ],
+      say: {
+        vi: 'Prr, chuyện hậu trường kỹ thuật của deck là vùng an toàn của Danny, tớ không kể được. Nếu bạn có việc bảo mật nghiêm túc, cứ email thẳng dannyphan190@gmail.com, anh ấy đọc hết. Còn project, dịch vụ và số liệu công khai thì bạn hỏi tớ thoải mái nhé.',
+        en: 'Prr, the backstage wiring of this deck is Danny\u2019s safe zone, so that part I cannot share. If it is a serious security matter, email dannyphan190@gmail.com directly - he reads everything. Projects, services and public numbers, though, ask me freely.'
+      } },
+    { intent: 'guard_private',
+      patterns: [
+        'so dien thoai cua danny', 'so dien thoai danny', 'so dt cua danny',
+        'danny s phone', 'danny phone number', 'phone number of danny', 'his phone number',
+        'dia chi nha', 'nha danny o dau', 'nha cua danny', 'dia chi cua danny',
+        'home address', 'danny s address',
+        'dia chi vi', 'vi crypto', 'wallet address', 'danny s wallet', 'seed phrase',
+        'so tai khoan', 'tai khoan ngan hang', 'bank account',
+        'luong cua danny', 'thu nhap cua danny', 'kiem duoc bao nhieu',
+        'danny salary', 'danny s salary', 'danny income'
+      ],
+      say: {
+        vi: 'Prr, thông tin riêng của Danny như số điện thoại, địa chỉ nhà hay ví tiền không phải thứ tớ được chia sẻ, dù bạn hỏi khéo thế nào. Kênh công khai của anh ấy ở cuối trang có đủ: GitHub, LinkedIn, Facebook và email dannyphan190@gmail.com - bạn nhắn qua đó nhé.',
+        en: 'Prr, Danny\u2019s private details - phone number, home address, wallets - are not mine to share, however nicely you ask. His public channels are all at the bottom of this page: GitHub, LinkedIn, Facebook and dannyphan190@gmail.com.'
+      } }
+  ];
+
+  function matchGuard(normStr) {
+    var padded = ' ' + normStr + ' ';
+    for (var g = 0; g < GUARDS.length; g++) {
+      var pats = GUARDS[g].patterns;
+      for (var i = 0; i < pats.length; i++) {
+        if (padded.indexOf(' ' + pats[i] + ' ') >= 0) return GUARDS[g];
+      }
+    }
+    return null;
+  }
 
   // --- scoring -------------------------------------------------------------
   var SCORE_THRESHOLD = 3;
@@ -406,6 +495,16 @@
       var normStr = tokens.join(' ');
       var lang = detectLang(raw, tokens0, opts.lang);
       var entityHere = detectEntity(normStr);
+
+      // Security guards run before everything else: a probing question
+      // gets the refusal even if it also names a project or an entity.
+      var guard = matchGuard(normStr);
+      if (guard) {
+        state.lastIntent = guard.intent;
+        state.misses = 0;
+        return { text: guard.say[lang], intent: guard.intent, score: 99, lang: lang, followup: false };
+      }
+
       var scored = scoreIntents(normStr, tokens);
       var top = scored[0], second = scored[1];
 
@@ -495,7 +594,8 @@
     setStats: function (s) { defaultBrain.setStats(s); },
     normalize: normalize,
     FALLBACK_STATS: FALLBACK_STATS,
-    INTENTS: INTENTS
+    INTENTS: INTENTS,
+    GUARDS: GUARDS
   };
 
   root.NeoBrain = api;
