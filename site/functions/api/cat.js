@@ -39,6 +39,9 @@
 //     pre-guarded by construction.
 //
 // Env (Pages project):
+//   AI            Workers AI binding (variable name "AI"). PREFERRED provider:
+//                 same-account inference, no key, free Neurons quota. When the
+//                 binding exists it wins over the HTTP upstream below.
 //   CAT_API_BASE  default https://api.cerebras.ai/v1 (no trailing slash)
 //   CAT_API_KEY   secret, set in Pages env only. Never in repo.
 //   CAT_MODEL     default gpt-oss-120b
@@ -57,6 +60,7 @@ const MAX_TURN_CHARS = 300;        // chars per history turn
 const INPUT_TOKEN_BUDGET = 1200;   // estimated with chars/4, system included
 const MAX_TOKENS_OUT = 256;
 const SEND_REASONING_EFFORT = true; // set false if a provider rejects the field
+const WAI_MODEL = '@cf/openai/gpt-oss-120b'; // Workers AI binding model (same gpt-oss-120b)
 const UPSTREAM_TIMEOUT_MS = 25000;
 const CACHE_TTL_MS = 24 * 3600 * 1000;
 const STATS_CACHE_MS = 10 * 60 * 1000;
@@ -254,6 +258,16 @@ export function replyHasLeak(text) {
   return LEAK_PATTERNS.some(re => re.test(t));
 }
 
+// Workers AI binding path: env.AI.run returns { response } for chat models;
+// accept a bare string or an OpenAI-shaped result defensively.
+async function callWorkersAI(env, messages) {
+  const out = await env.AI.run(WAI_MODEL, { messages, max_tokens: MAX_TOKENS_OUT, temperature: 0.7 });
+  if (typeof out === 'string') return out;
+  if (out && typeof out.response === 'string') return out.response;
+  const c = out && out.choices && out.choices[0] && out.choices[0].message;
+  return c && typeof c.content === 'string' ? c.content : '';
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
   let body;
@@ -302,11 +316,6 @@ export async function onRequestPost(context) {
     return json({ error: 'global_budget', fallback: true, session }, 200, headers);
   }
 
-  const apiKey = env.CAT_API_KEY;
-  if (!apiKey) return json({ error: 'upstream', fallback: true }, 200, headers);
-  const apiBase = (env.CAT_API_BASE || 'https://api.cerebras.ai/v1').replace(/\/$/, '');
-  const model = env.CAT_MODEL || 'gpt-oss-120b';
-
   const stats = await loadStats(env);
   const system = buildNeoSystem(stats);
 
@@ -323,35 +332,50 @@ export async function onRequestPost(context) {
     .concat([{ role: 'user', content: message }])
     .concat([{ role: 'system', content: NEO_POST_HISTORY }]);
 
-  const payload = { model, temperature: 0.7, max_tokens: MAX_TOKENS_OUT, messages };
-  if (SEND_REASONING_EFFORT) payload.reasoning_effort = 'low';
+  // Provider selection: the Workers AI binding wins when present (no key,
+  // no external quota wall - free Neurons in the same Cloudflare account).
+  // Otherwise the OpenAI-compatible HTTP upstream (env-configured).
+  const useBinding = !!(env.AI && typeof env.AI.run === 'function');
+  const apiKey = env.CAT_API_KEY;
+  if (!useBinding && !apiKey) return json({ error: 'upstream', fallback: true }, 200, headers);
 
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), UPSTREAM_TIMEOUT_MS);
+  let reply = '';
   try {
-    const res = await fetch(apiBase + '/chat/completions', {
-      method: 'POST',
-      headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-      signal: ctrl.signal,
-    });
-    clearTimeout(timer);
-    if (!res.ok) return json({ error: 'upstream', fallback: true }, 200, headers);
-    const data = await res.json();
-    const reply = shapeReply(data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content);
-    if (!reply) return json({ error: 'upstream', fallback: true }, 200, headers);
-    // Output guard: a leaky reply is replaced and NEVER cached. Only
-    // guarded (clean) replies enter neo_cache, so cache hits are
-    // pre-guarded by construction and need no re-scan on the way out.
-    if (replyHasLeak(reply)) {
-      return json({ reply: SAFE_REPLY, session }, 200, headers);
+    if (useBinding) {
+      reply = shapeReply(await callWorkersAI(env, messages));
+    } else {
+      const apiBase = (env.CAT_API_BASE || 'https://api.cerebras.ai/v1').replace(/\/$/, '');
+      const model = env.CAT_MODEL || 'gpt-oss-120b';
+      const payload = { model, temperature: 0.7, max_tokens: MAX_TOKENS_OUT, messages };
+      if (SEND_REASONING_EFFORT) payload.reasoning_effort = 'low';
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), UPSTREAM_TIMEOUT_MS);
+      try {
+        const res = await fetch(apiBase + '/chat/completions', {
+          method: 'POST',
+          headers: { 'Authorization': 'Bearer ' + apiKey, 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: ctrl.signal,
+        });
+        if (!res.ok) return json({ error: 'upstream', fallback: true }, 200, headers);
+        const data = await res.json();
+        reply = shapeReply(data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content);
+      } finally {
+        clearTimeout(timer);
+      }
     }
-    await cachePut(env, cacheKey, reply);
-    return json({ reply, session }, 200, headers);
   } catch (e) {
-    clearTimeout(timer);
     return json({ error: 'upstream', fallback: true }, 200, headers);
   }
+  if (!reply) return json({ error: 'upstream', fallback: true }, 200, headers);
+  // Output guard: a leaky reply is replaced and NEVER cached. Only
+  // guarded (clean) replies enter neo_cache, so cache hits are
+  // pre-guarded by construction and need no re-scan on the way out.
+  if (replyHasLeak(reply)) {
+    return json({ reply: SAFE_REPLY, session }, 200, headers);
+  }
+  await cachePut(env, cacheKey, reply);
+  return json({ reply, session }, 200, headers);
 }
 
 export async function onRequestGet() {
