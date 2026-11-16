@@ -13,9 +13,9 @@ export const NEO_FIRST_MES =
 export const NEO_FACTS = [
   'Neo: mèo đen, co-pilot và trợ lý trực deck tại dannyphan.me, đeo thẻ phát sáng xanh acid.',
   'Danny Phan: kỹ sư bảo mật ở Hà Nội, Việt Nam; làm bảo mật vận hành trên hệ thống thật; triết lý: làm kỹ, kiểm chứng kỹ, chỉ ship khi thật sự tốt, không chạy đua thời gian.',
-  'antiRea: thư viện TypeScript phía server do Danny viết; đo lượng truy cập dữ liệu theo từng danh tính, phát hiện bầy bot cào dữ liệu có phối hợp; ngân sách 150 bản ghi mỗi danh tính mỗi 24h; 8 loại tín hiệu; bản mới nhất 2.8.0; có trên npm, JSR và MCP Registry; advisory, không tự ý chặn người dùng thật.',
+  'antiRea: thư viện TypeScript phía server do Danny viết; đo lượng truy cập dữ liệu theo từng danh tính, phát hiện bầy bot cào dữ liệu có phối hợp; ngân sách 150 bản ghi mỗi danh tính mỗi 24h; 8 loại tín hiệu; bản mới nhất 3.0.0; có trên npm, JSR và MCP Registry; advisory, không tự ý chặn người dùng thật.',
   'BaoAnSearch: công cụ tra cứu dữ liệu dược phẩm cho đội BaoAn Pharma; tìm theo công ty, sản phẩm, hoạt chất, hàm lượng; kho dữ liệu hàng nghìn dòng đã chuẩn hóa.',
-  'Catopedia: wiki mèo song ngữ Việt - Anh miễn phí; giống mèo, chăm sóc, nhận nuôi mèo gần bạn; Next.js trên Cloudflare, chi phí vận hành 0 đồng.',
+  '3Dlabobo: phòng lab 3D tương tác trên trình duyệt của Danny; Lab 01 Cat Jelly Press - máy ép thủy lực nghiền mèo jelly tới 400 bar, 7 loại vật liệu; Lab 02 Mecha Cat Teardown - mèo mecha tháo rời từng hệ thống (đầu, lõi năng lượng, khung, đuôi, bốn chân), X-Ray, view nổ tung, 3 cấu hình Ceramic / Stealth / Hazard; Three.js thuần, mỗi lab một file HTML, chạy trên GitHub Pages.',
   'News Translator: đường ống tin tự động; AI chọn bài đáng đọc, dịch, rồi dùng Playwright tự đăng bài.',
   'Dịch vụ Danny nhận (việc một lần và bounty): tự động hóa (Python, API, crawler, tool, bot); dữ liệu (Excel, SQL, PowerBI); web và bảo mật (thiết kế web, IAM, Azure, Jenkins, audit); media và design (edit video/ảnh, banner, logo, nhận diện thương hiệu, slide).',
   'Liên hệ: GitHub github.com/dankezo; LinkedIn in/dannyphan1909; Facebook Phan Dũng; email dannyphan190@gmail.com.',
