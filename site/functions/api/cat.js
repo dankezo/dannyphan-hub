@@ -8,7 +8,11 @@
 //             the widget treats a reply-less 200 as an error and answers with
 //             its local brain (v2). Neo rests upstream, the deck never dies.
 //        429 { error: 'budget', reply: string }  - session / IP / burst cap hit
-//        502 { error: 'upstream' }               - LLM upstream failed; widget falls back
+//        200 { error: 'upstream', fallback: true } - LLM upstream failed or no key;
+//             same reply-less fallback shape as global_budget (a bare 502 status
+//             gets its body replaced by the zone proxy on the custom domain,
+//             so the fallback signal travels as a 200 - the widget treats any
+//             reply-less response as 'use the local brain' either way)
 //        405 / 400 for wrong method / bad body
 //
 // v2 changes (NEO-UPGRADE-PROPOSAL-2026-11-16.md, Cerebras route approved by Danny):
@@ -299,7 +303,7 @@ export async function onRequestPost(context) {
   }
 
   const apiKey = env.CAT_API_KEY;
-  if (!apiKey) return json({ error: 'upstream' }, 502, headers);
+  if (!apiKey) return json({ error: 'upstream', fallback: true }, 200, headers);
   const apiBase = (env.CAT_API_BASE || 'https://api.cerebras.ai/v1').replace(/\/$/, '');
   const model = env.CAT_MODEL || 'gpt-oss-120b';
 
@@ -332,10 +336,10 @@ export async function onRequestPost(context) {
       signal: ctrl.signal,
     });
     clearTimeout(timer);
-    if (!res.ok) return json({ error: 'upstream' }, 502, headers);
+    if (!res.ok) return json({ error: 'upstream', fallback: true }, 200, headers);
     const data = await res.json();
     const reply = shapeReply(data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content);
-    if (!reply) return json({ error: 'upstream' }, 502, headers);
+    if (!reply) return json({ error: 'upstream', fallback: true }, 200, headers);
     // Output guard: a leaky reply is replaced and NEVER cached. Only
     // guarded (clean) replies enter neo_cache, so cache hits are
     // pre-guarded by construction and need no re-scan on the way out.
@@ -346,7 +350,7 @@ export async function onRequestPost(context) {
     return json({ reply, session }, 200, headers);
   } catch (e) {
     clearTimeout(timer);
-    return json({ error: 'upstream' }, 502, headers);
+    return json({ error: 'upstream', fallback: true }, 200, headers);
   }
 }
 
