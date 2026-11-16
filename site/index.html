@@ -854,6 +854,7 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
   </form>
 </div>
 
+<script src="assets/neo-brain.js"></script>
 <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 
 (function(){
@@ -1348,10 +1349,14 @@ var KB = [
   [/cảm ơn|thank/i, 'Prr, không có chi. Cần gì cứ gọi tớ, tớ trực deck 24/7, trừ lúc ngủ gật trên bàn phím.'],
   [/mèo|neo|cat/i, 'Đúng tớ đây: Neo, mèo đen đeo thẻ phát sáng, co-pilot của deck. Tớ biết gần hết về Danny và các module, hỏi gì tớ cũng ráng trả lời cho ra ngô ra khoai.']
 ];
-function localBrain(q){
+function localBrainLegacy(q){
   var kb = LANG === 'en' ? KB_EN : KB;
   for (var i = 0; i < kb.length; i++) if (kb[i][0].test(q)) return kb[i][1];
   return T('kbDefault');
+}
+function localBrain(q){
+  if (window.NeoBrain) return NeoBrain.localBrain(q, LANG);
+  return localBrainLegacy(q);
 }
 function sendCat(text){
   var q = (text || input.value || '').trim(); if (!q) return;
@@ -1364,7 +1369,7 @@ function sendCat(text){
   var timer = ctrl ? setTimeout(function(){ ctrl.abort(); }, 7000) : null;
   fetch('/api/cat', { method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ message: q, history: history.slice(-6), session: neoSession() }), signal: ctrl ? ctrl.signal : undefined })
-    .then(function(r){ if (timer) clearTimeout(timer); if (!r.ok) throw new Error('bad'); return r.json(); })
+    .then(function(r){ if (timer) clearTimeout(timer); return r.json().then(function(j){ return j; }, function(){ return null; }); })
     .then(function(j){ if (j && j.reply) done(j.reply); else throw new Error('empty'); })
     .catch(function(){ setTimeout(function(){ done(localBrain(q)); }, 650); });
 }
@@ -1373,6 +1378,9 @@ function openCat(){
   panel.classList.add('open'); $('#catTeaser').classList.remove('show');
   if (!opened) {
     opened = true;
+    fetch('assets/neo-stats.json').then(function(r){ return r.json(); })
+      .then(function(s){ if (window.NeoBrain) NeoBrain.setStats(s); })
+      .catch(function(){});
     var saved = [];
     try { saved = JSON.parse(localStorage.getItem('neo_transcript') || '[]'); } catch (e) { saved = []; }
     if (saved.length) {

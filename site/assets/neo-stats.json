@@ -1,0 +1,66 @@
+{
+  "antirea": {
+    "budget_records_per_day": 150,
+    "fail": 0,
+    "github_forks": 3,
+    "github_stars": 5,
+    "latest_release": "v3.0.0",
+    "npm_downloads_week": 1161,
+    "npm_downloads_week_range": "2026-11-09..2026-11-15",
+    "pass": 1054,
+    "skip": 2,
+    "tests": 1056,
+    "version": "3.0.0"
+  },
+  "baoan": {
+    "companies": 82,
+    "rows": 9237
+  },
+  "bounty_prs_open": 7,
+  "generated_at": "2026-11-16T14:40:28.260Z",
+  "lab": {
+    "legit_blocked": "0/12",
+    "note_en": "REA only took 50/500 records with antiRea 3.0.0 + GATEKEY on, and 0/12 real user sessions were blocked",
+    "note_vi": "REA chỉ lấy được 50/500 bản ghi khi antiRea 3.0.0 + GATEKEY bật, người dùng thật bị chặn 0/12 phiên",
+    "rea_taken": "50/500",
+    "url": "lab.dannyphan.me"
+  },
+  "projects": [
+    {
+      "id": "antirea",
+      "name": "antiRea",
+      "one_liner_en": "Server-side TypeScript library: meters dataset access per identity and detects coordinated scraping herds",
+      "one_liner_vi": "Thư viện TypeScript phía server: đo lượng truy cập dữ liệu theo danh tính, phát hiện bầy bot cào dữ liệu có phối hợp",
+      "url": "antirea.dannyphan.me"
+    },
+    {
+      "id": "baoan",
+      "name": "BaoAnSearch",
+      "one_liner_en": "Pharma data search for the BaoAn Pharma team: 9,237 rows, 82 companies",
+      "one_liner_vi": "Công cụ tra cứu dữ liệu dược phẩm cho đội BaoAn Pharma: 9.237 dòng, 82 công ty",
+      "url": ""
+    },
+    {
+      "id": "3dlabobo",
+      "name": "3Dlabobo",
+      "one_liner_en": "Interactive 3D lab: Lab 01 Cat Jelly Press, Lab 02 Mecha Cat Teardown",
+      "one_liner_vi": "Phòng lab 3D tương tác: Lab 01 Cat Jelly Press, Lab 02 Mecha Cat Teardown",
+      "url": "3dlabobo.dannyphan.me"
+    },
+    {
+      "id": "news",
+      "name": "News Translator",
+      "one_liner_en": "Self-running news pipeline: AI picks stories worth reading, translates them, Playwright publishes",
+      "one_liner_vi": "Đường ống tin tự động: AI chọn bài đáng đọc, dịch, rồi Playwright tự đăng bài",
+      "url": ""
+    },
+    {
+      "id": "superlab",
+      "name": "Super Lab",
+      "one_liner_en": "Public arena that tests your website against antiRea and a real REA",
+      "one_liner_vi": "Sàn đấu công khai để thử web của bạn trước antiRea và REA thật",
+      "url": "lab.dannyphan.me"
+    }
+  ],
+  "warnings_sent": 46
+}
