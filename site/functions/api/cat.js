@@ -61,6 +61,9 @@ const INPUT_TOKEN_BUDGET = 1200;   // estimated with chars/4, system included
 const MAX_TOKENS_OUT = 256;
 const SEND_REASONING_EFFORT = true; // set false if a provider rejects the field
 const WAI_MODEL = '@cf/openai/gpt-oss-120b'; // Workers AI binding model (same gpt-oss-120b)
+const WAI_MAX_TOKENS_OUT = 512;    // binding path only: gpt-oss spends part of the
+                                   // budget on hidden reasoning, 256 cut visible
+                                   // answers mid-sentence in live tests 2026-11-17
 const UPSTREAM_TIMEOUT_MS = 25000;
 const CACHE_TTL_MS = 24 * 3600 * 1000;
 const STATS_CACHE_MS = 10 * 60 * 1000;
@@ -261,7 +264,7 @@ export function replyHasLeak(text) {
 // Workers AI binding path: env.AI.run returns { response } for chat models;
 // accept a bare string or an OpenAI-shaped result defensively.
 async function callWorkersAI(env, messages) {
-  const out = await env.AI.run(WAI_MODEL, { messages, max_tokens: MAX_TOKENS_OUT, temperature: 0.7 });
+  const out = await env.AI.run(WAI_MODEL, { messages, max_tokens: WAI_MAX_TOKENS_OUT, temperature: 0.7 });
   if (typeof out === 'string') return out;
   if (out && typeof out.response === 'string') return out.response;
   const c = out && out.choices && out.choices[0] && out.choices[0].message;
