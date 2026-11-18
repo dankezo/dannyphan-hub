@@ -1,0 +1,3 @@
+/slimmy https://slimmy.dannyphan.me/ 301
+/slimmy/ https://slimmy.dannyphan.me/ 301
+/slimmy/* https://slimmy.dannyphan.me/:splat 301
