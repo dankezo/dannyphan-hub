@@ -1,0 +1,26 @@
+<!doctype html><html><head><meta charset="utf-8"><title>cors test</title></head><body>
+<pre id="out">running...</pre>
+<script>
+const targets = [
+  'https://www.etsy.com/your/account',
+  'https://www.etsy.com/'
+];
+const markers = ['dannyphan190@gmail.com', 'D\u0169ng Phan'];
+async function run(){
+  const out = [];
+  for (const u of targets){
+    try {
+      const r = await fetch(u, {credentials:'include'});
+      let body = '';
+      try { body = await r.text(); } catch(e){ out.push(u+' READ-ERROR '+e.message); continue; }
+      const hit = markers.some(m => body.includes(m));
+      out.push(u+' status='+r.status+' readable=YES len='+body.length+' contains_account_marker='+hit+' ctype='+(r.headers.get('content-type')||''));
+    } catch(e){
+      out.push(u+' FETCH-FAILED browser-blocked: '+e.message);
+    }
+  }
+  document.getElementById('out').textContent = out.join('\n');
+  document.title = 'cors test DONE';
+}
+run();
+</script></body></html>
