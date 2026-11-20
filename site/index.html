@@ -723,66 +723,6 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
   </section>
 
 
-  <!-- METHODS + FIELD RESULTS -->
-  <section class="blk" id="methods">
-    <div class="sec-head reveal">
-      <div>
-        <div class="idx">SECTION <b>02</b> - PROPRIETARY METHODS</div>
-        <h2 data-i18n="methTitle">Methods</h2>
-      </div>
-    </div>
-    <div class="meths">
-      <div class="meth reveal">
-        <div class="mviz"><div class="rings"><i></i><i></i><i></i></div><div class="sweep"></div><div class="blip"></div></div>
-        <div class="mname">THE HERD LENS</div>
-        <h3 data-i18n="m1Name">Nhìn cả bầy, không soi từng con</h3>
-        <p data-i18n="m1Desc">Đo theo cohort trên cửa sổ thời gian trượt: tương quan nhịp request, độ phủ dataset và herd-phase - độ đồng pha của cả bầy. Một identity lẻ luôn trông vô hại - bầy phối hợp không giấu được chữ ký thống kê chung.</p>
-      </div>
-      <div class="meth reveal">
-        <div class="mviz"><div class="gauge"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div></div>
-        <div class="mname">THE METER</div>
-        <h3 data-i18n="m2Name">Đồng hồ đo theo danh tính</h3>
-        <p data-i18n="m2Desc">Metering theo identity: mỗi danh tính mang một record budget trượt 24h (mặc định 150 bản ghi). Vượt trần thì ghi sổ bằng chứng và trả 429 - người dùng thật không bao giờ chạm trần.</p>
-      </div>
-      <div class="meth reveal">
-        <div class="mviz cusum"><svg viewBox="0 0 300 132" preserveAspectRatio="none" aria-hidden="true"><line class="thr" x1="0" y1="38" x2="300" y2="38"></line><path class="cpath" pathLength="100" d="M0,98 L28,93 L52,99 L78,91 L104,96 L128,87 L152,79 L178,65 L202,51 L226,37 L248,23 L272,11 L300,3"></path><circle class="cdot" cx="226" cy="37" r="4.5"></circle></svg><div class="cform">S_t = max(0, S_{t-1} + (x_t - k))</div></div>
-        <div class="mname">THE ACCUMULATOR - CUSUM</div>
-        <h3 data-i18n="m3Name">Lệch nhỏ cộng dồn, mưu lớn lộ hình</h3>
-        <p data-i18n="m3Desc">CUSUM - thuật toán phát hiện điểm đổi chiều của Page (1954): mỗi request cộng một điểm lệch vào một biến tích lũy. Nhiễu ngẫu nhiên tự triệt tiêu, lên rồi xuống; lệch có chủ đích chỉ đi một chiều nên tích lũy tăng đều cho tới khi chạm ngưỡng báo động. Một request lẻ không bao giờ đủ sức - cả một chiến dịch cào dữ liệu thì không giấu nổi.</p>
-      </div>
-    </div>
-    <div class="board reveal">
-      <div class="bdash">
-        <div class="dstat"><div class="dn"><span data-count="560">0</span></div><div class="dl" data-i18n="dScan">SITE ĐÃ QUÉT SÂU</div></div>
-        <div class="dstat"><div class="dn"><span data-count="46">0</span></div><div class="dl" data-i18n="dAdv">CẢNH BÁO BẢO MẬT ĐÃ GỬI RIÊNG</div></div>
-        <div class="dstat"><div class="dn"><span data-count="7">0</span></div><div class="dl" data-i18n="dBounty">BOUNTY PR ĐANG MỞ</div></div>
-        <div class="dstat"><div class="dn"><span data-count="3">0</span></div><div class="dl" data-i18n="dWarn">CẢNH BÁO SUPPLY-CHAIN ĐÃ ĐĂNG CÔNG KHAI</div></div>
-      </div>
-      <div class="brow bhead"><span data-i18n="bSite">WEBSITE ĐÃ GIÚP</span><span data-i18n="bProb">VẤN ĐỀ</span><span data-i18n="bMeth">METHODS</span><span data-i18n="bStat">TRẠNG THÁI</span></div>
-      <div class="bscroll"><div class="btrack">
-        <div class="brow hl"><span data-i18n="r1Site">Website dịch vụ nhà - Hà Nội</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r1Prob">Tên miền bị chiếm: toàn bộ khách truy cập bị chuyển hướng 301 sang sòng bạc trực tuyến</span></span><span>DEEP AUDIT</span><span class="bst" data-i18n="r1Stat">Đã gửi cảnh báo + bằng chứng</span></div>
-        <div class="brow hl"><span data-i18n="r2Site">Công ty vận tải - Việt Nam</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r2Prob">Trang phpinfo phơi toàn bộ cấu hình server; chứng chỉ TLS hết hạn hơn 1 năm</span></span><span>DEEP AUDIT</span><span class="bst" data-i18n="r2Stat">Đã gửi cảnh báo kèm ảnh chụp</span></div>
-        <div class="brow hl"><span data-i18n="r3Site">Khách sạn - Đà Nẵng</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r3Prob">Nội dung casino bị cài ẩn vào website, chủ site không hề hay biết</span></span><span>THE HERD LENS</span><span class="bst" data-i18n="r3Stat">Đã báo riêng, kèm bằng chứng</span></div>
-        <div class="brow hl"><span data-i18n="r4Site">Mã nguồn mở - Tari Universe</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r4Prob">Loader tải và chạy code từ xa giấu trong 3 PR đối thủ - tấn công chuỗi cung ứng</span></span><span>BOUNTY</span><span class="bst" data-i18n="r4Stat">Đã cảnh báo công khai trên 3 PR</span></div>
-        <div class="brow"><span data-i18n="r5Site">Mã nguồn mở - Tari Universe</span><span data-i18n="r5Prob">4 PR sửa lỗi production: xung đột cổng MCP, treo clipboard trên Flatpak/Wayland, trạng thái PIN, lịch đào tự khởi động lại</span><span>BOUNTY</span><span class="bst" data-i18n="r5Stat">Đang mở - chờ review</span></div>
-        <div class="brow"><span data-i18n="r6Site">Khách sạn quốc tế - Hà Nội</span><span data-i18n="r6Prob">Chứng chỉ TLS hết hạn ngay mùa cao điểm</span><span>THE HERD LENS</span><span class="bst" data-i18n="r6Stat">Đã cảnh báo trước hạn</span></div>
-        <div class="brow"><span data-i18n="r7Site">Chuỗi nha khoa - TP.HCM</span><span data-i18n="r7Prob">CORS phản chiếu mọi origin, kèm credentials</span><span>THE ACCUMULATOR</span><span class="bst" data-i18n="r7Stat">Đã xác minh 2 vòng</span></div>
-        <div class="brow"><span data-i18n="r8Site">Website thương mại điện tử</span><span data-i18n="r8Prob">Vẫn bật TLS 1.0 / 1.1 lỗi thời</span><span>THE HERD LENS</span><span class="bst" data-i18n="r8Stat">Đã gửi khuyến nghị gia cố</span></div>
-        <div class="brow"><span data-i18n="r9Site">Khách sạn - Đà Nẵng</span><span data-i18n="r9Prob">Luồng đặt phòng cần rà soát bảo mật</span><span>THE METER</span><span class="bst" data-i18n="r9Stat">Đã báo riêng, kèm bằng chứng</span></div>
-        <div class="brow hl" aria-hidden="true"><span data-i18n="r1Site">Website dịch vụ nhà - Hà Nội</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r1Prob">Tên miền bị chiếm: toàn bộ khách truy cập bị chuyển hướng 301 sang sòng bạc trực tuyến</span></span><span>DEEP AUDIT</span><span class="bst" data-i18n="r1Stat">Đã gửi cảnh báo + bằng chứng</span></div>
-        <div class="brow hl" aria-hidden="true"><span data-i18n="r2Site">Công ty vận tải - Việt Nam</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r2Prob">Trang phpinfo phơi toàn bộ cấu hình server; chứng chỉ TLS hết hạn hơn 1 năm</span></span><span>DEEP AUDIT</span><span class="bst" data-i18n="r2Stat">Đã gửi cảnh báo kèm ảnh chụp</span></div>
-        <div class="brow hl" aria-hidden="true"><span data-i18n="r3Site">Khách sạn - Đà Nẵng</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r3Prob">Nội dung casino bị cài ẩn vào website, chủ site không hề hay biết</span></span><span>THE HERD LENS</span><span class="bst" data-i18n="r3Stat">Đã báo riêng, kèm bằng chứng</span></div>
-        <div class="brow hl" aria-hidden="true"><span data-i18n="r4Site">Mã nguồn mở - Tari Universe</span><span><span class="crit" data-i18n="critTag">NGHIÊM TRỌNG</span><span data-i18n="r4Prob">Loader tải và chạy code từ xa giấu trong 3 PR đối thủ - tấn công chuỗi cung ứng</span></span><span>BOUNTY</span><span class="bst" data-i18n="r4Stat">Đã cảnh báo công khai trên 3 PR</span></div>
-        <div class="brow" aria-hidden="true"><span data-i18n="r5Site">Mã nguồn mở - Tari Universe</span><span data-i18n="r5Prob">4 PR sửa lỗi production: xung đột cổng MCP, treo clipboard trên Flatpak/Wayland, trạng thái PIN, lịch đào tự khởi động lại</span><span>BOUNTY</span><span class="bst" data-i18n="r5Stat">Đang mở - chờ review</span></div>
-        <div class="brow" aria-hidden="true"><span data-i18n="r6Site">Khách sạn quốc tế - Hà Nội</span><span data-i18n="r6Prob">Chứng chỉ TLS hết hạn ngay mùa cao điểm</span><span>THE HERD LENS</span><span class="bst" data-i18n="r6Stat">Đã cảnh báo trước hạn</span></div>
-        <div class="brow" aria-hidden="true"><span data-i18n="r7Site">Chuỗi nha khoa - TP.HCM</span><span data-i18n="r7Prob">CORS phản chiếu mọi origin, kèm credentials</span><span>THE ACCUMULATOR</span><span class="bst" data-i18n="r7Stat">Đã xác minh 2 vòng</span></div>
-        <div class="brow" aria-hidden="true"><span data-i18n="r8Site">Website thương mại điện tử</span><span data-i18n="r8Prob">Vẫn bật TLS 1.0 / 1.1 lỗi thời</span><span>THE HERD LENS</span><span class="bst" data-i18n="r8Stat">Đã gửi khuyến nghị gia cố</span></div>
-        <div class="brow" aria-hidden="true"><span data-i18n="r9Site">Khách sạn - Đà Nẵng</span><span data-i18n="r9Prob">Luồng đặt phòng cần rà soát bảo mật</span><span>THE METER</span><span class="bst" data-i18n="r9Stat">Đã báo riêng, kèm bằng chứng</span></div>
-      </div></div>
-      <div class="bfoot" data-i18n="bFoot">Bảng tự cuộn - di chuột để tạm dừng. Tên miền và hồ sơ đầy đủ giữ riêng: bảo vệ khách cũng là một phần của việc cố vấn.</div>
-    </div>
-  </section>
-
   <!-- PANORAMA BAND -->
   <div class="band" aria-hidden="true">
     <img id="bandImg" src="assets/panorama.jpg" alt="" loading="lazy">
@@ -793,7 +733,7 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
   <section class="blk" id="operator">
     <div class="sec-head reveal">
       <div>
-        <div class="idx">SECTION <b>03</b> - THE OPERATOR</div>
+        <div class="idx">SECTION <b>02</b> - THE OPERATOR</div>
         <h2 data-i18n="opTitle">Người giữ<br><span class="acid">buồng lái</span></h2>
       </div>
     </div>
@@ -818,7 +758,7 @@ html.no-motion *,html.no-motion *::before,html.no-motion *::after{animation-play
 
   <!-- CONTACT -->
   <footer id="contact">
-    <div class="idx mono" style="font-size:11px;letter-spacing:.2em;color:var(--mut)">SECTION <b style="color:var(--acid);font-weight:400">04</b> - OPEN CHANNEL</div>
+    <div class="idx mono" style="font-size:11px;letter-spacing:.2em;color:var(--mut)">SECTION <b style="color:var(--acid);font-weight:400">03</b> - OPEN CHANNEL</div>
     <div class="big reveal" style="margin-top:30px" data-i18n="ctTitle">Mở kênh<br><span class="acid">liên lạc</span></div>
     <div class="links reveal">
       <a href="https://github.com/dankezo" target="_blank" rel="noopener" data-cur="OPEN"><div class="lt">GITHUB</div><div class="lv">github.com/dankezo</div></a>
