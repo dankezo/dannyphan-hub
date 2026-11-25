@@ -5,8 +5,8 @@
     "github_forks": 3,
     "github_stars": 5,
     "latest_release": "v3.3.2",
-    "npm_downloads_week": 1047,
-    "npm_downloads_week_range": "2026-11-16..2026-11-22",
+    "npm_downloads_week": 928,
+    "npm_downloads_week_range": "2026-11-17..2026-11-23",
     "pass": 1054,
     "skip": 2,
     "tests": 1056,
@@ -16,8 +16,8 @@
     "companies": 82,
     "rows": 9237
   },
-  "bounty_prs_open": 7,
-  "generated_at": "2026-11-23T23:23:24.888Z",
+  "bounty_prs_open": 9,
+  "generated_at": "2026-11-24T23:23:21.317Z",
   "lab": {
     "legit_blocked": "0/12",
     "note_en": "REA only took 50/500 records with antiRea 3.0.0 + GATEKEY on, and 0/12 real user sessions were blocked",
